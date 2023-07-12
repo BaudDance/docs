@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # 介绍
 
-让我们探索 ** 五分钟Docusaurus **.
+让我们探索 ** 五分钟Docusaurus!! OK**.
 
 ## Getting Started
 
