@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: '波特律动',
-  tagline: 'Dinosaurs are cool',
+  tagline: '知而不行, 是为不知; 行而不知, 可以致知.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -72,7 +72,7 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
+            sidebarId: 'stm32Sidebar',
             position: 'left',
             label: 'STM32教程',
           },
