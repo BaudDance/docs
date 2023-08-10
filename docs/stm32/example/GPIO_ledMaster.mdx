@@ -17,7 +17,7 @@ GPIO的第一个例子：控制GPIO输出高电平，点亮学习板正面的LED
 
 - 在工程配置页面，将PA6、PA7、PB0都配置为GPIO_Outpu，并分别设置User Label为BLUE、GREEN、RED
 
-<img src='./img/LED/gpio config.png' width="60%" />
+<img src={require('./img/LED/gpio config.png').default} alt="gpio config" width="60%" />
 
 #### 2、代码
 
@@ -34,14 +34,14 @@ HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_RESET); //绿色，熄灭
 
 - 三个LED可以同时点亮，尝试不同的组合能显现出不同的颜色~
 
-<img src="img/LED/RGB.png" style="zoom:60%;" />
+<img src={require('./img/LED/RGB.png').default} alt="RGB" width="60%" />
 
 ## 故障排除
 
 - 找不到gpio.c文件：打开GPIO_RGB_LED.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
 
-<img src="img/LED/勾选生成独立初始化文件.png" style="zoom: 50%;" />
+<img src={require('./img/LED/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件" width="60%" />
 
 - 打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
 
-<img src="img/LED/New version dialog.png" style="zoom: 80%;" />
+<img src={require('./img/LED/New version dialog.png').default} alt="New version dialog" width="60%" />

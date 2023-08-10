@@ -1,0 +1,69 @@
+---
+sidebar_position: 1.1
+---
+# 【GPIO】按键控制
+## 【GPIO输入】通过按键控制LED（GPIO_KEY）
+
+通过学习板上的按键KEY1、KEY2控制LED的亮灭。
+
+## 如何使用例程
+
+编译并下载程序到学习板，即可看到程序效果：
+
+- 按住 KEY1 绿灯亮，松开绿灯熄灭
+
+- 按一下 KEY2，蓝灯亮/灭翻转一次
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+#### 1、工程配置
+
+- 在工程配置页面，将PA6、PA7配置为GPIO_Outpu，并分别设置User Label为BLUE、GREEN。并将PB12、PB13分别设置为KEY1、KEY2。
+- 进入System Core-GPIO，将PB13（KEY2）的GPIO Pull-up/Pull-down调为Pull-up。学习板上的KEY2没有接外部上拉电阻，因此必须使能该引脚的内部上拉电阻才能正常使用。
+
+<img src={require('./img/GPIO_key/gpio config.png').default} alt="gpio config" width="60%" />
+
+#### 2、代码
+
+- 通过 `HAL_GPIO_WritePin` 函数读取GPIO状态，如果是低电平，则说明按键被按下
+- 按键KEY1与LED联动：在main.c的while循环中实现
+
+```c
+// 如果KEY1按下，就点亮绿灯
+if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == GPIO_PIN_RESET){
+    HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_SET);
+}
+// 否则，就熄灭绿灯
+else{
+    HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_RESET);
+}
+```
+
+- 按键消抖：当检测到低电平时，先延时50ms再判断一次，如果还是保持低电平则说明不是抖动，可以进一步操作。触发一次按键操作后，需要等待按键松开再进行下一轮检测，否则按键将会连续触发。
+
+```c
+// KEY2消抖
+if (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin)) {
+    // 如果检测到KEY2低电平，先延时等待50ms
+    HAL_Delay(50);
+    // 再判断KEY2是否还处于低电平
+    if (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin)) {
+        // 确认不是抖动，蓝灯亮灭翻转
+        HAL_GPIO_TogglePin(BLUE_GPIO_Port, BLUE_Pin);
+        // 等待KEY2松开，才能开始下一次检测
+        while (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin));
+    }
+}
+```
+
+## 故障排除
+
+- 找不到gpio.c文件：工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
+
+<img src={require('./img/GPIO_key/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件" width="60%" />
+
+- 打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
+
+<img src={require('./img/GPIO_key/New version dialog.png').default} alt="New version dialog" width="60%" />
