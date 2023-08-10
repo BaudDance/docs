@@ -1,0 +1,63 @@
+---
+sidebar_position: 1.2
+---
+# 【GPIO】 继电器
+
+如何控制继电器
+
+## 如何使用例程
+
+编译并下载程序到学习板，即可看到程序效果：
+
+- 按下KEY1，继电器状态翻转
+- LED红灯表示继电器断开，绿灯表示接通
+- 为了更好的测试继电器的效果，可以将某个被控回路接入继电器的输出端，这样就可以通过程序控制该回路的通断。例如控制台灯、风扇等。
+
+> 注意！高电压可能造成危险，请不要尝试超过36V的电压。
+
+#### 继电器介绍
+
+继电器是一种电气开关，它使用电磁原理来控制开关的通断。继电器通常由线圈和若干个触点组成。当线圈通电时，会在继电器内部产生磁场，使得触点闭合或断开，从而实现电路的通断控制。
+
+- 学习板上的继电器型号：松乐SRD-5VDC-SL-C
+- 这款继电器有3个输出端口，分别是**常开、公共、常闭**（参考学习板背面丝印），属于单刀双掷开关。当继电器断电时（PB5置低），**公共-常闭**接通，而**公共-常开**断开；当继电器通电（PB5置高），**公共-常闭**断开，而**公共-常开**接通。
+
+<img src={require('./img/GPIO_Relay/relay2.png').default} alt="relay2" width="30%" />
+
+|  继电器线圈  | 公共-常开 | 公共-常闭 |
+| :----------: | :-------: | :-------: |
+| 断电 (PB5低) |   断开    |   闭合    |
+| 通电 (PB5高) |   闭合    |   断开    |
+
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- 将PB5配置为GPIO_Output，并设置User label为RELAY
+- 将PA7、PB0配置为GPIO_Output并分别设置User label为GREEN、RED
+- 将PB12配置为GPIO_Input并设置User label为KEY1
+
+<img src={require('./img/GPIO_Relay/Snipaste_2023-04-05_22-46-57.png').default} alt="工程配置" width="60%" />
+
+### 2、代码
+
+- 在main.c的while循环中，实现按键检测。检测到按键时，分别翻转红灯、绿灯、继电器的状态
+
+```c
+HAL_GPIO_TogglePin(RELAY_GPIO_Port, RELAY_Pin);
+HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
+HAL_GPIO_TogglePin(GREEN_GPIO_Port, GREEN_Pin);
+```
+
+## 故障排除
+
+- 找不到gpio.c文件：工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
+
+<img src={require('./img/GPIO_Relay/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件" width="60%" />
+
+- 打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
+
+<img src={require('./img/GPIO_Relay/New version dialog.png').default} alt="New version dialog" width="30%" />
