@@ -43,13 +43,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 ## 故障排除
 
-- 找不到gpio.c文件：工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
-
-<img src={require('./img/GPIO_EXTI/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件.png" width="60%" />
-
-- 打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
-
-<img src={require('./img/GPIO_EXTI/New version dialog.png').default} alt="New version dialog.png" width="60%" />
+[常见问题排除](http://localhost:3000/docs/stm32/FAQ/TroubleShooting)
 
 
 
