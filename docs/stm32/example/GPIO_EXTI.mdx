@@ -1,0 +1,56 @@
+---
+sidebar_position: 1.3
+---
+# 【GPIO】外部中断
+
+通过外部中断实现按键检测：按KEY1让绿灯亮/灭翻转。
+
+## 如何使用例程
+
+编译并下载程序到学习板，即可看到程序效果：
+
+程序效果：按下KEY1，触发中断，绿灯亮/灭翻转。
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+#### 1、工程配置
+
+- 在工程配置页面，将PB12配置为GPIO_EXTI12，并设置User label为KEY1。将PA7配置为GPIO_Output并设置User label为GREEN
+- 在System Core -> GPIO中将PB12的模式GPIO mode调为External Interrupt Mode with Falling edge trigger detection。然后切换到NVIC选项卡，使能EXTI line[15:10] Interrupts。
+- 注意：如果要在回调函数中使用HAL_Delay()，就必须在System Core -> NVIC里将Time base: System tick timer的主要优先级调到比EXTI line高。否则HAL_Delay()函数无法在中断回调函数中正常执行，会导致程序卡死在回调函数中。
+
+<img src={require('./img/GPIO_EXTI/image-20230405203114753.png').default} alt="image-20230405203114753" width="60%" />
+
+#### 2、代码
+
+- 在stm32f1xx_it.c中添加中断回调函数 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)，当中断被触发时，该回调函数就会执行
+- 在中断回调函数中实现绿灯的亮灭翻转
+
+```c
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  // 确认一下是否为KEY1按下
+  if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == 0){
+	  // 翻转绿灯
+	  HAL_GPIO_TogglePin(GREEN_GPIO_Port, GREEN_Pin);
+	  // 等待KEY1松开
+	  while(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == 0);
+  }
+}
+```
+
+## 故障排除
+
+- 找不到gpio.c文件：工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
+
+<img src={require('./img/GPIO_EXTI/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件.png" width="60%" />
+
+- 打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
+
+<img src={require('./img/GPIO_EXTI/New version dialog.png').default} alt="New version dialog.png" width="60%" />
+
+
+
+
