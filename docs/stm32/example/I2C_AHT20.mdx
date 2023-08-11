@@ -90,34 +90,4 @@ AHT20_Read(float *Temperature, float *Humidity)
 
 ## 故障排除
 
-### 工程建立和配置
-
-- **找不到gpio.c文件：**工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
-
-<img src={require('./img/I2C_AHT20/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件" width="60%" />
-
-- **打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：**因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
-
-<img src={require('./img/I2C_AHT20/New version dialog.png').default} alt="New version dialog" width="60%" />
-
-### 程序下载
-
-- **下载程序时，提示如图错误：Failed to start GDB server** 
-
-<img src={require('./img/I2C_AHT20/错误提示.png').default} alt="错误提示" width="60%" />
-
-可能是由于上次下载程序时关闭了debug接口。请将Boot0、Boot1跳线帽切换到H，并按下RST键，再尝试下载。如果此时下载成功，将跳线帽切换回L，按下RST键后程序即正常运行。
-
-**注意：为了避免下次出现该问题**，请在工程配置中，找到System Core -> SYS -> Debug，选择Serial Wire，重新生成代码。这样即可避免程序将debug接口关闭导致的下载失败。
-
-<img src={require('./img/I2C_AHT20/选择debug模式.png').default} alt="选择debug模式" width="60%" />
-
-- **下载程序时，提示“需要升级ST-LINK固件”，如图所示**
-
-<img src={require('./img/I2C_AHT20/需要升级STLINK固件.png').default} alt="需要升级STLINK固件" width="60%" />
-
-升级ST-LINK固件即可解决，请按如下步骤操作：
-
-1、 顶部工具栏 Help -> ST-LINK更新，打开固件升级工具。
-
-<img src={require('./img/I2C_AHT20/STLINK更新.png').default} alt="STLINK更新" width="60%" />
+[常见问题排除](http://localhost:3000/docs/stm32/FAQ/TroubleShooting)
