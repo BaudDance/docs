@@ -1,0 +1,291 @@
+---
+sidebar_position: 1.6
+---
+# 【I²C总线】OLED屏幕
+
+## OLED屏幕（I2C_OLED）
+
+在OLED屏幕上显示文字、图形和BMP图像
+
+板载OLED规格：（详细可参考资料包中的手册）
+
+
+|   参数   |       值        |
+| :------: | :-------------: |
+| 芯片型号 | 芯颖科技 CH1116 |
+|  分辨率  |    128 × 64     |
+| 屏幕尺寸 |    1.3 英寸     |
+| I²C地址  |      0x7A       |
+
+## 如何使用例程
+
+编译并下载程序到学习板，即可看到程序效果：
+
+OLED屏幕循环显示不同画面：
+
+- 汉字显示（反色）、中英文混合字符串显示、符号字符串显示
+- 变量显示
+- 绘制直线演示
+- 绘制（空心）矩形演示
+- 绘制（空心）圆形演示
+- 显示bmp图像
+
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- 在Pinout&Configuration页面，Connectivity -> I2C1，将I2C模式选择为I2C，并在下方Configuration -> Parameter Settings，将I2C Speed Mode选择为Fast Mode
+
+<img src={require('./img/I2C_OLED/Snipaste_2023-05-04_23-06-38.png').default} alt="工程配置" width="60%" />
+
+- 在System Core -> RCC中，将High Speed Clock(HSE)配置为Crystal/Ceramic Resonator
+- 切换到Clock Configuration页面，将HCLK（MHz）改为72，并按回车键。
+
+<img src={require('./img/I2C_OLED/Snipaste_2023-05-04_18-27-04.png').default} alt="工程配置" width="60%" />
+
+- 在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
+
+### 2、代码
+
+#### (1) 初始化过程
+
+- **拷贝库文件：**将oled.c、font.c文件拷贝到Core -> Src目录下，将oled.h、font.h文件拷贝到Core -> Inc目录下。
+- **在main.c中添加include：**oled.h
+- **初始化OLED：**
+
+```c
+// 刚上电时STM32比OLED启动快，因此需要等待一段时间再初始化OLED
+HAL_Delay(20);
+// 初始化OLED
+OLED_Init();
+// 设置OLED显示模式：正常/反色
+OLED_SetColorMode(OLED_COLOR_NORMAL);
+// 设置OLED显示方向：0°/180°
+OLED_SetOrientation(OLED_Orientation_0);
+// 清空显示缓冲区
+OLED_ClearBuffer();
+// 将缓存内容更新到屏幕显示
+OLED_Refresh();
+```
+
+#### (2) 显示函数
+
+- **将缓存内容更新到屏幕显示：**
+
+> 注意：任何操作都需要调用此函数才能显示到屏幕上，否则只是改变显示缓冲区
+
+```c
+OLED_Refresh(void);
+```
+
+- **缓存清屏：**
+
+```c
+OLED_ClearBuffer(void);
+```
+
+- **显示一个像素点：**
+  - `uint8_t x` x坐标
+  - `uint8_t y` y坐标
+  - `OLED_ColorMode mode` 颜色模式
+    - `OLED_COLOR_NORMAL` 正常
+    - `OLED_COLOR_REVERSE` 反色
+
+```c
+OLED_DrawPixel(uint8_t x, uint8_t y, OLED_ColorMode mode);
+// 应用示例
+OLED_DrawPixel(1, 1, OLED_COLOR_NORMAL);
+```
+
+- **显示ASCII字符串：**
+  - `uint8_t x` x坐标，[0, 127]
+  - `uint8_t y` y坐标，[0, 63]
+  - `char *s` 要显示的字符串
+  - `uint8_t font` 字体高度（参考“取字模”部分的介绍）
+  - `OLED_ColorMode mode` 颜色模式
+    - `OLED_COLOR_NORMAL` 正常
+    - `OLED_COLOR_REVERSE` 反色
+
+```c
+OLED_PrintString(uint8_t x, uint8_t y, char *s, uint8_t font, OLED_ColorMode mode);
+// 应用示例
+OLED_PrintString(0, 0, "Hi :P", 16, OLED_COLOR_NORMAL);
+```
+
+- **显示（中英文）字符串：**该函数支持显示中文字符、ASCII字符任意组合的字符串。
+  - `uint8_t x` x坐标，[0, 127]
+  - `uint8_t y` y坐标，[0, 63]
+  - `char *s` 要显示的字符串
+  - `uint8_t font` 字体高度
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_PrintChinese(uint8_t x, uint8_t y, char *s, uint8_t font, OLED_ColorMode mode);
+// 应用示例
+OLED_PrintChinese(0, 22, "B站-KEYSKING", 16, OLED_COLOR_NORMAL);
+```
+
+- **绘制直线：**
+  - `uint8_t x0` 直线起点 x坐标 [0, 127]
+  - `uint8_t y0` 直线起点 y坐标 [0, 63]
+  - `uint8_t x1` 直线终点 x坐标 [0, 127]
+  - `uint8_t y` 直线终点 y坐标 [0, 63]
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_DrawLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, OLED_ColorMode mode);
+// 应用示例
+OLED_DrawLine(0, 0, 10, 63, OLED_COLOR_NORMAL);
+```
+
+- **绘制（空心）矩形：**
+  - `uint8_t x0` 左端点 x坐标 [0, 127]
+  - `uint8_t y0` 上端点 y坐标 [0, 63]
+  - `uint8_t x1` 右端点 x坐标 [0, 127]
+  - `uint8_t y` 下端点 y坐标 [0, 63]
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_DrawRectangle(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, OLED_ColorMode mode);
+// 应用示例
+OLED_DrawRectangle(0, 0, 127, 63, OLED_COLOR_NORMAL);
+```
+
+- **绘制（填充）矩形：**
+  - `uint8_t x0` 左端点 x坐标 [0, 127]
+  - `uint8_t y0` 上端点 y坐标 [0, 63]
+  - `uint8_t x1` 右端点 x坐标 [0, 127]
+  - `uint8_t y` 下端点 y坐标 [0, 63]
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_DrawRectangleFilled(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, OLED_ColorMode mode);
+// 应用示例
+OLED_DrawRectangle(40, 20, 87, 43, OLED_COLOR_NORMAL);
+```
+
+- **绘制（空心）圆形：**
+  - `uint8_t x0` 圆心 x坐标 [0, 127]
+  - `uint8_t y0` 圆心 y坐标 [0, 63]
+  - `rad` 圆的半径
+  - `option` 绘制圆的部分
+    - `CIRCLE_UPPER_RIGHT` 只绘制圆的右上1/4
+    - `CIRCLE_UPPER_LEFT` 只绘制圆的左上1/4
+    - `CIRCLE_LOWER_LEFT` 只绘制圆的左下1/4
+    - `CIRCLE_LOWER_RIGHT` 只绘制圆的右下1/4
+    - `CIRCLE_ALL` 绘制完整的圆
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_DrawCircle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t option, OLED_ColorMode mode);
+// 应用示例
+OLED_DrawCircle(64, 32, 20, CIRCLE_ALL, OLED_COLOR_NORMAL);
+```
+
+- **绘制（填充）圆形：**
+  - `uint8_t x0` 圆心 x坐标 [0, 127]
+  - `uint8_t y0` 圆心 y坐标 [0, 63]
+  - `rad` 圆的半径
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_DrawCircleFilled(uint8_t x0, uint8_t y0, uint8_t rad, OLED_ColorMode mode);
+// 应用示例
+OLED_DrawCircleFilled(64, 32, 20, CIRCLE_ALL, OLED_COLOR_NORMAL);
+```
+
+- **显示BMP图像：**
+  - `uint8_t x` 左端点 x坐标 [0, 127]
+  - `uint8_t y` 上端点 y坐标 [0, 63]
+  - `uint8_t size_x` 图像宽度
+  - `uint8_t size_y` 图像高度
+  - `const unsigned char pic[]` 要显示的图像（参考“取字模”部分的介绍）
+  - `OLED_ColorMode mode` 颜色模式
+
+```c
+OLED_DrawPicture(uint8_t x, uint8_t y, uint8_t size_x, uint8_t size_y, const unsigned char pic[], OLED_ColorMode mode);
+// 应用示例
+OLED_DrawPicture(40, 7, 48, 48, icon_IDE, OLED_COLOR_NORMAL);
+```
+
+#### (3) 取字模
+
+**文字：**分为两类：ASCII字符、中文字符。
+
+- ASCII字符：font.c 库中已包含，可以直接调用
+
+  - 包含 8、12、16、24 四种大小的字体
+
+  - 每种字体均有95个可打印字符
+
+    > 具体请参考[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)中的ASCII码表
+
+- 中文字符：中文字符数量多，STM32内部Flash无法全部存储，因此需要根据使用的字符来取字模。
+  - 在线取字模工具和教程完善中，**即将更新**，请关注Keysking公众号推送。
+
+**图片：**支持BMP格式单色位图
+
+- 该工具同上，**即将更新**，请关注Keysking公众号推送。
+
+## 故障排除
+
+### OLED显示问题
+
+- **屏幕显示偏暗：**不要在STM32程序启动时马上初始化OLED。因为刚上电时STM32比OLED启动快，立即对OLED进行初始化可能会失败。建议延时10-50毫秒再调用OLED_Init()进行初始化操作。
+
+### 工程建立和配置问题
+
+- **cube重新生成代码后，中文出现乱码：**这是cubeIDE的问题，我们在环境变量中添加一行配置即可解决（仅Windows下）
+
+  - 点击开始菜单，输入“环境变量”搜索，进入系统属性设置
+
+  <img src={require('./img/I2C_OLED/搜索环境变量.png').default} alt="搜索环境变量" width="60%" />
+
+  - 点击系统属性下方的“环境变量”，进入环境变量配置页面。如图，点击新建，添加一个环境变量并保存即可。
+
+    变量名：JAVA_TOOL_OPTIONS
+
+    变量值：-Dfile.encoding=UTF-8
+
+  <img src={require('./img/I2C_OLED/添加环境变量.png').default} alt="添加环境变量" width="60%" />
+
+- **找不到gpio.c文件：**工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
+
+<img src={require('./img/I2C_OLED/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件" width="68%" />
+
+- **打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：**因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
+
+<img src={require('./img/I2C_OLED/New version dialog.png').default} alt="New version dialog" width="60%" />
+
+### 程序下载问题
+
+- **下载程序时，提示如图错误：Failed to start GDB server** 
+
+<img src={require('./img/I2C_OLED/错误提示.png').default} alt="错误提示" width="67%" />
+
+可能是由于上次下载程序时关闭了debug接口。请将Boot0、Boot1跳线帽切换到H，并按下RST键，再尝试下载。如果此时下载成功，将跳线帽切换回L，按下RST键后程序即正常运行。
+
+**注意：为了避免下次出现该问题**，请在工程配置中，找到System Core -> SYS -> Debug，选择Serial Wire，重新生成代码。这样即可避免程序将debug接口关闭导致的下载失败。
+
+<img src={require('./img/I2C_OLED/选择debug模式.png').default} alt="选择debug模式" width="60%" />
+
+- **下载程序时，提示“需要升级ST-LINK固件”，如图所示**
+
+<img src={require('./img/I2C_OLED/需要升级STLINK固件.png').default} alt="需要升级STLINK固件" width="60%" />
+
+升级ST-LINK固件即可解决，请按如下步骤操作：
+
+1、 顶部工具栏 Help -> ST-LINK更新，打开固件升级工具。
+
+<img src={require('./img/I2C_OLED/STLINK更新.png').default} alt="STLINK更新" width="60%" />
+
+2、重新插拔一下ST-LINK使其进入DFU模式
+
+3、点击“Refresh Device List”，然后点击2次“Open in update mode”，直到Version显示出来。（如果Version仍然是Unknown，再点击一次“Open in update mode”）
+
+<img src={require('./img/I2C_OLED/open_in_dfu.png').default} alt="open_in_dfu" width="67%" />
+
+4、点击“Upgrade”，进度条走完后，重新插拔ST-LINK，即可正常下载。
