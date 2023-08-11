@@ -10,7 +10,7 @@ sidebar_position: 3
 
 如果小伙伴们发现编译报错与下图类似, 那么应该是你将工程创建在路径中包含中文的文件夹下了, 重新创建工程到路径中没有中文的文件夹中就好了.
 
-![项目在中文路径](img/项目在中文路径.png)
+![项目在中文路径](img/CompilationFailed/项目在中文路径.png)
 
 ## PB3 PB4引脚被占用
 
@@ -22,6 +22,6 @@ sidebar_position: 3
 
 为了日后不再出现此情况, 小伙伴们可以直接在STM32Cube里将调试器模式设置为Serial Wire, 然后重新生成代码并下载. 就不会启用JTAG了.
 
-![设置Debug为Serial Wire](img/选择SerialWire.png)
+![设置Debug为Serial Wire](img/CompilationFailed/选择SerialWire.png)
 
 下载后调试器模式为Serial Wire的程序后, 就可以将Boot0切换回低电平(学习板上将BOOT0跳线帽换回L), 然后再次重启STM32, 就又可以愉快地玩耍啦~

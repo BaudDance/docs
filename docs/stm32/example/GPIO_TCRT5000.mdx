@@ -1,0 +1,60 @@
+---
+sidebar_position: 1.4
+---
+# 【GPIO】循迹模块
+
+如何使用循迹模块
+
+## 如何使用例程
+
+连接循迹模块，并下载程序，即可看到效果
+
+#### 硬件连接
+
+- 需要使用：3P杜邦线、TCRT5000循迹模块
+
+<img src={require('./img/GPIO_TCRT5000/连接线.png').default} alt="连接线" width="60%" />
+
+- 线序对应表：
+
+| 循迹模块 | 学习板 |
+| :------: | :----: |
+|   VCC    |   V    |
+|   GND    |   G    |
+|    DO    |  B14   |
+
+#### 程序效果
+
+- 绿灯指示循迹模块的状态，当检测到物体时绿灯熄灭
+- 循迹模块既可以检测物体的靠近，也可以检测颜色（黑白）。调节循迹模块的电位器可以改变灵敏度
+- 循迹模块可以用于循迹小车、自动计数等设计
+
+<img src={require('./img/GPIO_TCRT5000/演示.gif').default} alt="演示" width="60%" />
+
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- 将PB14配置为GPIO_Input，并设置User label为TCRT
+- 将PA7配置为GPIO_Output并设置User label为GREEN
+
+### 2、代码
+
+- 在main.c的while循环中，不断读取循迹模块输出状态
+- 如果循迹模块输出低电平，则说明有物体靠近（或检测到白线）；高电平则说明没有物体靠近（或检测到黑线）
+
+```c
+// 如果循迹模块输出高电平，说明没有检测到物体靠近（或检测到白线）
+if (HAL_GPIO_ReadPin(TCRT_GPIO_Port, TCRT_Pin))
+    HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_SET);
+// 如果循迹模块输出低电平，说明检测到物体靠近（或检测到黑线）
+else
+    HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_RESET);
+```
+
+## 故障排除
+
+[常见问题排除](http://localhost:3000/docs/stm32/FAQ/TroubleShooting)
