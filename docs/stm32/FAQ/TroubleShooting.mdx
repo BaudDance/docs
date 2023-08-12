@@ -1,7 +1,7 @@
 ---
 sidebar_position: 4
 ---
-## 工程建立和配置
+# 工程建立和配置
 
 - **找不到gpio.c文件：**工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
 
@@ -32,3 +32,11 @@ sidebar_position: 4
 1、 顶部工具栏 Help -> ST-LINK更新，打开固件升级工具。
 
 <img src={require('./img/TroubleShooting/STLINK更新.png').default} alt="STLINK更新" width="60%" />
+
+2、重新插拔一下ST-LINK使其进入DFU模式
+
+3、点击“Refresh Device List”，然后点击2次“Open in update mode”，直到Version显示出来。（如果Version仍然是Unknown，再点击一次“Open in update mode”）
+
+<img src={require('./img/TroubleShooting/open_in_dfu.png').default} alt="open_in_dfu" width="67%" />
+
+4、点击“Upgrade”，进度条走完后，重新插拔ST-LINK，即可正常下载。

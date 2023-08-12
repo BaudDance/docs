@@ -262,19 +262,7 @@ OLED_DrawPicture(40, 7, 48, 48, icon_IDE, OLED_COLOR_NORMAL);
 
 ### 程序下载问题
 
-- **下载程序时，提示如图错误：Failed to start GDB server** 
-
-<img src={require('./img/I2C_OLED/错误提示.png').default} alt="错误提示" width="67%" />
-
-可能是由于上次下载程序时关闭了debug接口。请将Boot0、Boot1跳线帽切换到H，并按下RST键，再尝试下载。如果此时下载成功，将跳线帽切换回L，按下RST键后程序即正常运行。
-
-**注意：为了避免下次出现该问题**，请在工程配置中，找到System Core -> SYS -> Debug，选择Serial Wire，重新生成代码。这样即可避免程序将debug接口关闭导致的下载失败。
-
-<img src={require('./img/I2C_OLED/选择debug模式.png').default} alt="选择debug模式" width="60%" />
-
-- **下载程序时，提示“需要升级ST-LINK固件”，如图所示**
-
-<img src={require('./img/I2C_OLED/需要升级STLINK固件.png').default} alt="需要升级STLINK固件" width="60%" />
+[工程建立和配置](http://localhost:3000/docs/stm32/FAQ/TroubleShooting)
 
 升级ST-LINK固件即可解决，请按如下步骤操作：
 
