@@ -1,0 +1,27 @@
+---
+sidebar_position: 3.1
+---
+# 【Misc】实时时钟掉电走时
+## 实时时钟掉电走时 (RTC)
+
+- 配置：System Core，SYS，Debug配置为SerialWire
+
+  > 因为STM32默认占用PB4等IO作为JTAG引脚
+
+- （可选）配置RCC，LowSpeedClock（LSE）配置为Crystal/Ceramic Resonator
+
+- 配置：Timers，RTC
+  - Activate Clock Source
+  - Activate Calendar
+  - 配置一下初始时间、日期
+  
+- 配置：Connectivity，USART2，Mode配置为Asynchronous
+
+- （可选）在Project Manager，Code Generator里勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，这样会给每个外设的初始化函数生成单独.c/.h文件，会使main.c更简洁
+
+- （可选）在clock configuration里把低速时钟源选为LSE
+
+- （可选）如果想掉保持时钟，需要在RTC_Init函数中，屏蔽掉设置时间的代码，这样每次上电时就不会重新设置时间了，就可以做到时间保持
+
+- 注意：HAL_RTC_GetTime得到的是BCD码的格式，需要/16*10+%16转换成10进制数字
+
