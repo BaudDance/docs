@@ -1,0 +1,30 @@
+---
+sidebar_position: 2.4
+---
+# 【PWM】无源蜂鸣器
+## (PWM_BUZZER)
+
+- 初始化外部晶振，配置SYSCLK与Timer Clock均为72MHz
+
+- 配置PB9为TIM4_CH4
+
+- 配置TIM4
+  - 勾选Internal Clock
+  - Channel4配置为PWM Generation CH4
+  - Prescaler配置为72-1
+  - Counter Period配置为500-1，此时PWM频率为2kHz
+  
+- （可选）因为蜂鸣器比较吵，可以配置一下KEY1（PB12），按下KEY1时蜂鸣器才响
+
+- （可选）再配置KEY2（PB13，需Pull-Up），按下KEY2可以发出不同的音调
+
+- 改变频率通过配置ARR寄存器实现：htim4.Instance->ARR = 500
+
+- 注意：驱动蜂鸣器的占空比应该保持在20%左右，过高的占空比将导致声音嘶哑
+
+  > 每次改变PWM频率，都配置一次占空比：
+  >
+  > __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR/5);
+
+ 
+

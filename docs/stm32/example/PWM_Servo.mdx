@@ -1,0 +1,30 @@
+---
+sidebar_position: 2.3
+---
+# 【PWM】伺服电机
+## (PWM_Servo)
+
+- 舵机通过PWM控制，PWM周期固定20ms（50Hz），脉冲宽度在0.5ms-2.5ms（2.5%-12.5%）之间，对应最小-最大角度
+
+- 接线：用3P杜邦线，连接开发板和舵机，舵机棕色线对应GND
+
+- 需要打开外部晶振，将SYSCLK配置到72MHz，APB timer clocks也配置到72MHz
+
+- 给PB8配置TIM4_CH3
+
+- 进入Timers - TIM4
+
+  - 勾选Internal Clock
+
+  - Channel3配置PWM Generation CH3
+
+  - Prescaler配置为720-1，Counter Period配置为2000-1，这样PWM频率就是50Hz
+
+  - PWM Generation Channel3 - Pulse配置为150（即占空比7.5%）
+
+    > 占空比 = 此数值 / Counter Period
+
+- HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3) 启动PWM输出
+
+- __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 250) 可以改变占空比
+

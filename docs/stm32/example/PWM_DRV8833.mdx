@@ -1,0 +1,35 @@
+---
+sidebar_position: 2.5
+---
+# 【PWM】直流电机
+## (PWM_DRV8833)
+
+- 需要打开外部晶振，将SYSCLK配置到72MHz，APB timer clocks也配置到72MHz
+
+- 给PA0、PA1分别配置TIM2_CH1、TIM2_CH2
+
+- 进入Timers - TIM2
+
+  - Clock Source配置Internal Clock
+  - Channel1配置PWM Generation CH1
+  - Channel2配置PWM Generation CH2
+
+- Prescaler配置为72-1，Counter Period配置为100-1，这样PWM频率就是10kHz
+
+- HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1) 启动PWM输出
+
+  > CH1和CH2，同时只能有1个通道输出
+  >
+  > 切换输出通道，可以切换正/反转
+
+- __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 80) 可以改变占空比
+
+  > 占空比低于60%有可能导致电机转不起来
+  >
+  > 占空比 = 此数值 / Counter Period
+
+- 接线
+
+  - 用4P杜邦线，连接开发板和模块，模块接GND-VCC-IN2-IN1
+  - 电机两根线连接模块OUT1-OUT2
+
