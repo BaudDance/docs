@@ -1,0 +1,77 @@
+---
+sidebar_position: 1.7
+---
+
+# 【ADC转换】读取电位器电压
+## 读取电位器电压 （ADC_Potentiometer）
+
+通过ADC读取电位器的电压值
+
+## 如何使用例程
+
+下载程序，并连接USB虚拟串口线，即可看到效果
+
+#### 硬件连接
+
+- 使用配套TYPE-C数据线，将学习板连接到计算机
+
+<img src={require('./img/ADC_Potentiometer/连接usb线.png').default} alt="连接usb线" width="68%" />
+
+#### 程序效果
+
+- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial，即可收到ADC转换结果，如图所示
+
+<img src={require('./img/ADC_Potentiometer/串口数据.png').default} alt="串口数据" width="68%" />
+
+- 程序会连续读取PA5的输入电压值，而PA5的电压值是由电位器VOL决定的，使用螺丝刀调节学习板上的电位器，即可观察到对应的数据变化。
+
+  > 数据变化范围0-4095，对应着PA5的电压值0-3.3V
+
+<img src={require('./img/ADC_Potentiometer/1.png').default} alt="数据变化" width="68%" />
+
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **打开ADC1：**在Pinout&Configuration页面，将PA5设置为ADC1_IN5
+
+- **配置ADC：**在Pinout&Configuration -> Analog -> ADC1 -> Configuration中
+  - ADC_Settings -> Continuous Conversion Mode设为Enable，使ADC转换持续进行，不需要每次获取之前手动触发转换
+  - ADC_Regular_ConversionMode -> Rank -> Sampling Time设为239.5 Cycles，最长采样时间，可以获得更稳定的转换结果
+  
+- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+
+- **启用float打印：**在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
+
+  > 默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
+
+### 2、代码
+
+#### (1) 初始化过程
+
+```c
+// 启动连续ADC转换
+HAL_ADC_Start(&hadc1);
+// 等待ADC稳定
+HAL_Delay(500);
+```
+
+#### (2) 读取ADC结果
+
+```c
+// 获取ADC值
+result = HAL_ADC_GetValue(&hadc1);
+// 计算电压值：电压 = ADC结果 × 3.3V ÷ 4095
+voltage = result * 3.3f / 4095;
+// 将变量打印为字符串
+sprintf(send_buf, "原始值: %d，电压值: %.3f V\r\n", result, voltage);
+// 通过串口2发送
+HAL_UART_Transmit(&huart2, (uint8_t*) send_buf, strlen(send_buf), 20);
+```
+
+## 故障排除
+
+[工程建立和配置](http://localhost:3000/docs/stm32/FAQ/TroubleShooting)
