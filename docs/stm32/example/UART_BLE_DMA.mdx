@@ -1,0 +1,20 @@
+---
+sidebar_position: 2.6
+---
+# 【UART】蓝牙透传
+## 串口通信-蓝牙透传(UART_BLE_DMA)
+
+- 将USART2配置为Asynchronous
+  - 在NVIC选项卡中勾选USART2 global interrupt
+- 将USART3配置为Asynchronous
+  - 更改Baud rate为9600
+  - 在NVIC选项卡中勾选USART2 global interrupt
+- DMA方式接收不定长数据：
+  - 在main.c中
+    - 在while前面启动DMA接收 HAL_UARTEx_ReceiveToIdle_DMA
+    - 在while循环中，每隔1ms读取一次全局变量rx_size，看是否接收完成，需要处理
+  - 在stm32f1xx_it.c中
+    - 添加中断回调函数 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart)
+    - 回调函数中将size赋值给全局变量rx_size，通知while循环接收完成
+    - HAL_UARTEx_ReceiveToIdle_DMA 再次启动DMA接收（否则下次无法接收）
+
