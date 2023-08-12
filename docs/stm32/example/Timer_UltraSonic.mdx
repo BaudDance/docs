@@ -1,0 +1,22 @@
+---
+sidebar_position: 2.1
+---
+
+# 【Timer】超声波测距
+## 超声波测距 (基本定时器方法) 
+
+- 初始化外部晶振，配置SYSCLK与Timer Clock均为72MHz
+- 配置GPIO
+  - PA11配置为Output，设置标签TRIG
+  - PA10配置为Input，设置标签ECHO
+- TIM1配置
+  - Clock Source配置为Internal Clock
+  - Prescaler配置为720-1，即分频到周期10us
+  - Counter Period配置为最大值65535
+- 将USART2配置为Asynchronous
+- 测距流程
+  - 拉高TRIG，等待5ms再拉低，即触发模块输出
+  - 清零定时器的计数，等待ECHO引脚拉高
+  - ECHO拉高时启动定时器
+  - 待ECHO拉低时，停止定时器，并计算距离
+

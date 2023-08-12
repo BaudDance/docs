@@ -1,0 +1,26 @@
+---
+sidebar_position: 2.2
+---
+# 【PWM】彩灯亮度可调
+## (PWM_RGB)
+
+- 需要打开外部晶振，将SYSCLK配置到72MHz，APB timer clocks也配置到72MHz
+
+- 给PA6、PA7、PB0分别配置TIM3_CH1、TIM3_CH2、TIM3_CH3
+
+- 进入Timers - TIM3
+
+  - 勾选Internal Clock
+
+  - Channel 1-3都配置PWM Generation CHx
+
+  - Prescaler配置为72-1，Counter Period配置为100-1，这样PWM频率是10kHz
+
+  - PWM Generation Channelx - Pulse配置为0~99对应亮度低到高
+
+    > 占空比 = 此数值 / Counter Period
+
+- HAL_TIM_PWM_Start 启动PWM输出
+
+- __HAL_TIM_SET_COMPARE 可以改变占空比
+

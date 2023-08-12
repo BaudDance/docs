@@ -1,0 +1,19 @@
+---
+sidebar_position: 3.0
+---
+# 【Misc】Ws2812彩灯控制
+- MX中勾选Generate Peripheral initialization as a pair of ".c/.h" file
+- **配置SYS：选择Serial Wire，否则PB4占用无法释放**
+- 先配置系统时钟，调节到72MHz的频率
+- 配置TIM3
+  - 将PB4分配给TIM3_CH1
+  - 勾选TIM3的Internal Clock
+  - Prescaler配置为0（不预分频），Counter Period配置为90-1（800kHz）
+  - 进入GPIO Settings：mode配置为AF OD，输出速度为High
+  - 进入DMA Settings，点Add，选择TIM3_CH1新增一个DMA通道
+    - 将Direction配置为Memory To Peripheral
+    - Data Width配置为Half Word
+    - Increment Address勾选Memory，不勾选Peripheral
+
+- 复制ws2812.c/ws2812.h文件到Core的Src/Inc目录下
+

@@ -1,0 +1,13 @@
+---
+sidebar_position: 2.0
+---
+# 【Timer】旋转编码器
+
+- 初始化外部晶振，配置SYSCLK与Timer Clock均为72MHz
+- 将PA8、PA9分别配置为TIM1_CH1、TIM1_CH2
+- 配置TIM1
+  - 将Combined Channels配置为Encoder Mode
+  - 可以配置Input Filter，启用集成滤波器，减少抖动，范围0~15
+- 配置USART2为Asynchronous
+- 启动编码器：HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL)
+
