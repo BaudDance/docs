@@ -12,16 +12,16 @@ sidebar_position: 3
 
 ![项目在中文路径](img/CompilationFailed/项目在中文路径.png)
 
-## PB3 PB4引脚被占用
+## PA13 PA14 引脚被占用
 
-许多小伙伴遇到了下载过一次程序后就无法再次下载程序的问题, 这是由于程序中默认启用了JTAG占用了PB3 PB4引脚(STLink通信引脚), 导致STLink无法正常与STM32芯片进行通信.
+许多小伙伴遇到了下载过一次程序后就无法再次下载程序的问题, 这是由于程序中 PA13 PA14 引脚(STLink 通信引脚)因为某些原因无法正常通信, 导致 STLink 无法正常与 STM32 芯片进行通信.
 
-解决办法是首先将Boot0引脚拉高(例如在学习板上将BOOT0跳线帽改到H上), 然后将STM32重启(按复位键或重新上电), 使得单片机进入系统内存启动模式. 然后再进行程序下载.
+解决办法是首先将 Boot0 引脚拉高(例如在学习板上将 BOOT0 跳线帽改到 H 上), 然后将 STM32 重启(按复位键或重新上电), 使得单片机进入系统内存启动模式. 然后再进行程序下载.
 
-关于STM32的启动模式,可以阅读[启动模式](/docs/stm32/knowledge/BootMode)进行了解.
+关于 STM32 的启动模式,可以阅读[启动模式](/docs/stm32/knowledge/BootMode)进行了解.
 
-为了日后不再出现此情况, 小伙伴们可以直接在STM32Cube里将调试器模式设置为Serial Wire, 然后重新生成代码并下载. 就不会启用JTAG了.
+为了日后不再出现此情况, 小伙伴们可以直接在 STM32Cube 里将调试器模式设置为 Serial Wire, 然后重新生成代码并下载. 就不会启用 JTAG 了.
 
 ![设置Debug为Serial Wire](img/CompilationFailed/选择SerialWire.png)
 
-下载后调试器模式为Serial Wire的程序后, 就可以将Boot0切换回低电平(学习板上将BOOT0跳线帽换回L), 然后再次重启STM32, 就又可以愉快地玩耍啦~
+下载后调试器模式为 Serial Wire 的程序后, 就可以将 Boot0 切换回低电平(学习板上将 BOOT0 跳线帽换回 L), 然后再次重启 STM32, 就又可以愉快地玩耍啦~
