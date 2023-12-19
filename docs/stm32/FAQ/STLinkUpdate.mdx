@@ -3,27 +3,46 @@ sidebar_position: 2
 ---
 # STLink固件升级
 
-有些小伙伴在STM32CubeIDE中进行程序下载时, 可能会下载失败, 并且弹出如下界面:
+ST官方会不定期**更新ST-LINK**固件，弹出升级提示：
 
-![STLINK固件升级提示](./img/STLinkUpdate/需要升级STLINK固件.png)
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/升级提示.png').default} alt="升级提示" width="450px" />
+</div>
 
-这是由于ST官方又推出了新的STLink固件, 提醒小伙伴们进行升级. 小伙伴们只需要点击升级提示的"YES", 按照接下来的操作进行设计即可:
+### 更新方法
 
-首先, **重新插拔一次STLink与电脑的连接**, 然后点击Refresh device list, 刷新一下设备列表. 再然后点击**两次**"Open in update mode"按钮, 打开更新模式. 成功后下面的信息中会显示当前的STLink固件版本号与最新版本的STLink固件版本号.
+- **1、点 Yes，进入升级界面**
 
-![STLink更新界面](img/STLinkUpdate/STLink更新界面.png)
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/ST-LINK升级页面.png').default} alt="ST-LINK升级页面" width="450px" />
+</div>
 
-然后就可以点击Upgrade按钮进行升级~ 
+- **2、拔掉ST-LINK，等3秒再插上**
 
-升级进度条走完后先不要着急, 等如下图所示,进度条消失并出现一行文字后, 重新STLink, 关闭此更新界面, 就可以正常使用啦😎~
+    > 不要关掉**第 (1) 步**的页面
 
-![STLink更新完成界面](img/STLinkUpdate/STLink更新完成界面.png)
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/拔出STLINK.png').default} alt="拔出STLINK" width="280px" />
+</div>
 
+- **3、按图操作，依次点击1-2-3按钮**
 
-## 依旧有问题?
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/操作步骤.png').default} alt="操作步骤" width="600px" />
+</div>
 
-根据小伙伴们的反馈, 有些STLink存在在Keil中可以正常使用, 但在STM32CubeIDE中无法正常使用, 也无法正常升级的问题. 如果小伙伴们按照上述操作尝试多次也无法正常升级, 可能是碰见了这种情况. 
+- **4、进度条走完后，等5秒关掉升级界面，就可以正常使用啦😎~**
 
-虽未经过亲手验证, 但据多次多名小伙伴的推断, 应当是商家卖给他们的是使用垃圾芯片的STLink, 而STM32CubeIDE有一定的防盗版检测能力, 对此芯片校验不通过, 也就无法正常更新.
+    点击绿色三角就可以下载程序啦
 
-> 波特律动STM32学习套件中的STLink并未出现过此情况
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/下载程序.png').default} alt="下载程序" width="550px" />
+</div>
+
+### 依旧有问题?
+
+- 尝试换个USB接口，重新上述步骤
+
+- 通过反馈发现，市面存在部分ST-LINK无法升级，原因不明，建议换个ST-LINK
+
+    > 当然，我们会推荐您使用波特律动学习套件😎

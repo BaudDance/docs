@@ -1,30 +1,139 @@
 ---
 sidebar_position: 2.3
 ---
-# 【PWM】伺服电机
-## (PWM_Servo)
+# 【PWM】舵机控制
 
-- 舵机通过PWM控制，PWM周期固定20ms（50Hz），脉冲宽度在0.5ms-2.5ms（2.5%-12.5%）之间，对应最小-最大角度
+**下载例程代码：** <a href="https://pan.baidu.com/s/1XHoPQsPdqJy7ODswOfskPA?pwd=gdc2" class="source_download_button">点击下载</a>
 
-- 接线：用3P杜邦线，连接开发板和舵机，舵机棕色线对应GND
+## PWM 简介
 
-- 需要打开外部晶振，将SYSCLK配置到72MHz，APB timer clocks也配置到72MHz
+#### PWM 波形
 
-- 给PB8配置TIM4_CH3
+PWM波形是一种方波信号，是高/低电平不断切换的结果，其波形如图所示，这是3种**占空比**不同的波形：
 
-- 进入Timers - TIM4
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM波形.jpg').default} alt="PWM波形" width="350px" />
+</div>
 
-  - 勾选Internal Clock
+PWM的几个关键参数为：
 
-  - Channel3配置PWM Generation CH3
+- **频率（Frequency）**：即高低电平切换的速度，切换的速度越快则频率越高，1000Hz的PWM波意味着1秒钟有1000个脉冲
 
-  - Prescaler配置为720-1，Counter Period配置为2000-1，这样PWM频率就是50Hz
+- **占空比（Duty Cycle）**：即每个周期内，高电平所占的宽度
 
-  - PWM Generation Channel3 - Pulse配置为150（即占空比7.5%）
+  - 例如图中 `50% duty cycle`，即**高/低电平的时间各占50%**；
 
-    > 占空比 = 此数值 / Counter Period
+  - 图中的`75% duty cycle`，**高电平占75%，低电平占25%**；
 
-- HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3) 启动PWM输出
+  - 图中的`25% duty cycle`，**高电平占25%，低电平占75%**；
 
-- __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 250) 可以改变占空比
+## SG-90 舵机简介
 
+- 舵机最早是应用于**遥控模型**的小型执行器，因此也称为RC舵机。它有一个输出轴，可以连接摇臂，通过输入信号就能**控制摇臂的运动**。
+
+- 与电机不同的是，它可以准确的控制摇臂旋转到某一个**指定位置**，并且自动抵抗外力，维持位置。
+
+- 除了RC模型，舵机可以用于双足机器人、机械臂、自动化执行器（阀门、门窗等等）
+
+	> 注意：舵机内部是塑料减速齿轮，不可大力掰摇臂，避免损坏齿轮
+
+- 舵机的输入信号为 **50Hz** 的PWM波，其占空比范围 **2.5%~12.5%**，分别对应 **0°~180°**位置。因此，调整PWM占空比即可控制舵机的角度。
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Servo/舵机2.png').default} alt="舵机2" width="300px" />
+</div>
+
+## 如何使用例程
+
+连接硬件，下载程序，即可看到效果
+
+#### 硬件连接
+
+- 将舵机的3P线插到学习板的**SERVO接口**。连接前请**核对线序**：
+
+|    舵机    | 学习板  |
+| :--------: | :----: |
+| 黄（信号） |   B8   |
+|  红（+）   |   5V   |
+|  棕（-）   |   G    |
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Servo/连接.png').default} alt="连接" width="500px" />
+</div>
+
+- 将舵机摇臂安装到舵机输出轴。如果需要更紧固，可以用附件中最小的螺丝拧到摇臂中心的孔里
+
+#### 程序效果
+
+- 烧录例程后，即可看到舵机摇臂开始摆动
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Servo/演示.gif').default} alt="演示" width="500px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **分配引脚：**在Pinout&Configuration页面，将PB8配置为TIM4_CH3
+
+- **配置TIM4：**在Pinout&Configuration -> Timers -> TIM4
+  
+  - Configuration -> Mode，勾选Internal Clock，开启 TIM4 的内部时钟源
+  
+  - Configuration -> Mode，将 Channel3 配置为 PWM Generation CH3
+  
+  - Configuration -> Parameter Settings -> Counter Settings，将 Prescaler 配置为 720-1，将Counter Period 配置为 2000-1，此时PWM频率为 50 Hz
+  
+    > PWM频率 = 72 MHz ÷ 720 ÷ 2000 = 50 Hz
+
+
+### 2、代码
+
+- **启动PWM输出：**`HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3)` 启动PWM输出
+
+- **舵机控制：**
+
+  - 舵机角度受占空比控制，占空比 2.5%~12.5% 代表 0°~180°
+
+  - 占空比通过`__HAL_TIM_SET_COMPARE` 调节，参数范围 50~250
+
+    > 占空比 = Compare寄存器值 ÷ Counter Period计数周期
+    >
+    > 因此，`__HAL_TIM_SET_COMPARE` 填入的值 = 占空比 * Counter Period
+    >
+    > 例如，设置占空比为2.5%、12.5%时，2.5% * 2000 = 50，2.5% * 2000 = 250
+
+```c
+while (1)
+{
+    // 舵机控制占空比范围2.5% ~ 12.5%
+    // Counter Period设置的是2000，因此占空比设置范围是50 ~ 250
+
+    // 中点，占空比7.5%，即2000 * 7.5% = 150
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 150);
+    HAL_Delay(1000);
+
+    // 向左转，占空比2.5%，即2000 * 2.5% = 50
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 50);
+    HAL_Delay(1000);
+
+    // 向右转，占空比12.5%，即2000 * 12.5% = 250
+    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 250);
+    HAL_Delay(1000);
+}
+```

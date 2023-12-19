@@ -1,27 +1,145 @@
 ---
 sidebar_position: 3.1
 ---
-# 【Misc】实时时钟掉电走时
-## 实时时钟掉电走时 (RTC)
+# 【RTC】实时时钟 & 掉电走时
 
-- 配置：System Core，SYS，Debug配置为SerialWire
+**下载例程代码：** <a href="https://pan.baidu.com/s/1hICSr0qObGn-yAQPN2EiWA?pwd=7dvf" class="source_download_button">点击下载</a>
 
-  > 因为STM32默认占用PB4等IO作为JTAG引脚
+## RTC 简介
 
-- （可选）配置RCC，LowSpeedClock（LSE）配置为Crystal/Ceramic Resonator
+RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持续记录时间，为程序提供精确的日期和时间信息，即使在断电期间也能确保准确运行。
 
-- 配置：Timers，RTC
-  - Activate Clock Source
-  - Activate Calendar
-  - 配置一下初始时间、日期
+#### 原理和特点
+
+- 在STM32中，存在两个时钟源：高速时钟（8 MHz）和低速时钟（32.768 kHz）。高速时钟用于驱动CPU、外设和定时器等核心组件，而低速时钟则负责管理看门狗和RTC等功能。
+- RTC依赖低速时钟运行。
+- RTC模块内部包含了一个独立的32位寄存器来保存当前的时间和日期信息。这个寄存器以**BCD码格式**存储，包括秒、分、时、日、月、年等数据。
+- 低速时钟以极低的功耗运行，即使在断电情况下，通过备用电源（如纽扣电池），RTC也能持续运行以确保时间准确性。
+
+#### BCD码简介
+
+- STM32的时间是通过BCD码格式存储的，因此我们需要先了解一下什么是BCD码。
+
+- 简单来说，就是一种用**二进制形式**来表示**十进制数字**的编码方式。0-9每个数字都有对应的二进制码表示，如下表所示，0001表示1，0010表示2，...，1001表示9。
+- 例如，15时20分，15时用BCD表示为：0001 0101，前面0001代表1，后面0101代表5。
+
+| 十进制数字 | 二进制编码 |
+| ---------- | ---------- |
+| 0          | 0 0 0 0    |
+| 1          | 0 0 0 1    |
+| 2          | 0 0 1 0    |
+| 3          | 0 0 1 1    |
+| 4          | 0 1 0 0    |
+| 5          | 0 1 0 1    |
+| 6          | 0 1 1 0    |
+| 7          | 0 1 1 1    |
+| 8          | 1 0 0 0    |
+| 9          | 1 0 0 1    |
+
+#### RTC的一般使用方法
+
+- 通过CubeMX配置初始日期和时间后，RTC外设会自动从该时间开始记录时间信息。
+- 即使学习板断电，RTC依然能够持续记录时间。
+- 需要获取当前日期和时间时，只需调用相应函数即可实现。
+
+## 如何使用例程
+
+下载程序，并连接硬件，即可看到效果
+
+#### 硬件连接
+
+- 使用配套TYPE-C数据线，将学习板连接到计算机
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
+
+#### 程序效果
+
+- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
+- 在串口助手中，将持续看到实时打印的日期和时间。
+- 但当前程序下，断电**会导致时间重置**。掉电走时的方法，请参考下面的代码解释部分。
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/MISC_RTC/串口输出信息.png').default} alt="串口输出信息" width="600px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **激活RTC：**在Pinout&Configuration -> Timers -> RTC -> Mode，勾选 Activate Clock Source、Activate Calendar，以启用RTC时钟并激活日历功能。仅开启RTC时钟将仅记录时间，而不包括日期信息。
+- **设置初始时间/日期：**在Pinout&Configuration -> Timers -> RTC -> Configuration
+  - 在Calendar Time中配置初始**时间**
+  - 在Calendar Date中配置初始**日期**，其中Year的范围只有0-99，例如今年是2023年，则应该填写23
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/MISC_RTC/RTC配置.png').default} alt="RTC配置" width="600px" />
+</div>
+
+- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+
+
+### 2、代码
+
+- 经过上述工程配置后，RTC将自动启动并持续记录时间和日期
+
+- 当需要获取日期和时间，调用相应函数即可
+
+  - `HAL_RTC_GetTime`  获取当前**时间**
+
+    > 注意：获取到的时间是以**BCD码**保存的，为了打印出正确的时间，我们可以通过**十六进制格式**打印，这样就可以将BCD码直接还原成十进制数字
+    >
+    > `sprintf(str, "%02x, sDate.Month);`，%02x的含义是：
+    >
+    > x：输出十六进制格式
+    >
+    > 2：一共2位数字
+    >
+    > 0：不足2位的补0
   
-- 配置：Connectivity，USART2，Mode配置为Asynchronous
+  - `HAL_RTC_GetDate`  获取当前**日期**
+  
+    > 注意：获取到的年份范围只有0-99，需要手动补全，例如今年是2023年，应该+2000
+    >
 
-- （可选）在Project Manager，Code Generator里勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，这样会给每个外设的初始化函数生成单独.c/.h文件，会使main.c更简洁
 
-- （可选）在clock configuration里把低速时钟源选为LSE
+```c
+while (1)
+{
+    // 获取的时间是BCD码，需要转换成十进制打印
+    // 每隔1秒钟，用串口打印一次时间和日期
+    HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
+    HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
+    sprintf(str, "20%02x-%02x-%02x %02x:%02x:%02x\r\n", sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
+    HAL_UART_Transmit(&huart2, (uint8_t *)str, strlen(str), 0xFFFF);
+    HAL_Delay(1000);
+}
+```
 
-- （可选）如果想掉保持时钟，需要在RTC_Init函数中，屏蔽掉设置时间的代码，这样每次上电时就不会重新设置时间了，就可以做到时间保持
+- **掉电走时：**在工程目录中打开c文件 Core -> Src -> rtc.c，找到以下段落：
 
-- 注意：HAL_RTC_GetTime得到的是BCD码的格式，需要/16*10+%16转换成10进制数字
+```c
+/* USER CODE BEGIN Check_RTC_BKUP */
+// 在这里return，每次上电时就不会重新设置时间了，就可以做到时间保持
+// return;
+```
+
+取消注释 `//return;`，即可实现掉电走时的效果。
+
+> 其原理是：每次上电后，RTC初始化函数会**重置日期和时间**。`return`语句加入，函数会在重置时间之前退出，使得时间保持不变，实现掉电走时的功能。
 
