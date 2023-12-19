@@ -3,6 +3,8 @@ sidebar_position: 1.4
 ---
 # 【GPIO】循迹模块
 
+**下载例程代码：** <a href="https://pan.baidu.com/s/1kzx8DHcB47Hsj12QrYOOoQ?pwd=tur6" class="source_download_button">点击下载</a>
+
 如何使用循迹模块
 
 ## 如何使用例程
@@ -13,7 +15,9 @@ sidebar_position: 1.4
 
 - 需要使用：3P杜邦线、TCRT5000循迹模块
 
-<img src={require('./img/GPIO_TCRT5000/连接线.png').default} alt="连接线" width="60%" />
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/GPIO_TCRT5000/连接线.webp').default} alt="连接线" width="450px" />
+</div>
 
 - 线序对应表：
 
@@ -26,11 +30,14 @@ sidebar_position: 1.4
 #### 程序效果
 
 - 绿灯指示循迹模块的状态，当检测到物体时绿灯熄灭
+
 - 循迹模块既可以检测物体的靠近，也可以检测颜色（黑白）。调节循迹模块的电位器可以改变灵敏度
+
 - 循迹模块可以用于循迹小车、自动计数等设计
 
-<img src={require('./img/GPIO_TCRT5000/演示.gif').default} alt="演示" width="60%" />
-
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/GPIO_TCRT5000/演示.webp').default} alt="演示" width="500px" />
+</div>
 
 ## 例程讲解
 
@@ -38,12 +45,14 @@ sidebar_position: 1.4
 
 ### 1、工程配置
 
-- 将PB14配置为GPIO_Input，并设置User label为TCRT
-- 将PA7配置为GPIO_Output并设置User label为GREEN
+- 将 PB14 配置为 GPIO_Input，并设置 User label 为 TCRT
+
+- 将 PA7 配置为 GPIO_Output并设置 User label 为 GREEN
 
 ### 2、代码
 
 - 在main.c的while循环中，不断读取循迹模块输出状态
+
 - 如果循迹模块输出低电平，则说明有物体靠近（或检测到白线）；高电平则说明没有物体靠近（或检测到黑线）
 
 ```c

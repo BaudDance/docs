@@ -1,26 +1,125 @@
 ---
 sidebar_position: 2.2
 ---
-# 【PWM】彩灯亮度可调
-## (PWM_RGB)
+# 【PWM】彩色呼吸灯
 
-- 需要打开外部晶振，将SYSCLK配置到72MHz，APB timer clocks也配置到72MHz
+**下载例程代码：** <a href="https://pan.baidu.com/s/1fdPd4EwvxsVbbTtFclaRRA?pwd=7pab" class="source_download_button">点击下载</a>
 
-- 给PA6、PA7、PB0分别配置TIM3_CH1、TIM3_CH2、TIM3_CH3
+## PWM 简介
 
-- 进入Timers - TIM3
+#### PWM 波形
 
-  - 勾选Internal Clock
+PWM波形是一种方波信号，是高/低电平不断切换的结果，其波形如图所示，这是3种**占空比**不同的波形：
 
-  - Channel 1-3都配置PWM Generation CHx
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM波形.jpg').default} alt="PWM波形" width="350px" />
+</div>
 
-  - Prescaler配置为72-1，Counter Period配置为100-1，这样PWM频率是10kHz
+PWM的几个关键参数为：
 
-  - PWM Generation Channelx - Pulse配置为0~99对应亮度低到高
+- **频率（Frequency）**：即高低电平切换的速度，切换的速度越快则频率越高，1000Hz的PWM波意味着1秒钟有1000个脉冲
 
-    > 占空比 = 此数值 / Counter Period
+- **占空比（Duty Cycle）**：即每个周期内，高电平所占的宽度
 
-- HAL_TIM_PWM_Start 启动PWM输出
+  - 例如图中 `50% duty cycle`，即**高/低电平的时间各占50%**；
 
-- __HAL_TIM_SET_COMPARE 可以改变占空比
+  - 图中的`75% duty cycle`，**高电平占75%，低电平占25%**；
 
+  - 图中的`25% duty cycle`，**高电平占25%，低电平占75%**；
+
+#### PWM 实现呼吸灯
+
+如果使用PWM信号控制LED的亮/灭，那么**占空比越高**，灯**点亮的时间就越长**
+
+因此，当PWM**频率**足够高，以至于人眼无法分辨时，PWM的**占空比**就可以控制LED灯的**亮度**
+
+也就是说，**占空比越高，LED看起来越亮**
+
+此例程使用PWM来驱动学习板上的RGB LED，实现呼吸灯效果
+
+## 如何使用例程
+
+下载程序，即可看到效果
+
+#### 程序效果
+
+- 烧录例程后，可以看到RGB灯渐变效果
+- 修改一下例程可以实现不同颜色、不同速度的呼吸灯效果
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_RGB/演示.gif').default} alt="演示" width="400px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **分配引脚：**在Pinout&Configuration页面，将PA6、PA7、PB0分别配置为TIM1_CH1、TIM1_CH2、TIM1_CH3
+
+- **配置TIM1：**在Pinout&Configuration -> Timers -> TIM1
+  
+  - 勾选 Internal Clock，开启 TIM1 的内部时钟源
+  
+  - Configuration -> Mode，将 Channel1、Channel2、Channel3 分别配置为 PWM Generation CH1、2、3
+  
+  - Configuration -> Parameter Settings -> Counter Settings，将 Prescaler 配置为 72-1，将 Counter Period 配置为 100-1，使PWM频率为10kHz
+  
+    > PWM频率 = 72MHz ÷ 72 ÷ 100 = 10 kHz
+
+
+### 2、代码
+
+- **启动PWM输出**
+
+```c
+//启动3个通道的PWM输出
+HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+```
+
+- **在while循环中逐渐改变占空比**
+
+  - `__HAL_TIM_SET_COMPARE` 可以设置PWM的占空比，**范围 0 - 99**
+
+    > 注意：占空比**必须小于**前面配置的**Counter Period**，例程中配置为100-1，即占空比**可调范围是 0 - 99**
+
+  - 先从0逐渐增加到99，亮度逐渐提高
+
+  - 再从99逐渐减小到0，亮度逐渐降低
+
+```c
+while (1) {
+    // PWM通道CH1-3分别对应三个颜色，下面示例三个颜色一起呼吸灯
+    // 0-99为占空比，0为最小亮度，99为最大亮度
+    // 每7ms调整一次占空比，从0逐渐增加到99
+    for (int period = 0; period < 100; period++) {
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, period);
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period);
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, period);
+        HAL_Delay(7);
+    }
+    // 从99逐渐减小到0
+    for (int period = 99; period >= 0; period--) {
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, period);
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period);
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, period);
+        HAL_Delay(7);
+    }
+    HAL_Delay(100); 
+}
+```

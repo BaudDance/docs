@@ -3,12 +3,13 @@ sidebar_position: 1.5
 ---
 # 【I²C总线】AHT20温湿度传感器
 
+**下载例程代码：** <a href="https://pan.baidu.com/s/1cDNtCR2tmjO8hlpESSy0dw?pwd=84d3" class="source_download_button">点击下载</a>
+
 ## AHT20温湿度传感器（I2C_AHT20）
 
 通过I²C读取AHT20温湿度计
 
 板载AHT20传感器规格：（详细可参考资料包中的手册）
-
 
 |    参数    |       值       |
 | :--------: | :------------: |
@@ -21,7 +22,11 @@ sidebar_position: 1.5
 |  湿度误差  |    ± 2 %RH     |
 | 湿度分辨率 |   0.024 %RH    |
 
-> **AHT20 对比 DHT20：**如图所示，DHT20内部是AHT20加上拉电阻、去耦电容，软件操作是完全相同的。
+学习板上的AHT20传感器：
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_AHT20/正面照.png').default} alt="正面照" width="400px" />
+</div>
 
 ## 如何使用例程
 
@@ -29,13 +34,16 @@ sidebar_position: 1.5
 
 - 使用配套TYPE-C数据线，将学习板连接到计算机
 
-<img src={require('./img/I2C_AHT20/连接usb线.png').default} alt="连接usb线" width="60%" />
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
 
 - 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
 - 此时即可收到温湿度信息，如图所示
 
-<img src={require('./img/I2C_AHT20/串口.png').default} alt="串口" width="60%" />
-
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_AHT20/串口.png').default} alt="串口" width="600px" />
+</div>
 
 ## 例程讲解
 
@@ -58,7 +66,16 @@ sidebar_position: 1.5
 #### (1) 初始化过程
 
 - **拷贝库文件：**将aht20.c文件拷贝到Core -> Src目录下，将aht20.h文件拷贝到Core -> Inc目录下。
+
 - **在main.c中添加include：**aht20.h
+
+- **引用头文件：**需要使用 sprintf 打印输出，在 main.c 引用头文件：
+
+```c
+#include "stdio.h"
+#include "string.h"
+```
+
 - **初始化AHT20：**
 
 ```c
@@ -73,6 +90,7 @@ AHT20_Read(float *Temperature, float *Humidity)
 ```
 
 - 预先定义两个float类型的变量，将指针传入该函数，用于接收读取结果
+
 - 建议读取间隔大于500毫秒
 
 ### 3、AHT20与DHT20、DHT11的区别
@@ -80,13 +98,24 @@ AHT20_Read(float *Temperature, float *Humidity)
 三种型号都是广州奥松的温湿度传感器，他们的主要区别如下
 
 - AHT20 vs DHT20
-  - AHT20、DHT20在程序上完全通用，可以相互替代
+
+  - AHT20、DHT20在程序上通用，可以相互替代 
+
   - AHT20是贴片封装，DHT系列是插针封装
+
   - AHT20精度比DHT20稍高一些
+
 - DHT20 vs DHT11
-  - DHT20是DHT11的全新升级产品，提升了精度、响应时间、测量范围，不推荐使用老产品。
+
+  - DHT20、AHT20 是DHT11的全新升级产品，提升了精度、响应时间、测量范围、稳定性，不推荐使用老产品。
+  
   - DHT20是标准的I²C通信，DHT11是单总线通信
 
+DHT20 内部结构：
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_AHT20/DHT20.png').default} alt="DHT20" width="400px" />
+</div>
 
 ## 故障排除
 

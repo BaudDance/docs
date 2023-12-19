@@ -3,6 +3,8 @@ sidebar_position: 1.1
 ---
 # 【GPIO】按键控制
 
+**下载例程代码：** <a href="https://pan.baidu.com/s/1UE4Sw3llYVgAtMOltWPMJA?pwd=pej4" class="source_download_button">点击下载</a>
+
 通过学习板上的按键KEY1、KEY2控制LED的亮灭。
 
 ## 如何使用例程
@@ -13,21 +15,45 @@ sidebar_position: 1.1
 
 - 按一下 KEY2，蓝灯亮/灭翻转一次
 
+- 按一下 KEY3，红灯亮/灭翻转一次
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/GPIO_key/正面照.png').default} alt="正面照" width="400px" />
+</div>
+
 ## 例程讲解
 
 下面介绍了如何自己实现该例程的功能
 
 #### 1、工程配置
 
-- 在工程配置页面，将PA6、PA7配置为GPIO_Outpu，并分别设置User Label为BLUE、GREEN。并将PB12、PB13分别设置为KEY1、KEY2。
-- 进入System Core-GPIO，将PB13（KEY2）的GPIO Pull-up/Pull-down调为Pull-up。学习板上的KEY2没有接外部上拉电阻，因此必须使能该引脚的内部上拉电阻才能正常使用。
+- **分配引脚：**在Pinout&Configuration页面，配置如下引脚
 
-<img src={require('./img/GPIO_key/gpio config.png').default} alt="gpio config" width="60%" />
+  - **输出引脚：**将 PA6、PA7、PB0 分别设置为 GPIO_Output，并分别设置 User label 为 BLUE、GREEN、RED
+
+  - **输入引脚：**将 PB12、PB13、PB15 设置为 GPIO_Input，并分别设置 User label 为 KEY1、KEY2、KEY3
+
+    > 左键点击对应的引脚，选择 GPIO_Output 或 GPIO_Input；
+    >
+    > 右键点击对应的引脚，选择 User label，分别输入 BLUE、GREEN、KEY1、KEY2
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/GPIO_key/gpio config.png').default} alt="gpio config" width="600px" />
+</div>
+
+- **配置GPIO：**在Pinout&Configuration -> GPIO，将 PB13、PB15 的 GPIO Pull-up/Pull-down 配置为 Pull-up
+
+    > 学习板仅 KEY1 配置了外部上拉电阻，因此 KEY1 可以不配置 Pull-up。
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/GPIO_key/配置.png').default} alt="配置" width="600px" />
+</div>
 
 #### 2、代码
 
-- 通过 `HAL_GPIO_WritePin` 函数读取GPIO状态，如果是低电平，则说明按键被按下
-- 按键KEY1与LED联动：在main.c的while循环中实现
+通过 `HAL_GPIO_WritePin` 函数读取 GPIO 状态，如果是**低电平**，则说明按键被按下
+
+- 如果读取到 KEY1 低电平，就点亮绿灯；否则，熄灭绿灯
 
 ```c
 // 如果KEY1按下，就点亮绿灯
@@ -40,7 +66,14 @@ else{
 }
 ```
 
-- 按键消抖：当检测到低电平时，先延时50ms再判断一次，如果还是保持低电平则说明不是抖动，可以进一步操作。触发一次按键操作后，需要等待按键松开再进行下一轮检测，否则按键将会连续触发。
+- KEY2 按下，蓝灯亮/灭翻转一次，然后等待按键释放（否则会导致连续翻转）
+
+    > **按键消抖**
+    > - 读取到 KEY2 是低电平时，先延时 50 ms，再次判断 KEY2 是否还是低电平
+    >
+    > - 如果是，则说明 KEY2 确实被按下
+    >
+    > - 否则，说明 KEY2 是抖动，不做任何操作
 
 ```c
 // KEY2消抖
@@ -52,7 +85,35 @@ if (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin)) {
         // 确认不是抖动，蓝灯亮灭翻转
         HAL_GPIO_TogglePin(BLUE_GPIO_Port, BLUE_Pin);
         // 等待KEY2松开，才能开始下一次检测
-        while (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin));
+        while (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin)) 
+        {
+        }
+    }
+}
+```
+
+- KEY3 按下，红灯亮/灭翻转一次，然后等待按键释放（否则会导致连续翻转）
+
+    > **按键消抖**
+    > - 读取到 KEY3 是低电平时，先延时 50 ms，再次判断 KEY2 是否还是低电平
+    >
+    > - 如果是，则说明 KEY3 确实被按下
+    >
+    > - 否则，说明 KEY3 是抖动，不做任何操作
+    
+```c
+// KEY3 编码器按键
+if (!HAL_GPIO_ReadPin(KEY3_GPIO_Port, KEY3_Pin)) {
+    // 如果检测到低电平，先延时等待50ms
+    HAL_Delay(50);
+    // 再判断KEY3是否还处于低电平
+    if (!HAL_GPIO_ReadPin(KEY3_GPIO_Port, KEY3_Pin)) {
+        // 确认不是抖动，蓝灯亮灭翻转
+        HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
+        // 等待KEY3松开，才能开始下一次检测
+        while (!HAL_GPIO_ReadPin(KEY3_GPIO_Port, KEY3_Pin)) 
+        {
+        }
     }
 }
 ```

@@ -2,29 +2,123 @@
 sidebar_position: 2.4
 ---
 # 【PWM】无源蜂鸣器
-## (PWM_BUZZER)
 
-- 初始化外部晶振，配置SYSCLK与Timer Clock均为72MHz
+**下载例程代码：** <a href="https://pan.baidu.com/s/1B-LjtwcvXJ_3DE1wURJMZA?pwd=krw5" class="source_download_button">点击下载</a>
 
-- 配置PB9为TIM4_CH4
+## PWM 简介
 
-- 配置TIM4
-  - 勾选Internal Clock
-  - Channel4配置为PWM Generation CH4
-  - Prescaler配置为72-1
-  - Counter Period配置为500-1，此时PWM频率为2kHz
-  
-- （可选）因为蜂鸣器比较吵，可以配置一下KEY1（PB12），按下KEY1时蜂鸣器才响
+#### PWM 波形
 
-- （可选）再配置KEY2（PB13，需Pull-Up），按下KEY2可以发出不同的音调
+PWM波形是一种方波信号，是高/低电平不断切换的结果，其波形如图所示，这是3种**占空比**不同的波形：
 
-- 改变频率通过配置ARR寄存器实现：htim4.Instance->ARR = 500
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM波形.jpg').default} alt="PWM波形" width="350px" />
+</div>
 
-- 注意：驱动蜂鸣器的占空比应该保持在20%左右，过高的占空比将导致声音嘶哑
+PWM的几个关键参数为：
 
-  > 每次改变PWM频率，都配置一次占空比：
-  >
-  > __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR/5);
+- **频率（Frequency）**：即高低电平切换的速度，切换的速度越快则频率越高，1000Hz的PWM波意味着1秒钟有1000个脉冲
+- **占空比（Duty Cycle）**：即每个周期内，高电平所占的宽度
+  - 例如图中 `50% duty cycle`，即**高/低电平的时间各占50%**；
+  - 图中的`75% duty cycle`，**高电平占75%，低电平占25%**；
+  - 图中的`25% duty cycle`，**高电平占25%，低电平占75%**；
 
- 
+#### PWM 播放音调
 
+通过改变**PWM频率**，可以输出不同频率的方波信号。用这个信号驱动**无源蜂鸣器**，便能播放不同频率的声音。
+
+#### 无源蜂鸣器原理
+
+- 学习板上的蜂鸣器型号为：**QMB-09B-03电磁式无源蜂鸣器**。
+- 蜂鸣器内部有一个**电磁线圈**，能够驱动**振动膜片**发出声音。通过PWM给蜂鸣器提供不同频率的信号，即可发出不同频率的声音
+- 实际操作中，除了控制**PWM频率**，还需要控制**PWM占空比**，以使膜片振动趋近于正弦波，从而发出清脆明亮的声音。在学习板上，使用**20%占空比**可以有较好的响度和音质
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Buzzer/正面照.png').default} alt="正面照" width="500px" />
+</div>
+
+## 如何使用例程
+
+下载程序，即可看到效果
+
+#### 程序效果
+
+- 烧录例程后，按下 KEY1、KEY2 会听到 2kHz、3kHz 的音调
+- 可以尝试修改例程代码，产生其他频率的声音
+
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **分配引脚：**在Pinout&Configuration页面，配置如下引脚
+
+  - 将PB9配置为TIM4_CH4，
+
+  - 将PB12、PB13设置为GPIO_Input，并分别设置User Label为KEY1、KEY2
+
+- **配置GPIO：**在Pinout&Configuration -> GPIO，将PB13的GPIO Pull-up/Pull-down配置为Pull-up
+
+- **配置TIM4：**在Pinout&Configuration -> Timers -> TIM1
+
+  - 勾选 Internal Clock，开启 TIM4 的内部时钟源
+
+  - Configuration -> Mode，将 Channel4 配置为 PWM Generation CH4
+
+  - Configuration -> Parameter Settings -> Counter Settings，将 Prescaler 配置为 72-1
+
+### 2、代码
+
+- **启动PWM输出**
+
+```c
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+```
+
+- **在while循环中检测按键并输出相应的频率**
+
+  - `htim4.Instance->ARR = 500` 可以将 TIM4 的 Counter Period 设置为 500
+
+    > 此时，**PWM频率** = 72 MHz ÷ 72 ÷ 500 = 2 kHz
+
+  - `__HAL_TIM_SET_COMPARE` 可以设置PWM的占空比，将占空比设为 20%，可以确保声音清脆明亮
+
+    > 注意：占空比**必须小于**前面配置的**Counter Period**，例程中配置为100-1，即占空比**可调范围是 0 - 99**
+
+```c
+while (1)
+{
+    // KEY1按下: 输出2kHz声波
+    if (!HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin))
+    {
+        htim4.Instance->ARR = 500; // 2kHz = 72MHz / 72 / 500
+        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR / 5); // 20%占空比
+    }
+    // KEY2按下: 输出3kHz声波
+    else if (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin))
+    {
+        htim4.Instance->ARR = 334; // 3kHz = 72MHz / 72 / 334
+        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR / 5); // 20%占空比
+    }
+    // 否则: 关闭声波输出
+    else
+    {
+        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+    }
+    HAL_Delay(100);
+}
+```

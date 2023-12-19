@@ -3,20 +3,196 @@ sidebar_position: 2.1
 ---
 
 # 【Timer】超声波测距
-## 超声波测距 (基本定时器方法) 
 
-- 初始化外部晶振，配置SYSCLK与Timer Clock均为72MHz
-- 配置GPIO
-  - PA11配置为Output，设置标签TRIG
-  - PA10配置为Input，设置标签ECHO
-- TIM1配置
-  - Clock Source配置为Internal Clock
-  - Prescaler配置为720-1，即分频到周期10us
-  - Counter Period配置为最大值65535
-- 将USART2配置为Asynchronous
-- 测距流程
-  - 拉高TRIG，等待5ms再拉低，即触发模块输出
-  - 清零定时器的计数，等待ECHO引脚拉高
-  - ECHO拉高时启动定时器
-  - 待ECHO拉低时，停止定时器，并计算距离
+**下载例程代码：** <a href="https://pan.baidu.com/s/17KXyGSry5mN9Y7IGRcdwrA?pwd=x5gi" class="source_download_button">点击下载</a>
 
+## HC-SR04 超声波模块简介
+
+#### HC-SR04 工作原理
+
+模块有2个超声波换能器（如图所示），一个发出声波，另一个接收物体反射回来的声波，这中间所经过的时间即**声波传播的时间**，再结合声速就能计算出：
+
+- 距离 = 声速 * 时间 ÷ 2
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/Timer_UltraSonic/超声波模块.png').default} alt="超声波模块" width="300px" />
+</div>
+
+#### 如何使用HC-SR04模块
+
+模块具有4个引脚，除了电源外，有TRIG、ECHO两个引脚需要操作：
+
+- 首先，向**TRIG引脚**发送一个高电平脉冲，来触发模块输出声波
+
+- 记录ECHO引脚输出高电平的时间，即**声波的飞行时间**
+
+- 距离 = 声速(340m/s) * 声波的飞行时间 ÷ 2
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/Timer_UltraSonic/模块使用方法.png').default} alt="模块使用方法" width="600px" />
+</div>
+
+> 更多资料请查看资料包 -> 配套模块资料 -> 超声波测距HC-SR04-P
+
+## 如何使用例程
+
+下载程序，并连接硬件，即可看到效果
+
+#### 硬件连接
+
+- 使用配套TYPE-C数据线，将学习板连接到计算机
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
+
+- 需要使用：4P杜邦线、超声波模块
+
+- 连接模块时请**核对好线序**：
+
+| 循迹模块 | 学习板 |
+| :------: | :----: |
+|   VCC    |  VCC   |
+|   TRIG   |  A11   |
+|   ECHO   |  A10   |
+|   GND    |  GND   |
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/Timer_UltraSonic/模块接线.png').default} alt="模块接线" width="500px" />
+</div>
+
+#### 程序效果
+
+- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
+
+- 将超声波模块对准一个平面（量程 2 - 400 cm），可以在串口助手看到测距结果
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/Timer_UltraSonic/串口输出信息.png').default} alt="串口输出信息" width="600px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **分配引脚：**在Pinout&Configuration页面，将PA11、PA10分别配置为GPIO_Output、TIM1_CH3，并将PA11命名为TRIG
+
+- **配置TIM1：**在Pinout&Configuration -> Timers -> TIM1
+
+  - Mode -> Clock Source 设为 Internal Clock，Channel3 设为 Input Capture direct mode，即**输入捕获**
+
+  - Configuration ->  Parameter Settings -> Counter Settings -> Prescaler 设为 72-1，使定时器计数周期刚好为 **1 us**
+
+  - （可选）开启输入滤波，以提高稳定性：Configuration ->  Parameter Settings -> Input Capture Channel 3 -> Input Filter，填写范围0 - 15，数值越大，**滤波效果越强**
+
+  - Configuration -> NVIC Settings -> 勾选TIM1 capture compare interrupt，开启**捕获中断**
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/Timer_UltraSonic/TIM1配置.png').default} alt="TIM1配置" width="600px" />
+</div>
+
+- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+
+- **启用float打印：**在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
+
+> 默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
+>
+
+
+### 2、代码
+
+- **引用头文件**
+  - 因为需要打印输出变量，所以应该引用几个头文件：
+
+```c
+#include "stdio.h"
+#include "string.h"
+```
+
+- **触发测量**
+  - 将TRIG引脚拉高至少10us后拉低，触发测量
+
+```c
+// 触发
+HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, 1);
+HAL_Delay(5);
+HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, 0);
+```
+
+- **打开脉冲捕获**
+  - 先清零变量
+  - `__HAL_TIM_SET_CAPTUREPOLARITY ` 配置为上升沿捕获
+  - `HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3)` 开始捕获
+
+```c
+// 清零
+rising_cnt = 0;
+falling_cnt = 0;
+echo_flag = 0;
+__HAL_TIM_SET_COUNTER(&htim1, 0);
+// 开始捕获
+__HAL_TIM_SET_CAPTUREPOLARITY(&htim1, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
+```
+
+- **重定义输入捕获中断函数**
+
+  - 捕获到边沿时，Timer会自动记录当前的计数值，通过`__HAL_TIM_SET_CAPTUREPOLARITY`函数即可获取
+
+  - 捕获到上升沿时，立即配置成下降沿捕获，以捕获下降沿
+
+  - 将上升沿、下降沿的值分别保存到变量`rising_cnt`、`falling_cnt`
+
+```c
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim == &htim1 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
+  {
+    // 捕获到上升沿
+    if (!echo_flag)
+    {
+      rising_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+      echo_flag = 1;
+      __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
+    }
+    // 捕获到下降沿
+    else
+    {
+      falling_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+      echo_flag = 0;
+      __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+    }
+  }
+}
+```
+
+- **计算距离**
+  - 当`rising_cnt`、`falling_cnt`都捕获完成时，计算距离，并通过串口发送结果
+
+```c
+if (rising_cnt != 0 && falling_cnt != 0)
+{
+    // 计算距离
+    // 定时器每1us计数1次，因此 距离=计数*0.34/2（毫米）
+    float distance = (falling_cnt - rising_cnt) * 0.017;
+    // 发送到串口
+    char buf[32];
+    sprintf(buf, "Distance: %.2f cm\r\n", distance);
+    HAL_UART_Transmit(&huart2, (uint8_t *)buf, strlen(buf), 1000);
+    break;
+}
+```

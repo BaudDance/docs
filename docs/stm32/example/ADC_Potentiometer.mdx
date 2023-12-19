@@ -3,7 +3,8 @@ sidebar_position: 1.7
 ---
 
 # 【ADC转换】读取电位器电压
-## 读取电位器电压 （ADC_Potentiometer）
+
+**下载例程代码：** <a href="https://pan.baidu.com/s/15XFJpnJ9CVSn0-vOFoUokg?pwd=fmkf" class="source_download_button">点击下载</a>
 
 通过ADC读取电位器的电压值
 
@@ -13,22 +14,27 @@ sidebar_position: 1.7
 
 #### 硬件连接
 
-- 使用配套TYPE-C数据线，将学习板连接到计算机
+- 使用配套TYPE-C数据线，将学习板连接到计算机 
 
-<img src={require('./img/ADC_Potentiometer/连接usb线.png').default} alt="连接usb线" width="68%" />
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
 
 #### 程序效果
 
 - 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial，即可收到ADC转换结果，如图所示
 
-<img src={require('./img/ADC_Potentiometer/串口数据.png').default} alt="串口数据" width="68%" />
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/ADC_Potentiometer/串口数据.png').default} alt="串口数据" width="600px" />
+</div>
 
 - 程序会连续读取PA5的输入电压值，而PA5的电压值是由电位器VOL决定的，使用螺丝刀调节学习板上的电位器，即可观察到对应的数据变化。
 
   > 数据变化范围0-4095，对应着PA5的电压值0-3.3V
 
-<img src={require('./img/ADC_Potentiometer/1.png').default} alt="数据变化" width="68%" />
-
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/ADC_Potentiometer/1.png').default} alt="数据变化" width="500px" />
+</div>
 
 ## 例程讲解
 
@@ -51,6 +57,16 @@ sidebar_position: 1.7
 ### 2、代码
 
 #### (1) 初始化过程
+
+- **引用头文件：**需要使用 sprintf 打印输出，以及数学函数，在 main.c 引用头文件：
+
+```c
+#include "stdio.h"
+#include "string.h"
+#include "math.h"
+```
+
+- **启动连续ADC转换**
 
 ```c
 // 启动连续ADC转换
