@@ -1,0 +1,35 @@
+# 下载失败
+
+## 1. No Target Found
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/CompilationFailed/noDeviceFound.png').default} alt="noDeviceFound" width="350px" />
+</div>
+
+#### 问题1：设备未连接牢靠
+
+- ST-LINK 排线**用力压紧**
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/CompilationFailed/压紧排线.png').default} alt="压紧排线" width="450px" />
+</div>
+
+#### 问题2：下载成功过，但这次不行了
+
+- 按文档操作： **[解决方法](/docs/stm32/FAQ/DownloadFailed/CompilationFailed)**
+
+## 2. ST-LINK 初始化出错
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/CompilationFailed/端口被占用.png').default} alt="端口被占用" width="600px" />
+</div>
+
+#### GDB端口被占用了
+
+按文档操作： **[解决方法](/docs/stm32/FAQ/DownloadFailed/PortOccupied)**
+
+## 详细说明文档
+
+import DocCardList from '@theme/DocCardList';
+
+<DocCardList />
