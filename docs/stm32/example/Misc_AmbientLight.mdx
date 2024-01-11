@@ -75,7 +75,7 @@ WS2812 的颜色通过RGB三通道混合产生，每个通道的调节范围都�
 
   - Configuration -> Parameter Settings -> Counter Settings，将 Prescaler 配置为 0，Counter Period配置为90-1，即PWM频率 800 kHz
 
-  - Configuration -> GPIO Settings，将PB4的GPIO mode配置为 Alternate Function Open Drain
+  - Configuration -> GPIO Settings，将PB4的GPIO mode配置为 Alternate Function Open Drain，Maximum output speed 配置为 High
 
     > 因为WS2812是5V电平的，因此需要用开漏输出模式，外接5V上拉电阻，使信号高电平变成5V
     >
