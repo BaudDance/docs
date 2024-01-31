@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      description="波特律动文档网站">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
