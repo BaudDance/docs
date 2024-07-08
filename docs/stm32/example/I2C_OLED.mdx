@@ -67,22 +67,19 @@ OLED屏幕循环显示不同画面：
 #### (1) 初始化过程
 
 - **拷贝库文件：**将oled.c、font.c文件拷贝到Core -> Src目录下，将oled.h、font.h文件拷贝到Core -> Inc目录下。
-- **在main.c中添加include：**oled.h
+- **在main.c中添加include：**
+  
+```c
+#include "string.h"
+#include "oled.h"
+#include "stdio.h"
+```
+  
 - **初始化OLED：**
 
 ```c
-// 刚上电时STM32比OLED启动快，因此需要等待一段时间再初始化OLED
-HAL_Delay(20);
-// 初始化OLED
-OLED_Init();
-// 设置OLED显示模式：正常/反色
-OLED_SetColorMode(OLED_COLOR_NORMAL);
-// 设置OLED显示方向：0°/180°
-OLED_SetOrientation(OLED_Orientation_0);
-// 清空显示缓冲区
-OLED_ClearBuffer();
-// 将缓存内容更新到屏幕显示
-OLED_Refresh();
+HAL_Delay(20); // 单片机启动比OLED上电快,需要延迟等待一下
+OLED_Init(); // 初始化OLED
 ```
 
 #### (2) 显示函数
@@ -92,138 +89,220 @@ OLED_Refresh();
 > 注意：任何操作都需要调用此函数才能显示到屏幕上，否则只是改变显示缓冲区
 
 ```c
-OLED_Refresh(void);
+OLED_ShowFrame();
 ```
 
-- **缓存清屏：**
+
+- **新建空白缓冲区：**
+
+> 注意：只存在一个Frame，NewFrame后之前的内容将被清空
 
 ```c
-OLED_ClearBuffer(void);
+OLED_NewFrame();
 ```
+
 
 - **显示一个像素点：**
-  - `uint8_t x` x坐标
-  - `uint8_t y` y坐标
+  - `uint8_t x` 横坐标
+  - `uint8_t y` 纵坐标
   - `OLED_ColorMode mode` 颜色模式
     - `OLED_COLOR_NORMAL` 正常
     - `OLED_COLOR_REVERSE` 反色
 
 ```c
-OLED_DrawPixel(uint8_t x, uint8_t y, OLED_ColorMode mode);
-// 应用示例
-OLED_DrawPixel(1, 1, OLED_COLOR_NORMAL);
+void OLED_SetPixel(uint8_t x, uint8_t y, OLED_ColorMode color);
+```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_SetPixel(0, 0, OLED_COLOR_NORMAL); // 在(0, 0)处显示一个黑色的像素点
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
-- **显示ASCII字符串：**
-  - `uint8_t x` x坐标，[0, 127]
-  - `uint8_t y` y坐标，[0, 63]
-  - `char *s` 要显示的字符串
-  - `uint8_t font` 字体高度（参考“取字模”部分的介绍）
-  - `OLED_ColorMode mode` 颜色模式
-    - `OLED_COLOR_NORMAL` 正常
-    - `OLED_COLOR_REVERSE` 反色
+
+- **显示字符串**
+  - `uint8_t x` 纵坐标 [0, 127]
+  - `uint8_t y` 纵坐标 [0, 63]
+  - `char *str` 要显示的字符串
+  - `const Font *font` 字体
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_PrintString(uint8_t x, uint8_t y, char *s, uint8_t font, OLED_ColorMode mode);
-// 应用示例
-OLED_PrintString(0, 0, "Hi :P", 16, OLED_COLOR_NORMAL);
+void OLED_PrintString(uint8_t x, uint8_t y, char *str, const Font *font, OLED_ColorMode color);
 ```
-
-- **显示（中英文）字符串：**该函数支持显示中文字符、ASCII字符任意组合的字符串。
-  - `uint8_t x` x坐标，[0, 127]
-  - `uint8_t y` y坐标，[0, 63]
-  - `char *s` 要显示的字符串
-  - `uint8_t font` 字体高度
-  - `OLED_ColorMode mode` 颜色模式
-
 ```c
-OLED_PrintChinese(uint8_t x, uint8_t y, char *s, uint8_t font, OLED_ColorMode mode);
-// 应用示例
-OLED_PrintChinese(0, 22, "B站-KEYSKING", 16, OLED_COLOR_NORMAL);
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_PrintString(0, 22, "B站-KEYSKING", &font16x16, OLED_COLOR_NORMAL); // 中文、英文、符号混合显示
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
+
 
 - **绘制直线：**
-  - `uint8_t x0` 直线起点 x坐标 [0, 127]
-  - `uint8_t y0` 直线起点 y坐标 [0, 63]
-  - `uint8_t x1` 直线终点 x坐标 [0, 127]
-  - `uint8_t y` 直线终点 y坐标 [0, 63]
-  - `OLED_ColorMode mode` 颜色模式
+  - `uint8_t x1` 直线起点横坐标 [0, 127]
+  - `uint8_t y1` 直线起点纵坐标 [0, 63]
+  - `uint8_t x2` 直线终点横坐标 [0, 127]
+  - `uint8_t y2` 直线终点纵坐标 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_DrawLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, OLED_ColorMode mode);
-// 应用示例
-OLED_DrawLine(0, 0, 10, 63, OLED_COLOR_NORMAL);
+void OLED_DrawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, OLED_ColorMode color);
 ```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawLine(0, 0, 127, 63, OLED_COLOR_NORMAL); // 从左上角到右下角绘制一条直线
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
 
 - **绘制（空心）矩形：**
-  - `uint8_t x0` 左端点 x坐标 [0, 127]
-  - `uint8_t y0` 上端点 y坐标 [0, 63]
-  - `uint8_t x1` 右端点 x坐标 [0, 127]
-  - `uint8_t y` 下端点 y坐标 [0, 63]
-  - `OLED_ColorMode mode` 颜色模式
+  - `uint8_t x` 起始点横坐标 [0, 127]
+  - `uint8_t y` 起始点纵坐标 [0, 63]
+  - `uint8_t w` 矩形宽度 [0, 127]
+  - `uint8_t h` 矩形高度 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_DrawRectangle(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, OLED_ColorMode mode);
-// 应用示例
-OLED_DrawRectangle(0, 0, 127, 63, OLED_COLOR_NORMAL);
+void OLED_DrawRectangle(uint8_t x, uint8_t y, uint8_t w, uint8_t h, OLED_ColorMode color);
+```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawRectangle(32, 16, 63, 31, OLED_COLOR_NORMAL); // 绘制一个空心矩形
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
+
 - **绘制（填充）矩形：**
-  - `uint8_t x0` 左端点 x坐标 [0, 127]
-  - `uint8_t y0` 上端点 y坐标 [0, 63]
-  - `uint8_t x1` 右端点 x坐标 [0, 127]
-  - `uint8_t y` 下端点 y坐标 [0, 63]
-  - `OLED_ColorMode mode` 颜色模式
+  - `uint8_t x` 起始点横坐标 [0, 127]
+  - `uint8_t y` 起始点纵坐标 [0, 63]
+  - `uint8_t w` 矩形宽度 [0, 127]
+  - `uint8_t h` 矩形高度 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_DrawRectangleFilled(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, OLED_ColorMode mode);
-// 应用示例
-OLED_DrawRectangle(40, 20, 87, 43, OLED_COLOR_NORMAL);
+void OLED_DrawFilledRectangle(uint8_t x, uint8_t y, uint8_t w, uint8_t h, OLED_ColorMode color);
+```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawFilledRectangle(32, 16, 63, 31, OLED_COLOR_NORMAL); // 绘制一个填充矩形
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 - **绘制（空心）圆形：**
-  - `uint8_t x0` 圆心 x坐标 [0, 127]
-  - `uint8_t y0` 圆心 y坐标 [0, 63]
-  - `rad` 圆的半径
-  - `option` 绘制圆的部分
-    - `CIRCLE_UPPER_RIGHT` 只绘制圆的右上1/4
-    - `CIRCLE_UPPER_LEFT` 只绘制圆的左上1/4
-    - `CIRCLE_LOWER_LEFT` 只绘制圆的左下1/4
-    - `CIRCLE_LOWER_RIGHT` 只绘制圆的右下1/4
-    - `CIRCLE_ALL` 绘制完整的圆
-  - `OLED_ColorMode mode` 颜色模式
+> 此函数使用Bresenham算法绘制圆
+
+  - `uint8_t x` 圆心横坐标 [0, 127]
+  - `uint8_t y` 圆心纵坐标 [0, 63]
+  - `uint8_t r` 圆的半径 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_DrawCircle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t option, OLED_ColorMode mode);
-// 应用示例
-OLED_DrawCircle(64, 32, 20, CIRCLE_ALL, OLED_COLOR_NORMAL);
+void OLED_DrawCircle(uint8_t x, uint8_t y, uint8_t r, OLED_ColorMode color);
 ```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawCircle(64, 32, 16, OLED_COLOR_NORMAL); // 绘制一个空心圆形
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
 
 - **绘制（填充）圆形：**
-  - `uint8_t x0` 圆心 x坐标 [0, 127]
-  - `uint8_t y0` 圆心 y坐标 [0, 63]
-  - `rad` 圆的半径
-  - `OLED_ColorMode mode` 颜色模式
+> 此函数使用Bresenham算法绘制圆
+
+  - `uint8_t x` 圆心横坐标 [0, 127]
+  - `uint8_t y` 圆心纵坐标 [0, 63]
+  - `uint8_t r` 圆的半径 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_DrawCircleFilled(uint8_t x0, uint8_t y0, uint8_t rad, OLED_ColorMode mode);
-// 应用示例
-OLED_DrawCircleFilled(64, 32, 20, CIRCLE_ALL, OLED_COLOR_NORMAL);
+void OLED_DrawFilledCircle(uint8_t x, uint8_t y, uint8_t r, OLED_ColorMode color);
 ```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawFilledCircle(64, 32, 16, OLED_COLOR_NORMAL); // 绘制一个填充圆形
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
+
+- **绘制（空心）三角形：**
+  - `uint8_t x1` 第一个点横坐标 [0, 127]
+  - `uint8_t y1` 第一个点纵坐标 [0, 63]
+  - `uint8_t x2` 第二个点横坐标 [0, 127]
+  - `uint8_t y2` 第二个点纵坐标 [0, 63]
+  - `uint8_t x3` 第三个点横坐标 [0, 127]
+  - `uint8_t y3` 第三个点纵坐标 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
+
+```c
+void OLED_DrawTriangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t x3, uint8_t y3, OLED_ColorMode color);
+```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawTriangle(64, 0, 0, 63, 127, 63, OLED_COLOR_NORMAL); // 在屏幕中心绘制一个空心三角形
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
+
+- **绘制（填充）三角形：**
+  - `uint8_t x1` 第一个点横坐标 [0, 127]
+  - `uint8_t y1` 第一个点纵坐标 [0, 63]
+  - `uint8_t x2` 第二个点横坐标 [0, 127]
+  - `uint8_t y2` 第二个点纵坐标 [0, 63]
+  - `uint8_t x3` 第三个点横坐标 [0, 127]
+  - `uint8_t y3` 第三个点纵坐标 [0, 63]
+  - `OLED_ColorMode color` 颜色模式
+
+```c
+void OLED_DrawFilledTriangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t x3, uint8_t y3, OLED_ColorMode color);
+```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawFilledTriangle(64, 0, 0, 63, 127, 63, OLED_COLOR_NORMAL); // 在屏幕中心绘制一个填充三角形
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
+
+- **绘制（空心）椭圆：**
+  - `uint8_t x` 圆心横坐标 [0, 127]
+  - `uint8_t y` 圆心纵坐标 [0, 63]
+  - `uint8_t a` 长轴长度
+  - `uint8_t b` 短轴长度
+  - `OLED_ColorMode color` 颜色模式
+
+```c
+void OLED_DrawEllipse(uint8_t x, uint8_t y, uint8_t a, uint8_t b, OLED_ColorMode color)
+```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawEllipse(64, 32, 30, 15, OLED_COLOR_NORMAL); // 绘制一个空心椭圆
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
 
 - **显示BMP图像：**
-  - `uint8_t x` 左端点 x坐标 [0, 127]
-  - `uint8_t y` 上端点 y坐标 [0, 63]
-  - `uint8_t size_x` 图像宽度
-  - `uint8_t size_y` 图像高度
-  - `const unsigned char pic[]` 要显示的图像（参考“取字模”部分的介绍）
-  - `OLED_ColorMode mode` 颜色模式
+  - `uint8_t x` 起始点横坐标 [0, 127]
+  - `uint8_t y` 起始点纵坐标 [0, 63]
+  - `const Image *img` 图像数据
+  - `OLED_ColorMode color` 颜色模式
 
 ```c
-OLED_DrawPicture(uint8_t x, uint8_t y, uint8_t size_x, uint8_t size_y, const unsigned char pic[], OLED_ColorMode mode);
-// 应用示例
-OLED_DrawPicture(40, 7, 48, 48, icon_IDE, OLED_COLOR_NORMAL);
+void OLED_DrawImage(uint8_t x, uint8_t y, const Image *img, OLED_ColorMode color);
 ```
+```c
+// 示例
+OLED_NewFrame(); // 新建一个空白缓冲区
+OLED_DrawImage((128 - (bilibiliImg.w)) / 2, 0, &bilibiliImg, OLED_COLOR_NORMAL); // 显示名为bilibiliImg的BMP图像
+OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
+```
+
 
 #### (3) 取字模
 
@@ -239,7 +318,11 @@ OLED_DrawPicture(40, 7, 48, 48, icon_IDE, OLED_COLOR_NORMAL);
 
 - 中文字符：中文字符数量多，STM32内部Flash无法全部存储，因此需要根据使用的字符来取字模。
 
-- 在线取字模工具：https://led.baud-dance.com/
+  - 在线取字模工具：https://led.baud-dance.com/
+  - 使用方法
+    - 输入所有需要用到的中文字符后，点击右下角复制按钮，复制字模
+    - 将字模代码粘贴到font.c中，并在font.h中添加对应的声明
+    - 使用OLED_PrintString函数, 传入对应的字体结构体即可显示中文字符
 
 **图片：**支持BMP格式单色位图
 
@@ -265,18 +348,22 @@ OLED_DrawPicture(40, 7, 48, 48, icon_IDE, OLED_COLOR_NORMAL);
 
 ## 故障排除
 
-### OLED显示问题
+### 屏幕显示偏暗
 
-- **屏幕显示偏暗：**不要在STM32程序启动时马上初始化OLED。因为刚上电时STM32比OLED启动快，立即对OLED进行初始化可能会失败。建议延时10-50毫秒再调用OLED_Init()进行初始化操作。
+- **不要在STM32程序启动时马上初始化OLED** 
+  
+  刚上电时STM32比OLED启动快，立即对OLED进行初始化可能会失败。
 
-### 工程建立和配置问题
+  延时10-50毫秒再调用```OLED_Init()```函数即可。
 
-- **cube重新生成代码后，中文出现乱码：**这是cubeIDE的问题，我们在环境变量中添加一行配置即可解决（仅Windows下）
+### cube重新生成代码后，中文出现乱码
+
+- **cubeIDE对中文支持的问题，添加环境变量可以解决（仅Windows下）**
 
   - 点击开始菜单，输入“环境变量”搜索，进入系统属性设置
 
   <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-  <img src={require('./img/I2C_OLED/搜索环境变量.png').default} alt="搜索环境变量" width="300px" />
+  <img src={require('./img/I2C_OLED/搜索环境变量.png').default} alt="搜索环境变量" width="500px" />
   </div>
 
   - 点击系统属性下方的“环境变量”，进入环境变量配置页面。如图，点击新建，添加一个环境变量并保存即可。
@@ -286,35 +373,5 @@ OLED_DrawPicture(40, 7, 48, 48, icon_IDE, OLED_COLOR_NORMAL);
     变量值：-Dfile.encoding=UTF-8
 
   <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-  <img src={require('./img/I2C_OLED/添加环境变量.png').default} alt="添加环境变量" width="600px" />
+  <img src={require('./img/I2C_OLED/添加环境变量.png').default} alt="添加环境变量" width="500px" />
   </div>
-
-- **找不到gpio.c文件：**工程目录中打开xxx.ioc配置文件，进入Project Manager-Code Generator，勾选Generate peripheral initialization as a pair of '.c/.h' files per peripheral，保存并重新生成代码，就有单独的gpio.c文件了
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/I2C_OLED/勾选生成独立初始化文件.png').default} alt="勾选生成独立初始化文件" width="600px" />
-</div>
-
-- **打开.ioc配置文件时弹出对话框”New STM32Cube firmware version available“：**因为您的软件版本比例程高，此时建议直接点击”Migrate“迁移到您的版本即可，以后再打开就不会出现了。
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/I2C_OLED/New version dialog.png').default} alt="New version dialog" width="400ox" />
-</div>
-
-### 程序下载问题
-
-[工程建立和配置](/docs/stm32/FAQ/TroubleShooting)
-
-升级ST-LINK固件即可解决，请按如下步骤操作：
-
-1、 顶部工具栏 Help -> ST-LINK更新，打开固件升级工具。
-
-<img src={require('./img/I2C_OLED/STLINK更新.png').default} alt="STLINK更新" width="60%" />
-
-2、重新插拔一下ST-LINK使其进入DFU模式
-
-3、点击“Refresh Device List”，然后点击2次“Open in update mode”，直到Version显示出来。（如果Version仍然是Unknown，再点击一次“Open in update mode”）
-
-<img src={require('./img/I2C_OLED/open_in_dfu.png').default} alt="open_in_dfu" width="67%" />
-
-4、点击“Upgrade”，进度条走完后，重新插拔ST-LINK，即可正常下载。
