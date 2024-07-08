@@ -1,33 +1,48 @@
 # 安装错误
 
-## 中文路径问题
+打开安装包时弹出错误窗口：
 
-<img src={require('../img/IdeInstallationWizard/安装失败报错.png').default} alt="安装报错" width="60%" />
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/IdeInstallationWizard/安装失败报错.png').default} alt="安装报错" width="500px" />
+</div>
 
-### 情形1. 安装包在中文路径中
+### 问题1： 安装包在中文路径中
 
-检查安装包所在的文件夹路径中是否存在中文.
+- 检查安装包所在的文件夹路径中是否存在中文.
 
-若有, 将安装包移到无中文路径的文件夹下, 例如直接放到D盘根目录
+- 若有, 将安装包移到无中文路径的文件夹下, 例如直接放到D盘根目录
 
-### 情形2. 环境变量TEMP中有中文
+### 问题2： 环境变量TEMP中有中文
 
-> 这种情况多数是因为系统用户名为中文导致, 建议以后装系统不要使用中文用户名.
+> 通常是因为系统用户名含有中文
 
-**1. 按win键，然后直接输入进行搜索**
+> 鉴于嵌入式开发工具对中文支持不够友好，建议使用纯英文的用户名
 
-<img src={require('../img/IdeInstallationWizard/搜索环境变量.png').default} alt="搜索环境变量" width="60%" />
+- 点击开始菜单，输入“环境变量”搜索，进入系统属性设置
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/搜索环境变量.png').default} alt="搜索环境变量" width="500px" />
+</div>
+
+- 点击系统属性下方的“环境变量”，进入环境变量配置页面
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/IdeInstallationWizard/打开环境变量.png').default} alt="打开环境变量" width="700px" />
+</div>
+
+- 双击修改**用户变量**和**系统变量**中的**TEMP**和**TMP**变量, 将其值修改到一个**无中文**的文件夹中
+
+    > **请注意！必须是真实存在的文件夹** 
+
+    > 例如自己在D盘新建一个叫TEMP的文件夹, 全部修改到那个文件夹
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('../img/IdeInstallationWizard/修改环境变量.png').default} alt="修改环境变量" width="700px" />
+</div>
 
 
-**2. 打开环境变量界面**
+- 修改完成后, 重新打开IDE安装包, 重新安装即可
 
-<img src={require('../img/IdeInstallationWizard/打开环境变量.png').default} alt="打开环境变量" width="60%" />
-
-
-**3. 双击修改用户变量和系统变量中的TEMP和TMP变量, 将其值修改到一个无中文的文件夹中**
-
-(例如自己在D盘新建一个叫TEMP的文件夹, 全部修改到那个文件夹)
-
-<img src={require('../img/IdeInstallationWizard/修改环境变量.png').default} alt="修改环境变量" width="60%" />
+- 在之后新建工程、选择工作空间等操作时, 也需要保证路径中没有中文
 
 
