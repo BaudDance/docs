@@ -90,7 +90,11 @@ EC11有A、B两相输出，其规格是 **20脉冲/360°**
 ```c
 // 启动编码器
 HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+// 给TIM1的CNT赋初值1000
+htim1.Instance->CNT = 1000;
 ```
+
+> 赋初值1000是为了方便观察，实际应用中可以根据需求赋初值
 
 #### (2) 获得脉冲计数
 
