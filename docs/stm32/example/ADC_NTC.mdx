@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 sidebar_position: 1.8
 ---
@@ -115,4 +116,123 @@ float resistance2Temperature(float R1) {
 ```
 ## 故障排除
 
+=======
+---
+sidebar_position: 1.8
+---
+
+# 【ADC转换】NTC热敏电阻测温
+
+**下载例程代码：** <a href="https://pan.baidu.com/s/165NaFNbXgTJ7p0YcECWL3g?pwd=x99h" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+
+## 热敏电阻简介
+
+通过ADC转换器，读取NTC热敏电阻的电压，实现温度测量
+
+套件NTC热敏传感器主要参数：
+
+|    参数    |     值      |
+| :--------: | :---------: |
+|  常温电阻  | 10KΩ (25℃)  |
+|    B值     |    3950     |
+|    精度    |    ± 1%     |
+|  工作温度  | -20 ~ 105 ℃ |
+| 热时间常数 |   ≤ 12 s    |
+
+## 如何使用例程
+
+下载程序，并连接硬件，即可看到效果
+
+#### 硬件连接
+
+- 将配套的NTC热敏线插到学习板
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/ADC_NTC/NTC线.png').default} alt="NTC线" width="400px" />
+</div>
+
+- 使用配套TYPE-C数据线，将学习板连接到计算机
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
+
+#### 程序效果
+
+- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial，即可收到ADC转换结果，如图所示
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/ADC_NTC/串口数据.png').default} alt="串口数据" width="600px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **打开ADC1：**在Pinout&Configuration页面，将 PA4 设置为 ADC1_IN4
+
+- **配置ADC：**在Pinout&Configuration -> Analog -> ADC1 -> Configuration中
+  
+  - ADC_Settings -> Continuous Conversion Mode设为Enable，使 ADC 转换持续进行，不用每次手动触发
+
+  - ADC_Regular_ConversionMode -> Rank -> Sampling Time设为239.5 Cycles，最长采样时间，可以获得更稳定的转换结果
+
+    > 采样时间越长，转换结果越准确
+  
+- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将 Mode 选择为 Asynchronous
+
+- **启用float打印：**在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选 Use float with printf ... -nano
+
+  > 默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
+
+### 2、代码
+
+#### (1) 初始化过程
+
+- **引用头文件：**需要使用 sprintf 打印输出，以及数学函数，在 main.c 引用头文件：
+
+```c
+#include "stdio.h"
+#include "string.h"
+#include "math.h"
+```
+
+- **启动连续ADC转换**
+
+```c
+// 启动连续ADC转换
+HAL_ADC_Start(&hadc1);
+// 等待ADC稳定
+HAL_Delay(500);
+```
+
+#### (2) 温度计算
+
+- **通过ADC值计算NTC电阻值**
+  - `adc_value` 输入ADC结果，范围 0 - 4095
+  - `return` 返回NTC电阻值，浮点数类型，单位Ω
+
+```c
+float ADC2Resistance(uint32_t adc_value) {
+  return (adc_value / (4096.0f - adc_value)) * 10000.0f;
+}
+```
+
+- **通过NTC阻值计算温度**
+  - `R1` NTC电阻值
+  - `return` 返回温度，float类型，单位摄氏度
+
+```c
+float resistance2Temperature(float R1) {
+  float B = 3950.0f;
+  float R2 = 10000.0f;
+  float T2 = 25.0f;
+  return (1.0 / ((1.0 / B) * log(R1 / R2) + (1.0 / (T2 + 273.15))) - 273.15);
+}
+```
+## 故障排除
+
+>>>>>>> 3880c53ad50c530d8ce5775d62f67cc07e460830
 [工程建立和配置](/docs/stm32/FAQ/TroubleShooting)
