@@ -34,6 +34,7 @@
 .source_download_button {
   display: inline-block;
   padding: 2px 18px;
+  margin-right: 25px;
   color: #fff;
   background-color: #2d8e0a;
   border: none;
