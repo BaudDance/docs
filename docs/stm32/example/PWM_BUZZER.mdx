@@ -85,9 +85,9 @@ PWM的几个关键参数为：
 
 - **启动PWM输出**
 
-```c
-HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-```
+  ```c
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+  ```
 
 - **在while循环中检测按键并输出相应的频率**
 
@@ -99,26 +99,26 @@ HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
 
     > 注意：占空比**必须小于**前面配置的**Counter Period**，例程中配置为100-1，即占空比**可调范围是 0 - 99**
 
-```c
-while (1)
-{
-    // KEY1按下: 输出2kHz声波
-    if (!HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin))
-    {
-        htim4.Instance->ARR = 500; // 2kHz = 72MHz / 72 / 500
-        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR / 5); // 20%占空比
-    }
-    // KEY2按下: 输出3kHz声波
-    else if (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin))
-    {
-        htim4.Instance->ARR = 334; // 3kHz = 72MHz / 72 / 334
-        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR / 5); // 20%占空比
-    }
-    // 否则: 关闭声波输出
-    else
-    {
-        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
-    }
-    HAL_Delay(100);
-}
-```
+  ```c
+  while (1)
+  {
+      // KEY1按下: 输出2kHz声波
+      if (!HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin))
+      {
+          htim4.Instance->ARR = 500; // 2kHz = 72MHz / 72 / 500
+          __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR / 5); // 20%占空比
+      }
+      // KEY2按下: 输出3kHz声波
+      else if (!HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin))
+      {
+          htim4.Instance->ARR = 334; // 3kHz = 72MHz / 72 / 334
+          __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, htim4.Instance->ARR / 5); // 20%占空比
+      }
+      // 否则: 关闭声波输出
+      else
+      {
+          __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+      }
+      HAL_Delay(100);
+  }
+  ```

@@ -1,11 +1,11 @@
 ---
-sidebar_position: 2.61
+sidebar_position: 2.62
 ---
-# 【UART 串口】命令点灯
+# 【UART 串口】命令点灯（中断）
 
 **下载例程代码：** <a href="https://pan.baidu.com/s/1IH1MgJE1CAVYdpuWwVWYFQ?pwd=1234" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
 
-UART串口的第一个例子：通过串口（TYPE-C）向板子发送命令，控制学习板正面的LED。
+通过串口中断实现控制学习板正面的LED。
 
 ## 如何使用例程
 
@@ -43,83 +43,71 @@ UART串口的第一个例子：通过串口（TYPE-C）向板子发送命令，�
 
 - **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
 
+- **使能串口中断：**在 USART2 -> Configuration -> NVIC Settings 标签卡中，勾选 USART2 global interrupt 的 Enable
+
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/UART_RGB/configUART.png').default} alt="uart config" width="600px" />
+<img src={require('./img/UART_RGB/enableIT.png').default} alt="IT config" width="600px" />
 </div>
 
 
 ### 2、代码
 
-- 定义串口接收缓冲区，数组大小为2
+- 定义全局变量 `rx_data` 作为串口接收缓冲区。
 
     ```c
     // 串口接收缓冲区
     uint8_t rx_data[2];
     ```
 
-- 在while循环中，使用HAL_UART_Receive函数接收串口数据
+- 在 main 函数中，使用 `HAL_UART_Receive_IT` 函数开启串口接收中断
 
-    > `HAL_MAX_DELAY`  表示阻塞等待，直到接收到 2 个字节为止
+    > 只需要开启一次，接收到数据后会自动进入中断函数
 
     ```c
-    // 开始接收数据，阻塞等待，直到接收到 2 个字节
-    HAL_UART_Receive(&huart2, rx_data, 2, HAL_MAX_DELAY);
+    // 开启串口中断接收
+    HAL_UART_Receive_IT(&huart2, rx_data, 2);
     ```
 
-- 在while循环中，使用if语句判断接收到的数据，并控制LED
+- 在串口中断函数 `HAL_UART_RxCpltCallback` 中，处理接收到的数据，并控制LED
 
-    > `rx_data[0]` 第一个字符为颜色（R：红色，G：绿色，B：蓝色）
+    > **所有的串口接收和发送操作都在中断函数中进行，不会阻塞主程序**
 
-    > `rx_data[1]` 第二个字符为状态（0：灭，1：亮）
+    > **因此，while 循环中可以自由的处理其他任务**
 
     ```c
-    // 根据接收到的数据控制 LED
-    GPIO_PinState state = GPIO_PIN_SET;
-    if (rx_data[1] == '0')
+    // 串口接收完成（收到2个字节）中断回调函数
+    void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
+    if (huart->Instance == USART2)
+    {
+        // 根据接收到的数据控制 LED
+        GPIO_PinState state = GPIO_PIN_SET;
+        if (rx_data[1] == '0')
+        {
         state = GPIO_PIN_RESET;
-    }
-    if (rx_data[0] == 'R')
-    {
-        HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, state); 
-    }
-    else if (rx_data[0] == 'G')
-    {
-        HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, state); 
-    }
-    else if (rx_data[0] == 'B')
-    {
+        }
+        if (rx_data[0] == 'R')
+        {
+        HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, state);
+        }
+        else if (rx_data[0] == 'G')
+        {
+        HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, state);
+        }
+        else if (rx_data[0] == 'B')
+        {
         HAL_GPIO_WritePin(BLUE_GPIO_Port, BLUE_Pin, state);
+        }
+        // 将收到的数据返回（中断发送）
+        HAL_UART_Transmit_IT(&huart2, rx_data, 2);
+        // 重新开启中断接收
+        HAL_UART_Receive_IT(&huart2, rx_data, 2);
     }
-    ```
-
-- 在while循环最后，使用HAL_UART_Transmit函数返回收到的数据
-
-    > `HAL_MAX_DELAY`  表示阻塞等待，直到 2 个字节全部发送成功
-
-    ```c
-    // 将收到的数据返回
-    HAL_UART_Transmit(&huart2, rx_data, 2, HAL_MAX_DELAY);
+    }
     ```
 
 ### 3、返回数据发生颠倒
 
 例如发送 R1 返回却变成 1R
 
-- **原因：**`HAL_UART_Receive` 固定接收2字节。发送非2字节数据（如1或3字节）会使剩余字节留在缓冲区，下次读取时导致数据错乱。
-
-- **解决方法：**可以在 while 循环最上面添加一行代码，清空缓冲区
-
-    ```c
-    while (1)
-    {
-        // 先清空一下缓冲区
-        HAL_UART_Receive(&huart2, rx_data, 1, 0);
-        // 然后开始接收数据...
-        // 控制 LED...
-        // 将收到的数据返回...
-    }
-    ```
-
-
-    
+- **原因：**`HAL_UART_Receive_IT` 固定接收2字节。发送非2字节数据（如1或3字节）会使剩余字节留在缓冲区，下次读取时导致数据错乱。

@@ -85,12 +85,12 @@ PWM的几个关键参数为：
 
 - **启动PWM输出**
 
-```c
-//启动3个通道的PWM输出
-HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
-```
+  ```c
+  //启动3个通道的PWM输出
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  ```
 
 - **在while循环中逐渐改变占空比**
 
@@ -102,24 +102,24 @@ HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 
   - 再从99逐渐减小到0，亮度逐渐降低
 
-```c
-while (1) {
-    // PWM通道CH1-3分别对应三个颜色，下面示例三个颜色一起呼吸灯
-    // 0-99为占空比，0为最小亮度，99为最大亮度
-    // 每7ms调整一次占空比，从0逐渐增加到99
-    for (int period = 0; period < 100; period++) {
-        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, period);
-        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period);
-        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, period);
-        HAL_Delay(7);
-    }
-    // 从99逐渐减小到0
-    for (int period = 99; period >= 0; period--) {
-        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, period);
-        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period);
-        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, period);
-        HAL_Delay(7);
-    }
-    HAL_Delay(100); 
-}
-```
+  ```c
+  while (1) {
+      // PWM通道CH1-3分别对应三个颜色，下面示例三个颜色一起呼吸灯
+      // 0-99为占空比，0为最小亮度，99为最大亮度
+      // 每7ms调整一次占空比，从0逐渐增加到99
+      for (int period = 0; period < 100; period++) {
+          __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, period);
+          __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period);
+          __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, period);
+          HAL_Delay(7);
+      }
+      // 从99逐渐减小到0
+      for (int period = 99; period >= 0; period--) {
+          __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, period);
+          __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period);
+          __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, period);
+          HAL_Delay(7);
+      }
+      HAL_Delay(100); 
+  }
+  ```

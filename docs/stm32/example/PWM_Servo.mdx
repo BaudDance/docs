@@ -118,22 +118,22 @@ PWM的几个关键参数为：
     >
     > 例如，设置占空比为2.5%、12.5%时，2.5% * 2000 = 50，2.5% * 2000 = 250
 
-```c
-while (1)
-{
-    // 舵机控制占空比范围2.5% ~ 12.5%
-    // Counter Period设置的是2000，因此占空比设置范围是50 ~ 250
+  ```c
+  while (1)
+  {
+      // 舵机控制占空比范围2.5% ~ 12.5%
+      // Counter Period设置的是2000，因此占空比设置范围是50 ~ 250
 
-    // 中点，占空比7.5%，即2000 * 7.5% = 150
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 150);
-    HAL_Delay(1000);
+      // 中点，占空比7.5%，即2000 * 7.5% = 150
+      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 150);
+      HAL_Delay(1000);
 
-    // 向左转，占空比2.5%，即2000 * 2.5% = 50
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 50);
-    HAL_Delay(1000);
+      // 向左转，占空比2.5%，即2000 * 2.5% = 50
+      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 50);
+      HAL_Delay(1000);
 
-    // 向右转，占空比12.5%，即2000 * 12.5% = 250
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 250);
-    HAL_Delay(1000);
-}
-```
+      // 向右转，占空比12.5%，即2000 * 12.5% = 250
+      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 250);
+      HAL_Delay(1000);
+  }
+  ```

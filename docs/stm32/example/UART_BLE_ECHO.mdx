@@ -1,0 +1,157 @@
+---
+sidebar_position: 2.64
+---
+# 【BLE 蓝牙】蓝牙透传通信
+
+**下载例程代码：** <a href="https://pan.baidu.com/s/1IH1MgJE1CAVYdpuWwVWYFQ?pwd=1234" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+
+通过蓝牙接收任意不定长的数据，并将接收到的数据通过蓝牙原样返回。
+
+- 使用配套的 DX-BT24 模块，实现蓝牙透传通信
+
+- 使用UARTEx扩展库，实现不定长数据的接收
+
+- 使用DMA通道，实现串口数据的快速传输，不占用CPU资源
+
+## 如何使用例程
+
+- 编译并下载程序到学习板
+
+- 将蓝牙模块连接到学习板的 BLUETOOTH 接口
+
+    > 需要使用：4P杜邦线、超声波模块
+
+    > **连接模块时请核对好线序**
+
+    | 蓝牙模块 |  学习板  |
+    | :------: | :------: |
+    |   RXD    |    TX   |
+    |   TXD   |    RX   |
+    |   GND   |    G   |
+    |   5V    |    5V   |
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/wire.png').default} alt="连接线" width="400px" />
+</div>
+
+### 1、使用串口助手连接蓝牙
+
+- 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，**点击 蓝牙图标，进入蓝牙模式**
+
+    > **需要电脑支持蓝牙功能。**若不支持，可使用手机蓝牙助手
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/switchToBLE.png').default} alt="switchToBLE" width="350px" />
+</div>
+
+- 点击搜索蓝牙设备
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/selectBLE.png').default} alt="selectBLE" width="350px" />
+</div>
+
+- 选择 BT24，点击配对
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/search.png').default} alt="search" width="450px" />
+</div>
+
+- 绿色圆点亮起，表示连接成功。若未连接成功，可点击【重连】按钮
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/connect.png').default} alt="connect" width="350px" />
+</div>
+
+- 连接成功后，发送任意数据，即可看到接收到的数据原样返回
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/serial.png').default} alt="serial" width="700px" />
+</div>
+
+### 2、使用微信小程序连接蓝牙
+
+- 打开微信小程序【大夏无线传输助手】，点击【搜索】，找到 BT24，点击进行连接
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/wxSearch.png').default} alt="wxSearch" width="350px" />
+</div>
+
+- 连接成功后，发送任意数据，即可看到接收到的数据原样返回
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/wxComm.png').default} alt="wxComm" width="350px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+- **打开串口3外设：**Pinout&Configuration -> Connectivity -> USART3，将Mode选择为Asynchronous
+
+    > DX-BT24 模块连接到学习板的 USART3
+
+- **更改波特率：**在 USART3 -> Configuration -> Parameter Settings 标签卡中，将 Baud Rate 更改为 9600
+
+    > DX-BT24 模块默认波特率为 9600
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/configBaud.png').default} alt="configBaud" width="600px" />
+</div>
+
+- **添加DMA通道：**在 USART3 -> Configuration -> DMA Settings 标签卡中，点击 Add 按钮，分别添加 USART3_RX 和 USART3_TX 的 DMA 通道
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/configDMA.png').default} alt="DMA config" width="600px" />
+</div>
+
+- **使能串口中断：**在 USART3 -> Configuration -> NVIC Settings 标签卡中，勾选 USART3 global interrupt 的 Enable
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_BLE_ECHO/enableIT.png').default} alt="IT config" width="600px" />
+</div>
+
+### 2、代码
+
+- 定义全局变量 `rx_data` 作为串口接收缓冲区
+
+    > 由于是不定长数据的接收，因此缓冲区大小可以根据实际需求调整，**只能大不能小，否则可能会丢失数据**
+
+    ```c
+    // 串口接收缓冲区
+    uint8_t rx_data[256] = {0};
+    ```
+
+- 在 main 函数中，使用 `HAL_UARTEx_ReceiveToIdle_DMA` 函数开启不定长数据DMA接收
+
+    > **注意：需要关闭DMA传输过半中断，我们只需要接收完成中断**
+
+    > **此函数是以空闲中断作为接收完成的标志，而不是接收长度，因此可以接收任意长度的数据**
+
+    ```c
+    // 使用Ex函数，接收不定长数据
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart3, rx_data, sizeof(rx_data));
+    // 关闭DMA传输过半中断（HAL库默认开启，但我们只需要接收完成中断）
+    __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
+    ```
+
+- 在中断函数 `HAL_UARTEx_RxEventCallback` 中，处理接收到的数据
+
+    > **所有的串口接收和发送操作都在中断函数中进行，不会阻塞主程序**
+
+    ```c
+    // 不定长数据接收完成回调函数
+    void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+    {
+        if (huart->Instance == USART3)
+        {
+            // 使用DMA将接收到的数据发送回去
+            HAL_UART_Transmit_DMA(&huart3, rx_data, Size);
+            // 重新启动接收，使用Ex函数，接收不定长数据
+            HAL_UARTEx_ReceiveToIdle_DMA(&huart3, rx_data, sizeof(rx_data));
+            // 关闭DMA传输过半中断（HAL库默认开启，但我们只需要接收完成中断）
+            __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
+        }
+    }
+    ```

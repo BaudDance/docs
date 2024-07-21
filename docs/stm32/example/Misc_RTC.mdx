@@ -56,7 +56,7 @@ RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持�
 
 #### 程序效果
 
-- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
+- 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
 - 在串口助手中，将持续看到实时打印的日期和时间。
 - 但当前程序下，断电**会导致时间重置**。掉电走时的方法，请参考下面的代码解释部分。
 
@@ -118,26 +118,26 @@ RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持�
     >
 
 
-```c
-while (1)
-{
-    // 获取的时间是BCD码，需要转换成十进制打印
-    // 每隔1秒钟，用串口打印一次时间和日期
-    HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
-    HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
-    sprintf(str, "20%02x-%02x-%02x %02x:%02x:%02x\r\n", sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
-    HAL_UART_Transmit(&huart2, (uint8_t *)str, strlen(str), 0xFFFF);
-    HAL_Delay(1000);
-}
-```
+  ```c
+  while (1)
+  {
+      // 获取的时间是BCD码，需要转换成十进制打印
+      // 每隔1秒钟，用串口打印一次时间和日期
+      HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
+      HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
+      sprintf(str, "20%02x-%02x-%02x %02x:%02x:%02x\r\n", sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
+      HAL_UART_Transmit(&huart2, (uint8_t *)str, strlen(str), 0xFFFF);
+      HAL_Delay(1000);
+  }
+  ```
 
 - **掉电走时：**在工程目录中打开c文件 Core -> Src -> rtc.c，找到以下段落：
 
-```c
-/* USER CODE BEGIN Check_RTC_BKUP */
-// 在这里return，每次上电时就不会重新设置时间了，就可以做到时间保持
-// return;
-```
+  ```c
+  /* USER CODE BEGIN Check_RTC_BKUP */
+  // 在这里return，每次上电时就不会重新设置时间了，就可以做到时间保持
+  // return;
+  ```
 
 取消注释 `//return;`，即可实现掉电走时的效果。
 

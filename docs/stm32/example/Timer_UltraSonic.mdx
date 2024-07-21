@@ -63,7 +63,7 @@ sidebar_position: 2.1
 
 #### 程序效果
 
-- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
+- 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
 
 - 将超声波模块对准一个平面（量程 2 - 400 cm），可以在串口助手看到测距结果
 
@@ -118,36 +118,36 @@ sidebar_position: 2.1
 - **引用头文件**
   - 因为需要打印输出变量，所以应该引用几个头文件：
 
-```c
-#include "stdio.h"
-#include "string.h"
-```
+  ```c
+  #include "stdio.h"
+  #include "string.h"
+  ```
 
 - **触发测量**
   - 将TRIG引脚拉高至少10us后拉低，触发测量
 
-```c
-// 触发
-HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, 1);
-HAL_Delay(5);
-HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, 0);
-```
+  ```c
+  // 触发
+  HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, 1);
+  HAL_Delay(5);
+  HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, 0);
+  ```
 
 - **打开脉冲捕获**
   - 先清零变量
   - `__HAL_TIM_SET_CAPTUREPOLARITY ` 配置为上升沿捕获
   - `HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3)` 开始捕获
 
-```c
-// 清零
-rising_cnt = 0;
-falling_cnt = 0;
-echo_flag = 0;
-__HAL_TIM_SET_COUNTER(&htim1, 0);
-// 开始捕获
-__HAL_TIM_SET_CAPTUREPOLARITY(&htim1, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
-HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
-```
+  ```c
+  // 清零
+  rising_cnt = 0;
+  falling_cnt = 0;
+  echo_flag = 0;
+  __HAL_TIM_SET_COUNTER(&htim1, 0);
+  // 开始捕获
+  __HAL_TIM_SET_CAPTUREPOLARITY(&htim1, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
+  ```
 
 - **重定义输入捕获中断函数**
 
@@ -157,42 +157,42 @@ HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
 
   - 将上升沿、下降沿的值分别保存到变量`rising_cnt`、`falling_cnt`
 
-```c
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim == &htim1 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
+  ```c
+  void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
   {
-    // 捕获到上升沿
-    if (!echo_flag)
+    if (htim == &htim1 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
     {
-      rising_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-      echo_flag = 1;
-      __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
-    }
-    // 捕获到下降沿
-    else
-    {
-      falling_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-      echo_flag = 0;
-      __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+      // 捕获到上升沿
+      if (!echo_flag)
+      {
+        rising_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+        echo_flag = 1;
+        __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
+      }
+      // 捕获到下降沿
+      else
+      {
+        falling_cnt = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+        echo_flag = 0;
+        __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+      }
     }
   }
-}
-```
+  ```
 
 - **计算距离**
   - 当`rising_cnt`、`falling_cnt`都捕获完成时，计算距离，并通过串口发送结果
 
-```c
-if (rising_cnt != 0 && falling_cnt != 0)
-{
-    // 计算距离
-    // 定时器每1us计数1次，因此 距离=计数*0.34/2（毫米）
-    float distance = (falling_cnt - rising_cnt) * 0.017;
-    // 发送到串口
-    char buf[32];
-    sprintf(buf, "Distance: %.2f cm\r\n", distance);
-    HAL_UART_Transmit(&huart2, (uint8_t *)buf, strlen(buf), 1000);
-    break;
-}
-```
+  ```c
+  if (rising_cnt != 0 && falling_cnt != 0)
+  {
+      // 计算距离
+      // 定时器每1us计数1次，因此 距离=计数*0.34/2（毫米）
+      float distance = (falling_cnt - rising_cnt) * 0.017;
+      // 发送到串口
+      char buf[32];
+      sprintf(buf, "Distance: %.2f cm\r\n", distance);
+      HAL_UART_Transmit(&huart2, (uint8_t *)buf, strlen(buf), 1000);
+      break;
+  }
+  ```

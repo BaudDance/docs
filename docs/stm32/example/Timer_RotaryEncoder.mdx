@@ -45,7 +45,7 @@ EC11有A、B两相输出，其规格是 **20脉冲/360°**
 
 #### 程序效果
 
-- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
+- 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
 
 - 拧动学习板上的编码器
 
@@ -87,12 +87,12 @@ EC11有A、B两相输出，其规格是 **20脉冲/360°**
 
 #### (1) 初始化过程
 
-```c
-// 启动编码器
-HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
-// 给TIM1的CNT赋初值1000
-htim1.Instance->CNT = 1000;
-```
+  ```c
+  // 启动编码器
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+  // 给TIM1的CNT赋初值1000
+  htim1.Instance->CNT = 1000;
+  ```
 
 > 赋初值1000是为了方便观察，实际应用中可以根据需求赋初值
 
@@ -104,15 +104,15 @@ htim1.Instance->CNT = 1000;
 
   - `return` 返回uint16_t整数型变量，即当前的计数值
 
-```c
-cnt_encoder = __HAL_TIM_GET_COUNTER(&htim1);
-```
+  ```c
+  cnt_encoder = __HAL_TIM_GET_COUNTER(&htim1);
+  ```
 
 - **通过脉冲计算角度**
 
   - 每个脉冲代表18°，因此将脉冲数乘以18°即可
 
-```c
-angle = cnt_encoder * 18;
-```
+  ```c
+  angle = cnt_encoder * 18;
+  ```
 

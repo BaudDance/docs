@@ -38,7 +38,7 @@ sidebar_position: 1.5
 <img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
 </div>
 
-- 打开[波特律动 串口助手 (keysking.com)](https://serial.keysking.com/)在线串口调试助手，点击“选择串口”，选择USB Single Serial
+- 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
 - 此时即可收到温湿度信息，如图所示
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
@@ -71,17 +71,17 @@ sidebar_position: 1.5
 
 - **引用头文件：**需要使用 sprintf 打印输出，在 main.c 引用头文件：
 
-```c
-#include "stdio.h"
-#include "string.h"
-```
+  ```c
+  #include "stdio.h"
+  #include "string.h"
+  ```
 
 - **初始化AHT20：**
 
-```c
-// 初始化AHT20
-AHT20_Init();
-```
+  ```c
+  // 初始化AHT20
+  AHT20_Init();
+  ```
 
 #### (2) 读取数据
 
