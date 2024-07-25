@@ -1,0 +1,180 @@
+---
+sidebar_position: 1.7
+---
+# 【SPI】软件SPI库
+
+**下载例程代码：** <a href="https://pan.baidu.com/s/1IK90DFgfYx7V07lpztufQg?pwd=6666" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+
+本例程演示了如何使用软件SPI库
+
+- 支持同时使用多个SPI实例
+
+- SPI 主机模式
+
+- 全双工通信
+
+- 支持 CPOL（时钟极性）、CPHA（时钟相位）配置
+
+- 支持时钟速率调节 2.5KHz ~ 200KHz
+
+## SPI 简介
+
+SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要用于嵌入式系统中，用于集成电路之间的短距离有线通信。
+
+**典型应用场景有：**
+
+- W25QXX 系列 Flash
+
+- MPU6050 陀螺仪
+
+- NRF24L01 无线模块等。
+
+**一般情况下，SPI 通信有四根线：**
+
+- SCLK：时钟线，由主机产生
+
+- MOSI：主机输出从机输入，主机向从机发送数据
+
+- MISO：主机输入从机输出，从机向主机发送数据
+
+- CS：片选线，用于选择从机
+
+**时钟相位和极性（CPOL、CPHA）：**
+
+- CPOL：时钟极性，决定时钟信号在空闲时是高电平还是低电平
+
+    - CPOL = 0 时，SCLK 空闲时为低电平
+
+    - CPOL = 1 时，SCLK 空闲时为高电平
+
+- CPHA：时钟相位，决定数据采样时机
+
+    - CPHA = 0 时，数据在第一个时钟沿采样
+
+    - CPHA = 1 时，数据在第二个时钟沿采样
+
+- 例如：
+    
+    - CPOL = 0，CPHA = 0 时，SCLK 空闲时为低电平，数据在第一个时钟沿采样（上升沿采样）
+
+    - CPOL = 1，CPHA = 0 时，SCLK 空闲时为高电平，数据在第一个时钟沿采样（下降沿采样）
+
+    - CPOL = 0，CPHA = 1 时，SCLK 空闲时为低电平，数据在第二个时钟沿采样（下降沿采样）
+
+    - CPOL = 1，CPHA = 1 时，SCLK 空闲时为高电平，数据在第二个时钟沿采样（上升沿采样）
+
+> 时钟极性和相位的配置于目标芯片有关，需要根据目标芯片的 SPI 时序要求进行配置
+
+**SPI 通信流程实例：**
+
+- 这是一个典型的 SPI 通信流程，主机通过 SCLK 产生时钟信号，通过 MOSI 向从机发送数据，通过 MISO 从从机接收数据
+
+    > 配置 CPOL = 0，CPHA = 0 ，可见 SCLK 空闲时为低电平，数据在第一个时钟沿采样（上升沿采样）
+
+    > 通信波形文件包含在例程zip包中，可以使用【Saleae Logic 2】软件打开查看
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/SPI_Soft/logic1.png').default} alt="logic1" width="800px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何使用软件SPI库
+
+### 1、工程配置
+
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **分配引脚：**将 PA12、PA15、PB3、PB1 分别设置为 GPIO_Output，并分别设置 User label 为 SPI_SCLK、SPI_MOSI、SPI_MISO、SPI_CS
+
+  > 这几个是学习板左下角的自定义引脚，如果需要使用其他引脚，可以自行修改，任意引脚都可以使用
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/SPI_Soft/PinConf.png').default} alt="PinConf" width="600px" />
+</div>
+
+- **配置GPIO：**在 System Core -> GPIO
+
+    - 将 PA12、PA15、PB1 的 Maximum output speed 配置为 High
+
+    - 将 PB3 的 GPIO Pull-up/Pull-down 配置为 Pull-up
+
+    > 即 SPI_SCLK、SPI_MOSI、SPI_CS 配置为高速输出，SPI_MISO 配置为上拉输入
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/SPI_Soft/GPIO.png').default} alt="GPIO" width="600px" />
+</div>
+
+#### 2、代码
+
+#### (1) 初始化过程
+
+- **拷贝库文件：**将 softSPI.c、dwt_stm32_delay.c 文件拷贝到 Core -> Src 目录下，将 softSPI.h、dwt_stm32_delay.h 文件拷贝到 Core -> Inc 目录下。
+
+- **添加头文件：**在 main.c 中引用头文件
+
+    ```c
+    #include "softSPI.h"
+    ```
+
+- **初始化 SPI 实例结构体：** 在 main 函数中初始化 SPI 实例结构体
+
+    ```c
+    // 分配 SCLK 引脚
+    SoftSPI1.SCLK_GPIO = SPI_SCLK_GPIO_Port;
+    SoftSPI1.SCLK_Pin = SPI_SCLK_Pin;
+    // 分配 MOSI 引脚
+    SoftSPI1.MOSI_GPIO = SPI_MOSI_GPIO_Port;
+    SoftSPI1.MOSI_Pin = SPI_MOSI_Pin;
+    // 分配 MISO 引脚
+    SoftSPI1.MISO_GPIO = SPI_MISO_GPIO_Port;
+    SoftSPI1.MISO_Pin = SPI_MISO_Pin;
+    // 分配 CS 引脚
+    SoftSPI1.CS_GPIO = SPI_CS_GPIO_Port;
+    SoftSPI1.CS_Pin = SPI_CS_Pin;
+    // 设置 SPI 时钟频率
+    SoftSPI1.Delay_Time = SPI_FREQ_10KHZ;
+    // 设置 SPI 时钟极性和相位
+    SoftSPI1.CPOL = 0;
+    SoftSPI1.CPHA = 0;
+    ```
+
+- **初始化 SPI 实例：** 在 main 函数中初始化 SPI 实例
+
+    ```c
+    // 初始化 SPI 实例
+    SoftSPI_Init(&SoftSPI1);
+    ```
+
+#### (2) 进行 SPI 通信
+
+1. **使能片选**：使用 `SoftSPI_CS_Low` 函数使能片选
+
+    ```c
+    // 使能片选
+    SoftSPI_CS_Low(&SoftSPI1);
+    ```
+
+2. **收发数据：** 使用 `SoftSPI_WriteReadBuff` 函数发送和接收数据
+
+    ```c
+    // 读写数据
+    SoftSPI_WriteReadBuff(&SoftSPI1, tx_buffer, rx_buffer, 4);
+    ```
+
+3. **关闭片选**：使用 `SoftSPI_CS_High` 函数关闭片选
+
+    ```c
+    // 关闭片选
+    SoftSPI_CS_High(&SoftSPI1);
+    ```
