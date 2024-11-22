@@ -97,7 +97,7 @@ HAL_Delay(500);
 
 ```c
 float ADC2Resistance(uint32_t adc_value) {
-  return (adc_value / (4096.0f - adc_value)) * 10000.0f;
+  return (adc_value / (4095.0f - adc_value)) * 10000.0f;
 }
 ```
 
