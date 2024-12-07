@@ -13,33 +13,15 @@ RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持�
 
 - 在STM32中，存在两个时钟源：高速时钟（8 MHz）和低速时钟（32.768 kHz）。高速时钟用于驱动CPU、外设和定时器等核心组件，而低速时钟则负责管理看门狗和RTC等功能。
 - RTC依赖低速时钟运行。
-- RTC模块内部包含了一个独立的32位寄存器来保存当前的时间和日期信息。这个寄存器以**BCD码格式**存储，包括秒、分、时、日、月、年等数据。
+- RTC模块内部包含了一个独立的32位寄存器来保存当前的时间戳信息。
 - 低速时钟以极低的功耗运行，即使在断电情况下，通过备用电源（如纽扣电池），RTC也能持续运行以确保时间准确性。
-
-#### BCD码简介
-
-- STM32的时间是通过BCD码格式存储的，因此我们需要先了解一下什么是BCD码。
-
-- 简单来说，就是一种用**二进制形式**来表示**十进制数字**的编码方式。0-9每个数字都有对应的二进制码表示，如下表所示，0001表示1，0010表示2，...，1001表示9。
-- 例如，15时20分，15时用BCD表示为：0001 0101，前面0001代表1，后面0101代表5。
-
-| 十进制数字 | 二进制编码 |
-| ---------- | ---------- |
-| 0          | 0 0 0 0    |
-| 1          | 0 0 0 1    |
-| 2          | 0 0 1 0    |
-| 3          | 0 0 1 1    |
-| 4          | 0 1 0 0    |
-| 5          | 0 1 0 1    |
-| 6          | 0 1 1 0    |
-| 7          | 0 1 1 1    |
-| 8          | 1 0 0 0    |
-| 9          | 1 0 0 1    |
 
 #### RTC的一般使用方法
 
-- 通过CubeMX配置初始日期和时间后，RTC外设会自动从该时间开始记录时间信息。
+- 在CubeMX中找到Timers -> RTC，勾选Activate Clock Source，即可激活RTC时钟功能。
 - 即使学习板断电，RTC依然能够持续记录时间。
+- HAL库的RTC驱动未实现日期的断电走时功能，即断电后时间可以继续走时，但日期会重置。
+- keysking提供了RTC库，可以实现断电走时功能，具体代码见下文。
 - 需要获取当前日期和时间时，只需调用相应函数即可实现。
 
 ## 如何使用例程
@@ -58,7 +40,6 @@ RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持�
 
 - 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
 - 在串口助手中，将持续看到实时打印的日期和时间。
-- 但当前程序下，断电**会导致时间重置**。掉电走时的方法，请参考下面的代码解释部分。
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/MISC_RTC/串口输出信息.png').default} alt="串口输出信息" width="600px" />
@@ -70,22 +51,25 @@ RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持�
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 以及 Low Speed Clock (LSE) 都配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+<img src={require('./img/MISC_RTC/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置主时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
+- **配置RTC时钟频率：**在Clock Configuration 页面，将RTC时钟源选择为 LSE
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/MISC_RTC/配置RTC时钟源.png').default} alt="配置RTC时钟源" width="600px" />
+</div>
+
 - **激活RTC：**在Pinout&Configuration -> Timers -> RTC -> Mode，勾选 Activate Clock Source、Activate Calendar，以启用RTC时钟并激活日历功能。仅开启RTC时钟将仅记录时间，而不包括日期信息。
-- **设置初始时间/日期：**在Pinout&Configuration -> Timers -> RTC -> Configuration
-  - 在Calendar Time中配置初始**时间**
-  - 在Calendar Date中配置初始**日期**，其中Year的范围只有0-99，例如今年是2023年，则应该填写23
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/MISC_RTC/RTC配置.png').default} alt="RTC配置" width="600px" />
@@ -95,51 +79,204 @@ RTC（Real Time Clock），即实时时钟，类似于钟表一般，能够持�
 
 
 ### 2、代码
+在工程的Core/Inc文件夹上右键，选择New -> File，创建kk_rtc.h文件，将以下代码粘贴到kk_rtc.h文件中
 
-- 经过上述工程配置后，RTC将自动启动并持续记录时间和日期
+```c
+#ifndef INC_KK_RTC_H_
+#define INC_KK_RTC_H_
+#include "stm32f1xx_hal.h"
+#include "rtc.h"
+#include "time.h"
 
-- 当需要获取日期和时间，调用相应函数即可
+HAL_StatusTypeDef KK_RTC_SetTime(struct tm *time);
+struct tm *KK_RTC_GetTime();
+void KK_RTC_Init();
 
-  - `HAL_RTC_GetTime`  获取当前**时间**
+#endif /* INC_KK_RTC_H_ */
+```
 
-    > 注意：获取到的时间是以**BCD码**保存的，为了打印出正确的时间，我们可以通过**十六进制格式**打印，这样就可以将BCD码直接还原成十进制数字
-    >
-    > `sprintf(str, "%02x, sDate.Month);`，%02x的含义是：
-    >
-    > x：输出十六进制格式
-    >
-    > 2：一共2位数字
-    >
-    > 0：不足2位的补0
-  
-  - `HAL_RTC_GetDate`  获取当前**日期**
-  
-    > 注意：获取到的年份范围只有0-99，需要手动补全，例如今年是2023年，应该+2000
-    >
+在工程的Core/Src文件夹上右键，选择New -> File，创建kk_rtc.c文件，将以下代码粘贴到kk_rtc.c文件中
 
+```c
+#include "kk_rtc.h"
 
-  ```c
-  while (1)
+// RTC已经被初始化的值 记录在RTC_BKP_DR1中
+#define RTC_INIT_FLAG 0x2333
+
+/**
+ * @brief  进入RTC初始化模式
+ * @param  hrtc  指向包含RTC配置信息的RTC_HandleTypeDef结构体的指针
+ * @retval HAL status
+ */
+static HAL_StatusTypeDef RTC_EnterInitMode(RTC_HandleTypeDef *hrtc)
+{
+  uint32_t tickstart = 0U;
+
+  tickstart = HAL_GetTick();
+  /* 等待RTC处于INIT状态，如果到达Time out 则退出 */
+  while ((hrtc->Instance->CRL & RTC_CRL_RTOFF) == (uint32_t)RESET)
   {
-      // 获取的时间是BCD码，需要转换成十进制打印
-      // 每隔1秒钟，用串口打印一次时间和日期
-      HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
-      HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
-      sprintf(str, "20%02x-%02x-%02x %02x:%02x:%02x\r\n", sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
-      HAL_UART_Transmit(&huart2, (uint8_t *)str, strlen(str), 0xFFFF);
-      HAL_Delay(1000);
+    if ((HAL_GetTick() - tickstart) >  RTC_TIMEOUT_VALUE)
+    {
+      return HAL_TIMEOUT;
+    }
   }
-  ```
 
-- **掉电走时：**在工程目录中打开c文件 Core -> Src -> rtc.c，找到以下段落：
+  /* 禁用RTC寄存器的写保护 */
+  __HAL_RTC_WRITEPROTECTION_DISABLE(hrtc);
 
-  ```c
-  /* USER CODE BEGIN Check_RTC_BKUP */
-  // 在这里return，每次上电时就不会重新设置时间了，就可以做到时间保持
-  // return;
-  ```
 
-取消注释 `//return;`，即可实现掉电走时的效果。
+  return HAL_OK;
+}
 
-> 其原理是：每次上电后，RTC初始化函数会**重置日期和时间**。`return`语句加入，函数会在重置时间之前退出，使得时间保持不变，实现掉电走时的功能。
+/**
+ * @brief  退出RTC初始化模式
+ * @param  hrtc   指向包含RTC配置信息的RTC_HandleTypeDef结构体的指针
+ * @retval HAL status
+ */
+static HAL_StatusTypeDef RTC_ExitInitMode(RTC_HandleTypeDef *hrtc)
+{
+  uint32_t tickstart = 0U;
 
+  /* 禁用RTC寄存器的写保护。 */
+  __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
+
+  tickstart = HAL_GetTick();
+  /* 等到RTC处于INIT状态，如果到达Time out 则退出 */
+  while ((hrtc->Instance->CRL & RTC_CRL_RTOFF) == (uint32_t)RESET)
+  {
+    if ((HAL_GetTick() - tickstart) >  RTC_TIMEOUT_VALUE)
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  return HAL_OK;
+}
+
+/**
+ * @brief  写入RTC_CNT寄存器中的时间计数器。
+ * @param  hrtc   指向包含RTC配置信息的RTC_HandleTypeDef结构体的指针。
+ * @param  TimeCounter: 写入RTC_CNT寄存器的计数器
+ * @retval HAL status
+ */
+static HAL_StatusTypeDef RTC_WriteTimeCounter(RTC_HandleTypeDef *hrtc, uint32_t TimeCounter)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  /* 进入RTC初始化模式 */
+  if (RTC_EnterInitMode(hrtc) != HAL_OK)
+  {
+    status = HAL_ERROR;
+  }
+  else
+  {
+	/* 设置RTC计数器高位寄存器 */
+    WRITE_REG(hrtc->Instance->CNTH, (TimeCounter >> 16U));
+    /* 设置RTC计数器低位寄存器 */
+    WRITE_REG(hrtc->Instance->CNTL, (TimeCounter & RTC_CNTL_RTC_CNT));
+
+    /* 退出RTC初始化模式 */
+    if (RTC_ExitInitMode(hrtc) != HAL_OK)
+    {
+      status = HAL_ERROR;
+    }
+  }
+
+  return status;
+}
+
+
+/**
+ * @brief  读取RTC_CNT寄存器中的时间计数器。
+ * @param  hrtc   指向包含RTC配置信息的RTC_HandleTypeDef结构体的指针。
+ * @retval 时间计数器
+ */
+static uint32_t RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc)
+{
+  uint16_t high1 = 0U, high2 = 0U, low = 0U;
+  uint32_t timecounter = 0U;
+
+  high1 = READ_REG(hrtc->Instance->CNTH & RTC_CNTH_RTC_CNT);
+  low   = READ_REG(hrtc->Instance->CNTL & RTC_CNTL_RTC_CNT);
+  high2 = READ_REG(hrtc->Instance->CNTH & RTC_CNTH_RTC_CNT);
+
+  if (high1 != high2)
+  {
+	/* 当读取CNTL和CNTH寄存器期间计数器溢出时, 重新读取CNTL寄存器然后返回计数器值 */
+    timecounter = (((uint32_t) high2 << 16U) | READ_REG(hrtc->Instance->CNTL & RTC_CNTL_RTC_CNT));
+  }
+  else
+  {
+	/* 当读取CNTL和CNTH寄存器期间没有计数器溢出, 计数器值等于第一次读取的CNTL和CNTH值 */
+    timecounter = (((uint32_t) high1 << 16U) | low);
+  }
+
+  return timecounter;
+}
+
+/**
+ * @brief 设置RTC时间
+ * @param time 时间
+ * @retval HAL status
+ */
+HAL_StatusTypeDef KK_RTC_SetTime(struct tm *time){
+	uint32_t unixTime = mktime(time);
+	return RTC_WriteTimeCounter(&hrtc, unixTime);
+}
+
+/**
+ * @brief 获取RTC时间
+ * @retval 时间
+ */
+struct tm *KK_RTC_GetTime() {
+  time_t unixTime = RTC_ReadTimeCounter(&hrtc);
+  return gmtime(&unixTime);
+}
+
+void KK_RTC_Init(){
+	uint32_t initFlag = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+	if(initFlag == RTC_INIT_FLAG) return;
+	if (HAL_RTC_Init(&hrtc) != HAL_OK){
+		Error_Handler();
+	}
+	struct tm time = {
+		  .tm_year = 2025 - 1900,
+		  .tm_mon = 1 - 1,
+		  .tm_mday = 1,
+		  .tm_hour = 23,
+		  .tm_min = 59,
+		  .tm_sec = 55,
+	};
+	KK_RTC_SetTime(&time);
+	HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, RTC_INIT_FLAG);
+
+}
+
+
+```
+
+找到MX_RTC_Init的定义，在此文件中引用`#include "kk_rtc.h"`，并在MX_RTC_Init函数的`USER CODE RTC_Init 0`注释对中调用`KK_RTC_Init()`函数
+并且通过return 绕过MX_RTC_Init函数后面生成的代码
+
+```c
+	hrtc.Instance = RTC;
+	hrtc.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+	hrtc.Init.OutPut = RTC_OUTPUTSOURCE_ALARM;
+	KK_RTC_Init();
+	return;
+```
+
+
+在main函数的while循环中获取并通过串口输出当前时间
+```c
+  now = KK_RTC_GetTime();
+  sprintf(message, "%d-%d-%d %02d:%02d:%02d", now->tm_year + 1900,now->tm_mon + 1,now->tm_mday,
+      now->tm_hour,now->tm_min,now->tm_sec);
+  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+  HAL_Delay(1000);
+```
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/MISC_RTC/RTC主代码.png').default} alt="RTC主代码" width="600px" />
+</div>
