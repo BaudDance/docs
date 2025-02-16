@@ -1,0 +1,162 @@
+---
+sidebar_position: 1.13
+sidebar_label: "【2】创建和编译工程"
+---
+
+# 如何使用开发环境
+
+熟悉 cubeIDE 的界面和操作
+
+## 如何改成浅色主题？
+
+[**更换浅色主题🔗**](docs/stm32/FAQ/login.mdx)，即可跟教程一样白底浅色界面。
+
+## 创建工程
+
+#### 1️⃣ 在软件顶部的菜单栏，打开新建工程页面
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/newProject.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 2️⃣ 选择单片机型号 `STM32F103C8T6`
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/selc8t6.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 3️⃣ 起个名字，点 `Finish` 完成创建
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/finishnew.png').default} alt="1" width="450px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+> ⚠️提示：如果弹出图中的报错，则说明未登录 ST 账户
+> 
+> 此时必须按 [**登录方法🔗**](docs/stm32/FAQ/login.mdx) 登录后，再从第 1️⃣ 步开始重新创建工程，否则工程创建不完整无法下载
+>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/errorNeedLogin_cut.png').default} alt="1" width="360px" style={{boxShadow: "0px 0px 5PX 3PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 4️⃣ 点击 `YES`
+
+它询问是否打开 **`CubeMX`** 配置页面，点 **`YES`** 即可完成
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/finishnew_yes.png').default} alt="1" width="450px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 5️⃣ 配置下载方式为 `Serial Wire`
+
+> ⚠️提示：每个新工程都需要配置下载方式，否则程序会关闭下载接口
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/confDebug.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 6️⃣ 分配 LED 引脚
+
+将 **`PA7`** 配置为输出引脚
+> PA7 连接到学习板上的绿色 LED
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/confOutput.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 7️⃣ 设置引脚输出电平
+
+为刚刚分配的引脚设置输出电平
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/confGPIO.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 8️⃣ 保存并生成代码
+
+同时按下 **`Ctrl + S`** 组合键保存代码
+
+系统会弹出提示，询问是否在保存的同时生成代码，选择 **`Yes`**
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/choseAutoGenCode.png').default} alt="1" width="450px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+生成完成后，系统将再次询问是否打开刚刚生成的代码，选择 **`Yes`**
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/choseAutoPerspective.png').default} alt="1" width="450px" style={{boxShadow: "0px 0px  0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 9️⃣ 编译工程
+
+- 点击工具栏中的 🔨 Build 按钮，开始编译
+
+- 编译过程会检查代码是否有错误，并生成可执行文件
+
+- 编译成功后，底部 Console 窗口会显示：Build Finished, 0 errors, 0 warnings，表示工程已成功编译。
+
+**🎉 本节任务圆满完成！下一节我们将把工程下载到学习板**
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/buildFinished_spliced.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+---
+
+## 进一步了解软件功能
+
+本部分内容仅作介绍，无需操作。
+
+#### 1️⃣ 工程目录  `Project Explorer`
+
+在这里可以管理工程文件，打开代码、配置文件等
+
+点击 ∨ 可展开目录，查看详细文件结构
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px" }}>
+  <img
+    src={require('./img/whatIsProgExp.png').default}
+    alt="1"
+    width="600px"
+    style={{boxShadow: "0px 0px 5PX 2PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}
+  />
+</div>
+
+#### 2️⃣ 工程配置页面
+
+用于分配芯片引脚、开启外设、配置时钟等核心硬件设置
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/firstNewProject_cut.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 3️⃣ 代码编辑页面
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/codeWindow.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 4️⃣ 如何找到 “配置页面” 和 “代码页面”
+
+在工程目录 **`Project Explorer`** 中
+- 双击 **`.c`** 文件，打开【代码页面】
+- 双击 **`.ioc`** 文件，打开【配置页面】
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/howToOpenCodeAndConf.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 5️⃣ 信息栏 `Console`
+
+按上一步的方法打开 **`main.c`** 文件后，**`Console`** 信息栏就会显示出来
+
+**`Console` 用于展示编译过程、错误信息和下载进度，是排查和解决问题的重要工具**
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/Console.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+## 进入下一节
+
+[**下载工程到硬件：**如何将工程下载到学习板 🔗](docs/stm32/getting-started/getting-started_hardware.mdx)

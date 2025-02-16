@@ -1,48 +1,60 @@
 ---
-sidebar_position: 2
+sidebar_position: 1.221
+sidebar_label: "【下载】升级 STLINK 固件"
 ---
-# ST-LINK 升级固件
 
-ST官方会不定期**更新ST-LINK**固件，弹出升级提示：
+# 升级 STLINK 固件
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/STLinkUpdate/升级提示.png').default} alt="升级提示" width="450px" />
+通过 cubeIDE 升级 ST-LINK 下载器的固件
+
+## 📌 为什么要升级？
+
+ST 官方会不定期推送 STLINK 的固件更新
+
+有新版本时就会弹出升级提示，建议及时升级
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "0px"}}>
+<img src={require('./img/STLinkUpdate/linkNewVersion.png').default} alt="升级提示" width="460px" />
 </div>
 
-### 更新方法
+## 📌 升级方法
 
-- **1、点 Yes，进入升级界面**
+#### 1️⃣ 在软件顶部的菜单栏，按图片指示打开升级工具
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/STLinkUpdate/ST-LINK升级页面.png').default} alt="ST-LINK升级页面" width="450px" />
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/findupgtool.png').default} alt="ST-LINK升级页面" width="450px" />
 </div>
 
-- **2、拔掉ST-LINK，等3秒再插上**
+#### 2️⃣ 拔掉ST-LINK，等3秒再插上
 
-    > 不要关掉**第 (1) 步**的页面
+> **注意：不要关掉第 1 步的页面⚠️**
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/STLinkUpdate/拔出STLINK.png').default} alt="拔出STLINK" width="280px" />
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/拔出STLINK.png').default} alt="拔出STLINK" width="220px" />
 </div>
 
-- **3、按图操作，依次点击1-2-3按钮**
+#### 3️⃣ 按图操作，依次点击1-2-3按钮
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/STLinkUpdate/操作步骤.png').default} alt="操作步骤" width="600px" />
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/操作步骤.png').default} alt="操作步骤" width="550px" />
 </div>
 
-- **4、进度条走完后，等5秒关掉升级界面，就可以正常使用啦😎~**
+#### 4️⃣ 进度条走完后，等5秒关掉升级界面，升级完成😎
 
-    点击绿色三角就可以下载程序啦
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/STLinkUpdate/下载程序.png').default} alt="下载程序" width="550px" />
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('./img/STLinkUpdate/upgfinished.png').default} alt="upgfinished" width="550px" />
 </div>
 
-### 依旧有问题?
+## 📌 升级遇到问题?
 
-- 尝试换个USB接口，重新上述步骤
+- 提示 `ST-Link device lost when exiting upgrade mode`
 
-- 通过反馈发现，市面存在部分ST-LINK无法升级，原因不明，建议换个ST-LINK
+    只要升级进度条走完就可以了，可以忽略这个提示
 
-    > 当然，我们会推荐您使用波特律动学习套件😎
+- 即使重新插拔ST-LINK，仍然找不到设备，按钮为灰色
+
+    尝试换个USB接口，重新上述步骤
+
+- 提示：通过反馈发现，市面存在部分ST-LINK无法升级，原因不明，建议换个ST-LINK
+
+    > 当然，我们会推荐使用波特律动学习套件😎

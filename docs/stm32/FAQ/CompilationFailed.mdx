@@ -1,0 +1,84 @@
+---
+sidebar_position: 1.222
+sidebar_label: "【下载】报错 No Device Found"
+---
+
+# 报错 No Device Found
+
+解决方法：
+
+**1、配置一下工程**
+
+将 **`Debug`** 模式设为 **`Serial Wire`**，然后**保存并重新生成代码**
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/CompilationFailed/choseSerialWire.png').default} alt="配置工程" width="700px" />
+</div>
+
+**2、将 BOOT0 跳线帽改到 H**
+
+跳线帽可以垂直拔出。拔出后向左平移一个针脚，插到 H 与 0 之间（如图）
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/CompilationFailed/H.png').default} alt="H" width="400px" />
+</div>
+
+**3、按一下复位键**
+
+⚠️注意！跳线帽先不要换回 L
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/CompilationFailed/RST.png').default} alt="RST" width="400px" />
+</div>
+
+**4、现在就能下载程序了~**
+
+⚠️注意！跳线帽先不要换回 L
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/CompilationFailed/烧录.png').default} alt="烧录" width="600px" />
+</div>
+
+**5、现在将跳线帽换回 L，按复位键，程序即可正常运行**
+
+⚠️ 重要！不要跳过这一步，否则程序不会运行
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/CompilationFailed/L.png').default} alt="H" width="400px" />
+</div>
+
+**6、以后每次都要这样吗？**
+
+不需要
+
+为避免以后再次出现该问题，所有新建工程，都先将 **`Debug`** 模式设为 **`Serial Wire`**
+
+## 为什么会出现这个问题？
+
+当没有配置 Debug 接口为 Serial Wire 时，HAL库会认为**不需要下载接口**
+
+因此在生成初始化代码时，可能出现这一行：
+
+```c
+__HAL_AFIO_REMAP_SWJ_DISABLE(); // 关闭SWD、JTAG接口
+```
+这行代码**关闭了芯片的 SWD 接口**，导致下载失败
+
+## 为什么以前没有出现这个问题？
+
+这行代码是跟着 **串口、I²C** 等初始化代码一起生成的
+
+以前的工程可能没有用到，所以并没有生成这行代码
+
+而当用到例如 串口、I²C 等功能时，HAL库需要初始化 AFIO 时，就会生成这行代码
+
+## 只有学习板存在这个问题吗？
+
+**不是的**，所有 STM32F103 芯片都会遇到此问题
+
+这个问题是 HAL 库的特性所导致的，原理如前文所述
+
+## 怎么避免这个问题？
+
+在每次新建工程后，就配置 **`Debug`** 模式设为 **`Serial Wire`**
+

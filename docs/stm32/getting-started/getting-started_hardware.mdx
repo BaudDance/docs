@@ -1,0 +1,90 @@
+---
+sidebar_position: 1.14
+sidebar_label: "【3】下载工程到硬件"
+---
+
+# 下载工程到硬件
+
+首先进行一些硬件开箱和准备工作：
+
+## 给学习板供电
+
+#### 1️⃣ 通过**下载器**供电 // TODO：动图
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('/docs/stm32/getting-started/img/powerit.png').default} alt="title" width="250px" />
+</div>
+
+#### 2️⃣ 通过** USB 接口**供电（支持*电脑*、*移动电源*、*手机充电器*） // TODO：配图
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('/docs/stm32/getting-started/img/powerit.png').default} alt="title" width="250px" />
+</div>
+
+    💡提示：学习板具有电源选择电路，允许同时连接 2 种供电
+
+## 出厂程序 // TODO：动图
+
+- 学习板出厂时自带一个演示程序，通电后会自动点亮并运行
+
+- **如何关闭程序？**
+    当下载新的程序时，出厂演示程序将被覆盖。重新通电后，OLED 屏幕和灯光将完全关闭
+
+- 演示程序开源：[**下载源码🔗**](docs\stm32\example\FactoryDemo.mdx)
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('/docs/stm32/getting-started/img/powerit.png').default} alt="title" width="250px" />
+</div>
+
+
+
+## 升级STLINK固件
+
+由于 ST 官方不定期推送 STLINK 下载器的固件更新
+
+所以新购买的 STLINK 需要先升级固件
+
+#### 1️⃣ 在软件顶部的菜单栏，按图片指示打开升级工具
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('../FAQ/img/STLinkUpdate/findupgtool.png').default} alt="ST-LINK升级页面" width="450px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 2️⃣ 拔掉ST-LINK，等3秒再插上
+
+> **注意：不要关掉第 1 步的页面⚠️**
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('../FAQ/img/STLinkUpdate/拔出STLINK.png').default} alt="拔出STLINK" width="220px" />
+</div>
+
+#### 3️⃣ 按图操作，依次点击1-2-3按钮
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('../FAQ/img/STLinkUpdate/操作步骤.png').default} alt="操作步骤" width="550px" />
+</div>
+
+#### 4️⃣ 进度条走完后，等5秒关掉升级界面，升级完成😎
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('../FAQ/img/STLinkUpdate/upgfinished.png').default} alt="upgfinished" width="550px" />
+</div>
+
+## 下载程序
+
+#### 1️⃣ 连接好 STLINK 下载器 // TODO：动图
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginLeft:"20px", marginBottom: "20px"}}>
+<img src={require('/docs/stm32/getting-started/img/powerit.png').default} alt="title" width="250px" />
+</div>
+
+#### 2️⃣ 点击工具栏中的绿色 run 按钮，开始下载 // TODO：配图
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/buildFinished_spliced.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+
+## 进入下一节
+
+[**开始探索：**一些技巧，助你探索 STM32 的世界 🔗](docs/stm32/getting-started/getting-started_software.mdx)

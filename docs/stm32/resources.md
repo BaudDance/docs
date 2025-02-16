@@ -1,5 +1,6 @@
 ---
-sidebar_position: 1
+sidebar_position: 1.4
+sidebar_label: "📂资源合集"
 ---
 
 # 常用资源

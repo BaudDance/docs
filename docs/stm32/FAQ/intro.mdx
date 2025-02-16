@@ -1,0 +1,79 @@
+---
+sidebar_position: 1.20
+sidebar_label: "【目录】查找我的问题"
+---
+
+# 如何查找我遇到的问题
+
+首先，看看在以下哪一步中遇到了问题？
+
+## 我在安装 cubeIDE 时遇到问题
+
+- 我的安装包打不开：[**解决方法🔗**](docs/stm32/FAQ/InstallError.mdx)
+
+- 我不能登录 ST 账号
+
+    - 可以查看详细登录方法：[**详细登录方法🔗**](docs/stm32/FAQ/login.mdx)
+
+    - 我的电脑不能联网：[**绕过登录，手动安装芯片包🔗**](docs\stm32\FAQ\manualInstall.mdx)
+
+## 我在下载程序时遇到问题
+
+先根据下面截图对比报错信息，找到具体原因
+
+>提示：如果不显示底部 `Console` 栏，可以先 [**恢复显示布局🔗**](docs\stm32\FAQ\resetLayout.mdx)
+
+#### 1️⃣ 找不到目标芯片
+
+解决方法：[**找不到目标芯片🔗**](docs\stm32\FAQ\CompilationFailed.mdx)
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
+<img src={require('./img/DownloadError/errorNoTarget_zip.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 6PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 2️⃣ TCP 端口被其他软件占用
+
+查看 [**端口占用解决方法🔗**](docs\stm32\FAQ\PortOccupied.mdx)
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
+<img src={require('./img/DownloadError/errorOccupied_cut.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 6PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 3️⃣ 需要先升级 STLINK 固件
+
+ST 官方会不定期推送 STLINK 的固件更新，[**升级方法🔗**](docs\stm32\FAQ\STLinkUpdate.mdx)
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "0px"}}>
+<img src={require('./img/STLinkUpdate/linkNewVersion.png').default} alt="升级提示" width="460px" />
+</div>
+
+#### 4️⃣ 未安装 GDB Server 程序
+
+解决方法：[**安装 GDB SERVER 🔗**](docs\stm32\FAQ\PortOccupied.mdx) // TODO：添加此问题的文档
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/DownloadError/noDebugSession.png').default} alt="noTitle" width="460px" />
+</div>
+
+#### 5️⃣ 编写的代码有错误
+
+代码有错无法生成下载文件，改正错误即可。可以参考 [**如何改正代码 🔗**](docs\stm32\FAQ\PortOccupied.mdx) // TODO：添加此问题的文档
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
+<img src={require('./img/DownloadError/errorCode_mark.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 6PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 6️⃣ 没有可下载工程
+
+因为下载按钮是从历史记录找“上次下载的工程”
+
+新工程有可能找不到，需要右键工程，选择 `Run as` 下载（如图）
+
+如此操作一次，后面即可正常
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/DownloadError/errorNoRecent.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
+<img src={require('./img/DownloadError/run_project.png').default} alt="gpio config" width="460px" />
+</div>

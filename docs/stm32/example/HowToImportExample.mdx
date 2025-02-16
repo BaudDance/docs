@@ -1,36 +1,38 @@
 ---
 sidebar_position: 0.9
+sidebar_label: "【开始】如何下载例程"
 ---
-# 【如何下载例程】
+# 如何下载例程
 
-- 在例程页面，点击【下载代码】，获取源码
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/IMPORT_EXAMPLE/Download_button.png').default} alt="gpio config" width="500px" />
-</div>
-
-- 解压缩到全英文路径下（如：D:\stm32_workspace），然后双击里面的`.project`文件
+1️⃣ 在例程页面，点击【**下载代码**】，获取源码
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/IMPORT_EXAMPLE/dot_project.png').default} alt="gpio config" width="500px" />
+<img src={require('./img/IMPORT_EXAMPLE/Download_button.png').default} alt="gpio config" width="500px" style={{boxShadow: "0px 0px 5PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
-- 在 CubeIDE 中看见弹窗，点击【OK】，即导入成功
+2️⃣ 解压缩到全英文路径下（如 **`D:\stm32_workspace`** ），然后双击里面的 **`.project`** 文件
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/IMPORT_EXAMPLE/dot_project.png').default} alt="gpio config" width="500px" style={{boxShadow: "0px 0px 5PX 2PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+3️⃣ 出现弹窗，点击 **`OK`**，即导入成功
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/IMPORT_EXAMPLE/import_success.png').default} alt="gpio config" width="500px" />
 </div>
 
-- 右键刚刚导入的工程，选择【Run As】->【STM32 MCU C/C++ Application】，即可下载到学习板
+4️⃣ 如果出现图中的提示，点击 **`Migrate`**
+
+> 💡这是因为例程的软件版本较老，点击【Migrate】迁移即可
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/IMPORT_EXAMPLE/newVersionAvailable.png').default} alt="gpio config" width="450px" />
+</div>
+
+5️⃣ 【**右键点击**】刚刚导入的工程，选择 **`Run As`** -> **`STM32 MCU C/C++ Application`**，即可下载到学习板
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/IMPORT_EXAMPLE/run_project.png').default} alt="gpio config" width="500px" />
 </div>
 
-- 如果提示“New STM32Cube firmware version available”，点击【Migrate】即可
-
-    > 这是因为 CubeIDE 版本比例程的版本新，迁移一下即可
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/IMPORT_EXAMPLE/newVersionAvailable.png').default} alt="gpio config" width="450px" />
-</div>
