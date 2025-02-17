@@ -7,7 +7,7 @@ sidebar_label: "【下载】报错 No Device Found"
 
 解决方法：
 
-**1、配置一下工程**
+#### 1️⃣ 配置一下工程
 
 将 **`Debug`** 模式设为 **`Serial Wire`**，然后**保存并重新生成代码**
 
@@ -15,7 +15,7 @@ sidebar_label: "【下载】报错 No Device Found"
 <img src={require('./img/CompilationFailed/choseSerialWire.png').default} alt="配置工程" width="700px" />
 </div>
 
-**2、将 BOOT0 跳线帽改到 H**
+#### 2️⃣ 将 BOOT0 跳线帽改到 H
 
 跳线帽可以垂直拔出。拔出后向左平移一个针脚，插到 H 与 0 之间（如图）
 
@@ -23,31 +23,31 @@ sidebar_label: "【下载】报错 No Device Found"
 <img src={require('./img/CompilationFailed/H.png').default} alt="H" width="400px" />
 </div>
 
-**3、按一下复位键**
-
-⚠️注意！跳线帽先不要换回 L
-
+#### 3️⃣ 按一下复位键
+:::warning
+跳线帽先不要换回 L
+:::
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
 <img src={require('./img/CompilationFailed/RST.png').default} alt="RST" width="400px" />
 </div>
 
-**4、现在就能下载程序了~**
-
-⚠️注意！跳线帽先不要换回 L
-
+#### 4️⃣ 现在就能下载程序了~
+:::warning
+跳线帽先不要换回 L
+:::
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
 <img src={require('./img/CompilationFailed/烧录.png').default} alt="烧录" width="600px" />
 </div>
 
-**5、现在将跳线帽换回 L，按复位键，程序即可正常运行**
-
-⚠️ 重要！不要跳过这一步，否则程序不会运行
-
+#### 5️⃣ 现在将跳线帽换回 L，按复位键，程序即可正常运行
+:::warning
+重要！不要跳过这一步，否则程序不会运行
+:::
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
 <img src={require('./img/CompilationFailed/L.png').default} alt="H" width="400px" />
 </div>
 
-**6、以后每次都要这样吗？**
+#### 6️⃣ 以后每次都要这样吗？
 
 不需要
 

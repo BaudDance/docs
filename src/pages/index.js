@@ -7,6 +7,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
 
+
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
@@ -29,13 +30,13 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={`${siteConfig.title}`}
-      description="波特律动文档网站">
-      <HomepageHeader />
-      <main>
-        <HomepageFeatures />
-      </main>
-    </Layout>
+      <Layout
+        title={`${siteConfig.title}`}
+        description="波特律动文档网站">
+        <HomepageHeader />
+        <main>
+          <HomepageFeatures />
+        </main>
+      </Layout>
   );
 }

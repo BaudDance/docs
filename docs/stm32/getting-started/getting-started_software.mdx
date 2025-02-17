@@ -9,7 +9,7 @@ sidebar_label: "【2】创建和编译工程"
 
 ## 如何改成浅色主题？
 
-[**更换浅色主题🔗**](docs/stm32/FAQ/login.mdx)，即可跟教程一样白底浅色界面。
+[**更换浅色主题🔗**](docs/stm32/FAQ/changeTheme.mdx)，即可跟教程一样白底浅色界面。
 
 ## 创建工程
 
@@ -30,14 +30,15 @@ sidebar_label: "【2】创建和编译工程"
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/finishnew.png').default} alt="1" width="450px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
+:::tip
+如果弹出图中的报错，则说明未登录 ST 账户
 
-> ⚠️提示：如果弹出图中的报错，则说明未登录 ST 账户
-> 
-> 此时必须按 [**登录方法🔗**](docs/stm32/FAQ/login.mdx) 登录后，再从第 1️⃣ 步开始重新创建工程，否则工程创建不完整无法下载
->
+此时必须按 [**登录方法🔗**](docs/stm32/FAQ/login.mdx) 登录后，再从第 1️⃣ 步开始重新创建工程，否则工程创建不完整无法下载
+
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/errorNeedLogin_cut.png').default} alt="1" width="360px" style={{boxShadow: "0px 0px 5PX 3PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
+:::
 
 #### 4️⃣ 点击 `YES`
 
@@ -48,9 +49,9 @@ sidebar_label: "【2】创建和编译工程"
 </div>
 
 #### 5️⃣ 配置下载方式为 `Serial Wire`
-
-> ⚠️提示：每个新工程都需要配置下载方式，否则程序会关闭下载接口
-
+:::tip
+每个新工程都需要配置下载方式，否则会导致下载接口关闭，[**了解原因🔗**](docs/stm32/FAQ/CompilationFailed.mdx#为什么会出现这个问题？)
+:::
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/confDebug.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
@@ -159,4 +160,4 @@ sidebar_label: "【2】创建和编译工程"
 
 ## 进入下一节
 
-[**下载工程到硬件：**如何将工程下载到学习板 🔗](docs/stm32/getting-started/getting-started_hardware.mdx)
+[**下载工程到硬件**：如何将工程下载到学习板 🔗](docs/stm32/getting-started/getting-started_hardware.mdx)
