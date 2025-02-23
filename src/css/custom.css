@@ -46,6 +46,20 @@
   animation: buttonAnimation 0.5s ease-in-out;
 }
 
+.source_card_button {
+  display: inline-block;
+  padding: 9px 16px;
+  margin-right: 0px;
+  color: #fff;
+  background-color: #2d8e0a;
+  border: none;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  
+  animation: buttonAnimation 0.5s ease-in-out;
+}
+
 @keyframes buttonAnimation {
   0% { transform: scale(1); }
   50% { transform: scale(1.1); }
@@ -53,6 +67,12 @@
 }
 
 .source_download_button:hover {
+  color: #fff;
+  background-color: #39b10d;
+  text-decoration: none;
+}
+
+.source_card_button:hover {
   color: #fff;
   background-color: #39b10d;
   text-decoration: none;
