@@ -5,22 +5,23 @@ sidebar_label: "【3】下载工程到硬件"
 
 # 下载工程到硬件
 
-硬件开箱和准备工作
-
+:::tip
+你也可以直接开始 <a href="https://www.bilibili.com/video/BV12v4y1y7uV" target="_blank">**观看视频教程🔗**</a>
+:::
 ## 给学习板供电
 
 #### 👉方式1： 通过下载器供电
 
-<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginLeft:"20px", marginBottom: "40px"}}>
-<img src={require('/docs/stm32/getting-started/img/plugSTLINK_comp.gif').default} alt="title" width="550px" />
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginBottom: "40px"}}>
+<img src={require('/docs/stm32/getting-started/img/plugSTLINK_comp.gif').default} alt="title" width="500px" />
 </div>
 
 #### 👉方式2：通过 USB 接口供电
 :::tip
 USB 输入支持 **电脑**、**移动电源**、**手机充电器** 等任何标准的 USB 电源
 :::
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
-<img src={require('/docs/stm32/getting-started/img/plugTypec.png').default} alt="title" width="550px" />
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('/docs/stm32/getting-started/img/plugTypec.png').default} alt="title" width="500px" />
 </div>
 
 :::tip
@@ -29,9 +30,9 @@ USB 输入支持 **电脑**、**移动电源**、**手机充电器** 等任何�
 
 ## 出厂程序
 
-- 学习板出厂时自带一个演示程序，通电后会自动点亮并运行 [**下载源码🔗**](docs\stm32\example\FactoryDemo.mdx)
+学习板出厂时自带一个[**出厂演示程序🔗**](docs\stm32\example\FactoryDemo.mdx)，通电后会自动点亮并运行 
 
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('/docs/stm32/getting-started/img/fDemo.gif').default} alt="title" width="350px" />
 </div>
 
@@ -45,52 +46,51 @@ USB 输入支持 **电脑**、**移动电源**、**手机充电器** 等任何�
 
 由于 ST 官方不定期推送 STLINK 下载器的固件更新
 
-所以新购买的 STLINK 需要先升级固件
+**所以新购买的 STLINK 需要先升级固件**
 
-#### 1️⃣ 在软件顶部的菜单栏，按图片指示打开升级工具
-
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
-<img src={require('../FAQ/img/STLinkUpdate/findupgtool.png').default} alt="ST-LINK升级页面" width="450px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
-</div>
-
-#### 2️⃣ 拔掉ST-LINK，等3秒再插上
-
-:::warning
-**注意：此时不要关掉第 1 步的页面**
-:::
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
-<img src={require('../FAQ/img/STLinkUpdate/拔出STLINK.png').default} alt="拔出STLINK" width="220px" />
-</div>
-
-#### 3️⃣ 按图操作，依次点击1-2-3按钮
-
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
-<img src={require('../FAQ/img/STLinkUpdate/操作步骤.png').default} alt="操作步骤" width="550px" />
-</div>
-
-#### 4️⃣ 进度条走完后，等5秒关掉升级界面，升级完成😎
-
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginLeft:"20px", marginBottom: "20px"}}>
-<img src={require('../FAQ/img/STLinkUpdate/upgfinished.png').default} alt="upgfinished" width="550px" />
-</div>
+请按 <a href="/docs/stm32/FAQ/STLinkUpdate" target="_blank">**升级方法🔗**</a> 进行升级，然后再进行下一步
 
 ## 下载程序
 
-#### 1️⃣ 连接好 STLINK 下载器
+#### 1️⃣ 连接 STLINK 下载器
 
-<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginLeft:"20px", marginBottom: "40px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginBottom: "40px"}}>
 <img src={require('/docs/stm32/getting-started/img/plugSTLINK_comp.gif').default} alt="title" width="550px" />
 </div>
 
-#### 2️⃣ 点击工具栏中的绿色 run 按钮，开始下载 
+#### 2️⃣ 点击工具栏中的绿色运行按钮
 
-<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginLeft:"20px", marginBottom: "40px"}}>
+找到工具栏中的绿色运行按钮，点击它开始下载程序到 STM32 开发板
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginBottom: "40px"}}>
 <img src={require('./img/buildFinished_spliced.png').default} alt="title" width="550px" />
 </div>
 
+#### 3️⃣ 弹出提示窗口
 
-// TODO：配图
+在弹出的窗口中，勾选“自动编译”选项。这样每次点击运行按钮时，系统都会先自动重新编译
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginBottom: "40px"}}>
+<img src={require('./img/runconfig.png').default} alt="title" width="450px" />
+</div>
+
+:::tip
+**下载出错了？** <a href="/docs/stm32/getting-started/getting-started_finish" target="_blank">**点击查看解决方法🔗**</a>
+:::
+
+#### 4️⃣ 完成下载
+
+看到 **`Download and verify success`** 时，程序下载成功
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "left", marginBottom: "40px"}}>
+<img src={require('./img/runconfig.png').default} alt="title" width="450px" />
+</div>
+
+:::tip
+**为什么屏幕和背景灯还亮着？**
+由于原先程序已经发送了打开命令，而新程序并未主动发送关闭命令，所以不会立即熄灭，只会停止刷新。此时重新给板子通电，即可彻底关闭它们。
+:::
 
 ## 进入下一节
 
-[**开始探索**：一些技巧，助你探索 STM32 的世界 🔗](/docs/stm32/getting-started/getting-started_finish.mdx)
+<a href="/docs/stm32/getting-started/getting-started_finish" target="_blank">**开始探索**：一些技巧，助你探索 STM32 的世界 🔗</a>

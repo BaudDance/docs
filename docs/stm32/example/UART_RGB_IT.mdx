@@ -3,7 +3,11 @@ sidebar_position: 2.62
 ---
 # 【UART 串口】命令点灯（中断）
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1xSttydEZLqaZQopmwl2A4Q?pwd=6666" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1xSttydEZLqaZQopmwl2A4Q?pwd=6666" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 通过串口中断实现控制学习板正面的LED。
 
@@ -31,7 +35,7 @@ sidebar_position: 2.62
 
 ### 1、工程配置
 
-- **分配引脚：**在Pinout&Configuration页面，将 PA6、PA7、PB0 配置为 GPIO_Output，并分别设置 User label 为 BLUE、GREEN、RED
+- **分配引脚**：在Pinout&Configuration页面，将 PA6、PA7、PB0 配置为 GPIO_Output，并分别设置 User label 为 BLUE、GREEN、RED
 
     > 1、**左键**点击对应的引脚，选择 GPIO_Output；
     >
@@ -41,9 +45,9 @@ sidebar_position: 2.62
 <img src={require('./img/LED/gpio config.png').default} alt="gpio config" width="600px" />
 </div>
 
-- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+- **打开串口2外设**：Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
 
-- **使能串口中断：**在 USART2 -> Configuration -> NVIC Settings 标签卡中，勾选 USART2 global interrupt 的 Enable
+- **使能串口中断**：在 USART2 -> Configuration -> NVIC Settings 标签卡中，勾选 USART2 global interrupt 的 Enable
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/UART_RGB/enableIT.png').default} alt="IT config" width="600px" />
@@ -110,4 +114,4 @@ sidebar_position: 2.62
 
 例如发送 R1 返回却变成 1R
 
-- **原因：**`HAL_UART_Receive_IT` 固定接收2字节。发送非2字节数据（如1或3字节）会使剩余字节留在缓冲区，下次读取时导致数据错乱。
+- **原因**：`HAL_UART_Receive_IT` 固定接收2字节。发送非2字节数据（如1或3字节）会使剩余字节留在缓冲区，下次读取时导致数据错乱。

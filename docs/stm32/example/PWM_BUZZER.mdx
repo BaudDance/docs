@@ -3,7 +3,11 @@ sidebar_position: 2.4
 ---
 # 【PWM】无源蜂鸣器
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1B-LjtwcvXJ_3DE1wURJMZA?pwd=krw5" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1B-LjtwcvXJ_3DE1wURJMZA?pwd=krw5" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## PWM 简介
 
@@ -29,7 +33,7 @@ PWM的几个关键参数为：
 
 #### 无源蜂鸣器原理
 
-- 学习板上的蜂鸣器型号为：**QMB-09B-03电磁式无源蜂鸣器**。
+- 学习板上的蜂鸣器型号为**：QMB-09B-03电磁式无源蜂鸣器**。
 - 蜂鸣器内部有一个**电磁线圈**，能够驱动**振动膜片**发出声音。通过PWM给蜂鸣器提供不同频率的信号，即可发出不同频率的声音
 - 实际操作中，除了控制**PWM频率**，还需要控制**PWM占空比**，以使膜片振动趋近于正弦波，从而发出清脆明亮的声音。在学习板上，使用**20%占空比**可以有较好的响度和音质
 
@@ -53,27 +57,27 @@ PWM的几个关键参数为：
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
-- **分配引脚：**在Pinout&Configuration页面，配置如下引脚
+- **分配引脚**：在Pinout&Configuration页面，配置如下引脚
 
   - 将PB9配置为TIM4_CH4，
 
   - 将PB12、PB13设置为GPIO_Input，并分别设置User Label为KEY1、KEY2
 
-- **配置GPIO：**在Pinout&Configuration -> GPIO，将PB13的GPIO Pull-up/Pull-down配置为Pull-up
+- **配置GPIO**：在Pinout&Configuration -> GPIO，将PB13的GPIO Pull-up/Pull-down配置为Pull-up
 
-- **配置TIM4：**在Pinout&Configuration -> Timers -> TIM4
+- **配置TIM4**：在Pinout&Configuration -> Timers -> TIM4
 
   - 勾选 Internal Clock，开启 TIM4 的内部时钟源
 

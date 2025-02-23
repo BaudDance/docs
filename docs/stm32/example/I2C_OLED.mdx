@@ -3,7 +3,11 @@ sidebar_position: 1.6
 ---
 # 【I²C总线】OLED屏幕
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1f4TTVAjKqM9Iw32WTYYf5A?pwd=rpag" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1f4TTVAjKqM9Iw32WTYYf5A?pwd=rpag" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## OLED屏幕（I2C_OLED）
 
@@ -42,32 +46,32 @@ OLED屏幕循环显示不同画面：
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
-- **配置I²C1：**Pinout&Configuration -> Connectivity -> I2C1，将I2C模式选择为I2C，并在下方Configuration -> Parameter Settings，将I2C Speed Mode选择为Fast Mode
+- **配置I²C1**：Pinout&Configuration -> Connectivity -> I2C1，将I2C模式选择为I2C，并在下方Configuration -> Parameter Settings，将I2C Speed Mode选择为Fast Mode
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/I2C_OLED/Snipaste_2023-05-04_23-06-38.png').default} alt="工程配置" width="600px" />
 </div>
 
-- **配置生成单独.c/.h文件：**在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
+- **配置生成单独.c/.h文件**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
 
 ### 2、代码
 
 #### (1) 初始化过程
 
-- **拷贝库文件：**将oled.c、font.c文件拷贝到Core -> Src目录下，将oled.h、font.h文件拷贝到Core -> Inc目录下。
-- **在main.c中添加include：**
+- **拷贝库文件**：将oled.c、font.c文件拷贝到Core -> Src目录下，将oled.h、font.h文件拷贝到Core -> Inc目录下。
+- **在main.c中添加include**：
   
 ```c
 #include "string.h"
@@ -75,7 +79,7 @@ OLED屏幕循环显示不同画面：
 #include "stdio.h"
 ```
   
-- **初始化OLED：**
+- **初始化OLED**：
 
 ```c
 HAL_Delay(20); // 单片机启动比OLED上电快,需要延迟等待一下
@@ -84,7 +88,7 @@ OLED_Init(); // 初始化OLED
 
 #### (2) 显示函数
 
-- **将缓存内容更新到屏幕显示：**
+- **将缓存内容更新到屏幕显示**：
 
 > 注意：任何操作都需要调用此函数才能显示到屏幕上，否则只是改变显示缓冲区
 
@@ -93,7 +97,7 @@ OLED_ShowFrame();
 ```
 
 
-- **新建空白缓冲区：**
+- **新建空白缓冲区**：
 
 > 注意：只存在一个Frame，NewFrame后之前的内容将被清空
 
@@ -102,7 +106,7 @@ OLED_NewFrame();
 ```
 
 
-- **显示一个像素点：**
+- **显示一个像素点**：
   - `uint8_t x` 横坐标
   - `uint8_t y` 纵坐标
   - `OLED_ColorMode mode` 颜色模式
@@ -138,7 +142,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制直线：**
+- **绘制直线**：
   - `uint8_t x1` 直线起点横坐标 [0, 127]
   - `uint8_t y1` 直线起点纵坐标 [0, 63]
   - `uint8_t x2` 直线终点横坐标 [0, 127]
@@ -156,7 +160,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制（空心）矩形：**
+- **绘制（空心）矩形**：
   - `uint8_t x` 起始点横坐标 [0, 127]
   - `uint8_t y` 起始点纵坐标 [0, 63]
   - `uint8_t w` 矩形宽度 [0, 127]
@@ -174,7 +178,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制（填充）矩形：**
+- **绘制（填充）矩形**：
   - `uint8_t x` 起始点横坐标 [0, 127]
   - `uint8_t y` 起始点纵坐标 [0, 63]
   - `uint8_t w` 矩形宽度 [0, 127]
@@ -191,7 +195,7 @@ OLED_DrawFilledRectangle(32, 16, 63, 31, OLED_COLOR_NORMAL); // 绘制一个填�
 OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
-- **绘制（空心）圆形：**
+- **绘制（空心）圆形**：
 > 此函数使用Bresenham算法绘制圆
 
   - `uint8_t x` 圆心横坐标 [0, 127]
@@ -210,7 +214,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制（填充）圆形：**
+- **绘制（填充）圆形**：
 > 此函数使用Bresenham算法绘制圆
 
   - `uint8_t x` 圆心横坐标 [0, 127]
@@ -229,7 +233,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制（空心）三角形：**
+- **绘制（空心）三角形**：
   - `uint8_t x1` 第一个点横坐标 [0, 127]
   - `uint8_t y1` 第一个点纵坐标 [0, 63]
   - `uint8_t x2` 第二个点横坐标 [0, 127]
@@ -249,7 +253,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制（填充）三角形：**
+- **绘制（填充）三角形**：
   - `uint8_t x1` 第一个点横坐标 [0, 127]
   - `uint8_t y1` 第一个点纵坐标 [0, 63]
   - `uint8_t x2` 第二个点横坐标 [0, 127]
@@ -269,7 +273,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **绘制（空心）椭圆：**
+- **绘制（空心）椭圆**：
   - `uint8_t x` 圆心横坐标 [0, 127]
   - `uint8_t y` 圆心纵坐标 [0, 63]
   - `uint8_t a` 长轴长度
@@ -287,7 +291,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 ```
 
 
-- **显示BMP图像：**
+- **显示BMP图像**：
   - `uint8_t x` 起始点横坐标 [0, 127]
   - `uint8_t y` 起始点纵坐标 [0, 63]
   - `const Image *img` 图像数据
@@ -306,7 +310,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 
 #### (3) 取字模
 
-**文字：**分为两类：ASCII字符、中文字符。
+**文字**：分为两类：ASCII字符、中文字符。
 
 - ASCII字符：font.c 库中已包含，可以直接调用
 
@@ -324,7 +328,7 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
     - 将字模代码粘贴到font.c中，并在font.h中添加对应的声明
     - 使用OLED_PrintString函数, 传入对应的字体结构体即可显示中文字符
 
-**图片：**支持BMP格式单色位图
+**图片**：支持BMP格式单色位图
 
 - 在线取图模工具：https://led.baud-dance.com/
 

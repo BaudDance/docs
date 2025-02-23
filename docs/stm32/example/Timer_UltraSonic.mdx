@@ -4,7 +4,11 @@ sidebar_position: 2.1
 
 # 【Timer】超声波测距
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/17KXyGSry5mN9Y7IGRcdwrA?pwd=x5gi" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/17KXyGSry5mN9Y7IGRcdwrA?pwd=x5gi" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## HC-SR04 超声波模块简介
 
@@ -77,21 +81,21 @@ sidebar_position: 2.1
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
-- **分配引脚：**在Pinout&Configuration页面，将PA11、PA10分别配置为GPIO_Output、TIM1_CH3，并将PA11命名为TRIG
+- **分配引脚**：在Pinout&Configuration页面，将PA11、PA10分别配置为GPIO_Output、TIM1_CH3，并将PA11命名为TRIG
 
-- **配置TIM1：**在Pinout&Configuration -> Timers -> TIM1
+- **配置TIM1**：在Pinout&Configuration -> Timers -> TIM1
 
   - Mode -> Clock Source 设为 Internal Clock，Channel3 设为 Input Capture direct mode，即**输入捕获**
 
@@ -105,9 +109,9 @@ sidebar_position: 2.1
 <img src={require('./img/Timer_UltraSonic/TIM1配置.png').default} alt="TIM1配置" width="600px" />
 </div>
 
-- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+- **打开串口2外设**：Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
 
-- **启用float打印：**在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
+- **启用float打印**：在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
 
 > 默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
 >

@@ -3,7 +3,11 @@ sidebar_position: 2.63
 ---
 # 【UART 串口】任意数据的收发
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/19b-9ak9x8Mbfa17e4pfXIQ?pwd=6666" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/19b-9ak9x8Mbfa17e4pfXIQ?pwd=6666" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 通过串口（TYPE-C）接收任意不定长的数据，并将接收到的数据原样返回。
 
@@ -35,15 +39,15 @@ sidebar_position: 2.63
 
 ### 1、工程配置
 
-- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+- **打开串口2外设**：Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
 
-- **添加DMA通道：**在 USART2 -> Configuration -> DMA Settings 标签卡中，点击 Add 按钮，分别添加 USART2_RX 和 USART2_TX 的 DMA 通道
+- **添加DMA通道**：在 USART2 -> Configuration -> DMA Settings 标签卡中，点击 Add 按钮，分别添加 USART2_RX 和 USART2_TX 的 DMA 通道
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/UART_ECHO/configDMA.png').default} alt="DMA config" width="600px" />
 </div>
 
-- **使能串口中断：**在 USART2 -> Configuration -> NVIC Settings 标签卡中，勾选 USART2 global interrupt 的 Enable
+- **使能串口中断**：在 USART2 -> Configuration -> NVIC Settings 标签卡中，勾选 USART2 global interrupt 的 Enable
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/UART_ECHO/enableIT.png').default} alt="IT config" width="600px" />

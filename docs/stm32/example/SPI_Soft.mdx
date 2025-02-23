@@ -3,7 +3,11 @@ sidebar_position: 1.7
 ---
 # 【SPI】软件SPI库
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1IK90DFgfYx7V07lpztufQg?pwd=6666" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1IK90DFgfYx7V07lpztufQg?pwd=6666" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 本例程演示了如何使用软件SPI库
 
@@ -21,7 +25,7 @@ sidebar_position: 1.7
 
 SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要用于嵌入式系统中，用于集成电路之间的短距离有线通信。
 
-**典型应用场景有：**
+**典型应用场景有**：
 
 - W25QXX 系列 Flash
 
@@ -29,7 +33,7 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
 
 - NRF24L01 无线模块等。
 
-**一般情况下，SPI 通信有四根线：**
+**一般情况下，SPI 通信有四根线**：
 
 - SCLK：时钟线，由主机产生
 
@@ -39,7 +43,7 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
 
 - CS：片选线，用于选择从机
 
-**时钟相位和极性（CPOL、CPHA）：**
+**时钟相位和极性（CPOL、CPHA）**：
 
 - CPOL：时钟极性，决定时钟信号在空闲时是高电平还是低电平
 
@@ -65,7 +69,7 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
 
 > 时钟极性和相位的配置于目标芯片有关，需要根据目标芯片的 SPI 时序要求进行配置
 
-**SPI 通信流程实例：**
+**SPI 通信流程实例**：
 
 - 这是一个典型的 SPI 通信流程，主机通过 SCLK 产生时钟信号，通过 MOSI 向从机发送数据，通过 MISO 从从机接收数据
 
@@ -83,19 +87,19 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
-- **分配引脚：**将 PA12、PA15、PB3、PB1 分别设置为 GPIO_Output，并分别设置 User label 为 SPI_SCLK、SPI_MOSI、SPI_MISO、SPI_CS
+- **分配引脚**：将 PA12、PA15、PB3、PB1 分别设置为 GPIO_Output，并分别设置 User label 为 SPI_SCLK、SPI_MOSI、SPI_MISO、SPI_CS
 
   > 这几个是学习板左下角的自定义引脚，如果需要使用其他引脚，可以自行修改，任意引脚都可以使用
 
@@ -103,7 +107,7 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
 <img src={require('./img/SPI_Soft/PinConf.png').default} alt="PinConf" width="600px" />
 </div>
 
-- **配置GPIO：**在 System Core -> GPIO
+- **配置GPIO**：在 System Core -> GPIO
 
     - 将 PA12、PA15、PB1 的 Maximum output speed 配置为 High
 
@@ -119,15 +123,15 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
 
 #### (1) 初始化过程
 
-- **拷贝库文件：**将 softSPI.c、dwt_stm32_delay.c 文件拷贝到 Core -> Src 目录下，将 softSPI.h、dwt_stm32_delay.h 文件拷贝到 Core -> Inc 目录下。
+- **拷贝库文件**：将 softSPI.c、dwt_stm32_delay.c 文件拷贝到 Core -> Src 目录下，将 softSPI.h、dwt_stm32_delay.h 文件拷贝到 Core -> Inc 目录下。
 
-- **添加头文件：**在 main.c 中引用头文件
+- **添加头文件**：在 main.c 中引用头文件
 
     ```c
     #include "softSPI.h"
     ```
 
-- **初始化 SPI 实例结构体：** 在 main 函数中初始化 SPI 实例结构体
+- **初始化 SPI 实例结构体**： 在 main 函数中初始化 SPI 实例结构体
 
     ```c
     // 分配 SCLK 引脚
@@ -149,7 +153,7 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
     SoftSPI1.CPHA = 0;
     ```
 
-- **初始化 SPI 实例：** 在 main 函数中初始化 SPI 实例
+- **初始化 SPI 实例**： 在 main 函数中初始化 SPI 实例
 
     ```c
     // 初始化 SPI 实例
@@ -165,7 +169,7 @@ SPI（Serial Peripheral Interface）是一种同步串行通信协议，主要�
     SoftSPI_CS_Low(&SoftSPI1);
     ```
 
-2. **收发数据：** 使用 `SoftSPI_WriteReadBuff` 函数发送和接收数据
+2. **收发数据**： 使用 `SoftSPI_WriteReadBuff` 函数发送和接收数据
 
     ```c
     // 读写数据

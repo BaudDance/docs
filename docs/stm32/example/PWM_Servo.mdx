@@ -3,7 +3,11 @@ sidebar_position: 2.3
 ---
 # 【PWM】舵机控制
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1XHoPQsPdqJy7ODswOfskPA?pwd=gdc2" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1XHoPQsPdqJy7ODswOfskPA?pwd=gdc2" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## PWM 简介
 
@@ -77,21 +81,21 @@ PWM的几个关键参数为：
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
-- **分配引脚：**在Pinout&Configuration页面，将PB8配置为TIM4_CH3
+- **分配引脚**：在Pinout&Configuration页面，将PB8配置为TIM4_CH3
 
-- **配置TIM4：**在Pinout&Configuration -> Timers -> TIM4
+- **配置TIM4**：在Pinout&Configuration -> Timers -> TIM4
   
   - Configuration -> Mode，勾选Internal Clock，开启 TIM4 的内部时钟源
   
@@ -104,9 +108,9 @@ PWM的几个关键参数为：
 
 ### 2、代码
 
-- **启动PWM输出：**`HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3)` 启动PWM输出
+- **启动PWM输出**：`HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3)` 启动PWM输出
 
-- **舵机控制：**
+- **舵机控制**：
 
   - 舵机角度受占空比控制，占空比 2.5%~12.5% 代表 0°~180°
 

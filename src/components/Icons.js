@@ -1,8 +1,10 @@
 
 import React from 'react';
 
-const IconWechat = () => <span>📱</span>;
-const IconShoppingBag = () => <span>🛍️</span>;
+const IconWechat = () => <img src="/docs/stm32/getting-started/img/plugTypec.png" alt="WeChat" />;
+const IconShoppingBag = () => <img src="\docs\stm32\getting-started\img\stlink.jpg" alt="Shopping Bag" />;
+
+
 const IconDownload = () => <span>📥</span>;
 const IconBook = () => <span>📖</span>;
 const IconHelpCircle = () => <span>❓</span>;

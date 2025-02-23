@@ -5,11 +5,13 @@ sidebar_label: "【2】创建和编译工程"
 
 # 如何使用开发环境
 
-熟悉 cubeIDE 的界面和操作
+:::tip
+你也可以直接开始 <a href="https://www.bilibili.com/video/BV12v4y1y7uV" target="_blank">**观看视频教程🔗**</a>
+:::
 
 ## 如何改成浅色主题？
 
-[**更换浅色主题🔗**](docs/stm32/FAQ/changeTheme.mdx)，即可跟教程一样白底浅色界面。
+<a href="/docs/stm32/FAQ/changeTheme" target="_blank">**更换浅色主题🔗**</a>，即可跟教程一样白底浅色界面。
 
 ## 创建工程
 
@@ -33,7 +35,7 @@ sidebar_label: "【2】创建和编译工程"
 :::tip
 如果弹出图中的报错，则说明未登录 ST 账户
 
-此时必须按 [**登录方法🔗**](docs/stm32/FAQ/login.mdx) 登录后，再从第 1️⃣ 步开始重新创建工程，否则工程创建不完整无法下载
+此时必须按 <a href="/docs/stm32/FAQ/login" target="_blank">**登录方法🔗**</a> 登录后，再从第 1️⃣ 步开始重新创建工程，否则工程创建不完整无法下载
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/errorNeedLogin_cut.png').default} alt="1" width="360px" style={{boxShadow: "0px 0px 5PX 3PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
@@ -50,7 +52,7 @@ sidebar_label: "【2】创建和编译工程"
 
 #### 5️⃣ 配置下载方式为 `Serial Wire`
 :::tip
-每个新工程都需要配置下载方式，否则会导致下载接口关闭，[**了解原因🔗**](docs/stm32/FAQ/CompilationFailed.mdx#为什么会出现这个问题？)
+每个新工程都需要配置下载方式，否则会导致下载接口关闭，<a href="/docs/stm32/FAQ/CompilationFailed#为什么会出现这个问题" target="_blank">**了解原因🔗**</a>
 :::
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/confDebug.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
@@ -59,7 +61,7 @@ sidebar_label: "【2】创建和编译工程"
 #### 6️⃣ 分配 LED 引脚
 
 将 **`PA7`** 配置为输出引脚
-> PA7 连接到学习板上的绿色 LED
+（PA7 连接到学习板上的绿色 LED）
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/confOutput.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
@@ -67,7 +69,7 @@ sidebar_label: "【2】创建和编译工程"
 
 #### 7️⃣ 设置引脚输出电平
 
-为刚刚分配的引脚设置输出电平
+为刚刚分配的引脚设置输出电平 `High`
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
 <img src={require('./img/confGPIO.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
@@ -106,9 +108,9 @@ sidebar_label: "【2】创建和编译工程"
 ---
 
 ## 进一步了解软件功能
-
+:::tip
 本部分内容仅作介绍，无需操作。
-
+:::
 #### 1️⃣ 工程目录  `Project Explorer`
 
 在这里可以管理工程文件，打开代码、配置文件等
@@ -160,4 +162,4 @@ sidebar_label: "【2】创建和编译工程"
 
 ## 进入下一节
 
-[**下载工程到硬件**：如何将工程下载到学习板 🔗](docs/stm32/getting-started/getting-started_hardware.mdx)
+<a href="/docs/stm32/getting-started/getting-started_hardware" target="_blank">**下载工程到硬件**：如何将工程下载到学习板 🔗</a>

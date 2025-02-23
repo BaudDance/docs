@@ -3,7 +3,11 @@ sidebar_position: 1.1
 ---
 # 【GPIO】按键控制
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1UE4Sw3llYVgAtMOltWPMJA?pwd=pej4" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1UE4Sw3llYVgAtMOltWPMJA?pwd=pej4" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 通过学习板上的按键KEY1、KEY2控制LED的亮灭。
 
@@ -27,11 +31,11 @@ sidebar_position: 1.1
 
 #### 1、工程配置
 
-- **分配引脚：**在Pinout&Configuration页面，配置如下引脚
+- **分配引脚**：在Pinout&Configuration页面，配置如下引脚
 
-  - **输出引脚：**将 PA6、PA7、PB0 分别设置为 GPIO_Output，并分别设置 User label 为 BLUE、GREEN、RED
+  - **输出引脚**：将 PA6、PA7、PB0 分别设置为 GPIO_Output，并分别设置 User label 为 BLUE、GREEN、RED
 
-  - **输入引脚：**将 PB12、PB13、PB15 设置为 GPIO_Input，并分别设置 User label 为 KEY1、KEY2、KEY3
+  - **输入引脚**：将 PB12、PB13、PB15 设置为 GPIO_Input，并分别设置 User label 为 KEY1、KEY2、KEY3
 
     > 左键点击对应的引脚，选择 GPIO_Output 或 GPIO_Input；
     >
@@ -41,7 +45,7 @@ sidebar_position: 1.1
 <img src={require('./img/GPIO_key/gpio config.png').default} alt="gpio config" width="600px" />
 </div>
 
-- **配置GPIO：**在Pinout&Configuration -> GPIO，将 PB13、PB15 的 GPIO Pull-up/Pull-down 配置为 Pull-up
+- **配置GPIO**：在Pinout&Configuration -> GPIO，将 PB13、PB15 的 GPIO Pull-up/Pull-down 配置为 Pull-up
 
     > 学习板仅 KEY1 配置了外部上拉电阻，因此 KEY1 可以不配置 Pull-up。
 

@@ -3,7 +3,11 @@ sidebar_position: 1.5
 ---
 # 【I²C总线】AHT20温湿度传感器
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1J890MI_1HerJ0KRbAVGJpg?pwd=akgi" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1J890MI_1HerJ0KRbAVGJpg?pwd=akgi" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## AHT20温湿度传感器（I2C_AHT20）
 
@@ -51,13 +55,13 @@ sidebar_position: 1.5
 
 ### 1、工程配置
 
-- **打开I²C外设：**Pinout&Configuration -> Connectivity -> I2C1，将I2C模式选择为I2C
+- **打开I²C外设**：Pinout&Configuration -> Connectivity -> I2C1，将I2C模式选择为I2C
 
-- **打开串口2外设：**Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
+- **打开串口2外设**：Pinout&Configuration -> Connectivity -> USART2，将Mode选择为Asynchronous
 
-- **配置工程：**在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
+- **配置工程**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
 
-- **启用float打印：**在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
+- **启用float打印**：在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
 
   > 默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
 
@@ -65,18 +69,18 @@ sidebar_position: 1.5
 
 #### (1) 初始化过程
 
-- **拷贝库文件：**将aht20.c文件拷贝到Core -> Src目录下，将aht20.h文件拷贝到Core -> Inc目录下。
+- **拷贝库文件**：将aht20.c文件拷贝到Core -> Src目录下，将aht20.h文件拷贝到Core -> Inc目录下。
 
-- **在main.c中添加include：**aht20.h
+- **在main.c中添加include**：aht20.h
 
-- **引用头文件：**需要使用 sprintf 打印输出，在 main.c 引用头文件：
+- **引用头文件**：需要使用 sprintf 打印输出，在 main.c 引用头文件：
 
   ```c
   #include "stdio.h"
   #include "string.h"
   ```
 
-- **初始化AHT20：**
+- **初始化AHT20**：
 
   ```c
   // 初始化AHT20

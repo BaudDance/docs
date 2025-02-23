@@ -4,7 +4,11 @@ sidebar_position: 1.81
 
 # 【ADC转换】NTC热敏电阻测温
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/165NaFNbXgTJ7p0YcECWL3g?pwd=x99h" class="source_download_button">下载代码</a>
+**下载例程代码：** <a href="https://pan.baidu.com/s/165NaFNbXgTJ7p0YcECWL3g?pwd=x99h" class="source_download_button" target="_blank">下载代码</a>
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## 热敏电阻简介
 
@@ -52,9 +56,9 @@ sidebar_position: 1.81
 
 ### 1、工程配置
 
-- **打开ADC1：**在Pinout&Configuration页面，将 PA4 设置为 ADC1_IN4
+- **打开ADC1**：在Pinout&Configuration页面，将 PA4 设置为 ADC1_IN4
 
-- **配置ADC：**在Pinout&Configuration -> Analog -> ADC1 -> Configuration中
+- **配置ADC**：在Pinout&Configuration -> Analog -> ADC1 -> Configuration中
   
   - ADC_Settings -> Continuous Conversion Mode设为Enable，使 ADC 转换持续进行，不用每次手动触发
 

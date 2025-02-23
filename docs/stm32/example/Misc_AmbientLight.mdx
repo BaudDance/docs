@@ -3,7 +3,11 @@ sidebar_position: 3.0
 ---
 # 【WS2812】串行控制全彩色LED
 
-**下载例程代码：** <a href="https://pan.baidu.com/s/1Mdes2lw2Zo1dpvHLsPQzlA?pwd=1234" class="source_download_button">下载代码</a> [如何使用例程【点击查看教程】](/docs/stm32/example/HowToImportExample)
+**下载例程代码**： <a href="https://pan.baidu.com/s/1Mdes2lw2Zo1dpvHLsPQzlA?pwd=1234" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
 
 ## WS2812 简介
 
@@ -49,25 +53,25 @@ WS2812 的颜色通过RGB三通道混合产生，每个通道的调节范围都�
 
 ### 1、工程配置
 
-- **开启外部晶振：**在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
 </div>
 
-- **配置时钟频率：**在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
 </div>
 
-- **配置DEBUG方式：**由于PB4引脚默认分配给JTAG调试接口，所以需要先配置DUBUG方式为Serial Wire，以释放PB4引脚。在Pinout&Configuration -> System Core -> SYS 页面，将Debug设置为 Serial Wire
+- **配置DEBUG方式**：由于PB4引脚默认分配给JTAG调试接口，所以需要先配置DUBUG方式为Serial Wire，以释放PB4引脚。在Pinout&Configuration -> System Core -> SYS 页面，将Debug设置为 Serial Wire
 
-- **配置生成单独.c/.h文件：**在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
+- **配置生成单独.c/.h文件**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
 
-- **分配引脚：**在Pinout&Configuration页面，将PB4配置为TIM3_CH1
+- **分配引脚**：在Pinout&Configuration页面，将PB4配置为TIM3_CH1
 
-- **配置TIM3：**在Pinout&Configuration -> Timers -> TIM3
+- **配置TIM3**：在Pinout&Configuration -> Timers -> TIM3
 
   - 勾选 Internal Clock，开启 TIM3 的内部时钟源
 
@@ -96,9 +100,9 @@ WS2812 的颜色通过RGB三通道混合产生，每个通道的调节范围都�
 
 #### (1) 初始化过程
 
-- **拷贝库文件：**将 ws2812.c 文件拷贝到 Core -> Src 目录下，将 ws2812.h 文件拷贝到 Core -> Inc 目录下。
+- **拷贝库文件**：将 ws2812.c 文件拷贝到 Core -> Src 目录下，将 ws2812.h 文件拷贝到 Core -> Inc 目录下。
 
-- **添加头文件：**在 main.c 中引用头文件
+- **添加头文件**：在 main.c 中引用头文件
 
   ```c
   #include "ws2812.h"
