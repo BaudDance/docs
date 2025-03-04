@@ -62,16 +62,16 @@ sidebar_position: 1.5
 - **配置工程**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
 
 - **启用float打印**：在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
-
-  > 默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
-
+  :::tip
+  默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
+  :::
 ### 2、代码
 
 #### (1) 初始化过程
 
-- **拷贝库文件**：将aht20.c文件拷贝到Core -> Src目录下，将aht20.h文件拷贝到Core -> Inc目录下。
+- **拷贝库文件**：将 **`aht20.c`** 文件拷贝到 `Core` -> `Src` 目录下，将 **`aht20.h`** 文件拷贝到 `Core` -> `Inc` 目录下。
 
-- **在main.c中添加include**：aht20.h
+- **在main.c中添加include**：`aht20.h`
 
 - **引用头文件**：需要使用 sprintf 打印输出，在 main.c 引用头文件：
 
@@ -89,31 +89,26 @@ sidebar_position: 1.5
 
 #### (2) 读取数据
 
-```c
-AHT20_Read(float *Temperature, float *Humidity)
-```
+  ```c
+  AHT20_Read(float *Temperature, float *Humidity)
+  ```
 
-- 预先定义两个float类型的变量，将指针传入该函数，用于接收读取结果
+预先定义两个float类型的变量，将指针传入该函数，用于接收读取结果
+:::tip
+建议读取间隔大于500毫秒
+:::
 
-- 建议读取间隔大于500毫秒
+## AHT20与DHT20、DHT11的区别
 
-### 3、AHT20与DHT20、DHT11的区别
+三种型号都是广州奥松的温湿度传感器，它们的主要区别如下
 
-三种型号都是广州奥松的温湿度传感器，他们的主要区别如下
-
-- AHT20 vs DHT20
-
-  - AHT20、DHT20在程序上通用，可以相互替代 
-
-  - AHT20是贴片封装，DHT系列是插针封装
-
-  - AHT20精度比DHT20稍高一些
-
-- DHT20 vs DHT11
-
-  - DHT20、AHT20 是DHT11的全新升级产品，提升了精度、响应时间、测量范围、稳定性，不推荐使用老产品。
-  
-  - DHT20是标准的I²C通信，DHT11是单总线通信
+| 对比项目 | AHT20 | DHT20 | DHT11 |
+| ---- | ---- | ---- | ---- |
+| 通用 | 与 DHT20 通用 | 与 AHT20 通用 | 不通用 |
+| 体积 | 微型贴片 | 插针 | 插针 |
+| 精度 | 最高 | 低于 AHT20 | 最低 |
+| 定位 | 新 | 是 DHT11 的升级 | 老产品 |
+| 通信 | 标准 I²C  | 标准 I²C | 单总线 |
 
 DHT20 内部结构：
 

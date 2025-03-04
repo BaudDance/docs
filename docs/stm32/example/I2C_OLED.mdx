@@ -13,7 +13,7 @@ sidebar_position: 1.6
 
 在OLED屏幕上显示文字、图形和BMP图像
 
-板载OLED规格：（详细可参考资料包中的手册）
+板载OLED规格：
 
 
 |   参数   |       值        |
@@ -22,6 +22,10 @@ sidebar_position: 1.6
 |  分辨率  |    128 × 64     |
 | 屏幕尺寸 |    1.3 英寸     |
 | I²C地址  |      0x7A       |
+
+:::info
+查看 <a href="/docs/stm32/resourcePack/#配套模块手册" target="_blank">**OLED规格书.PDF 🔗**</a>
+:::
 
 ## 如何使用例程
 
@@ -49,19 +53,19 @@ OLED屏幕循环显示不同画面：
 - **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
 - **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
-- **配置I²C1**：Pinout&Configuration -> Connectivity -> I2C1，将I2C模式选择为I2C，并在下方Configuration -> Parameter Settings，将I2C Speed Mode选择为Fast Mode
+- **配置I²C1**：在 `I2C1` 配置页，将I2C模式选择为 **`I2C`**，并在下方 `Parameter Settings` 将 `I2C Speed Mode` 选择为 **`Fast Mode`**
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/I2C_OLED/Snipaste_2023-05-04_23-06-38.png').default} alt="工程配置" width="600px" />
+<img src={require('./img/I2C_OLED/Snipaste_2023-05-04_23-06-38.png').default} alt="工程配置" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
 - **配置生成单独.c/.h文件**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
@@ -73,39 +77,39 @@ OLED屏幕循环显示不同画面：
 - **拷贝库文件**：将oled.c、font.c文件拷贝到Core -> Src目录下，将oled.h、font.h文件拷贝到Core -> Inc目录下。
 - **在main.c中添加include**：
   
-```c
-#include "string.h"
-#include "oled.h"
-#include "stdio.h"
-```
+  ```c
+  #include "string.h"
+  #include "oled.h"
+  #include "stdio.h"
+  ```
   
 - **初始化OLED**：
 
-```c
-HAL_Delay(20); // 单片机启动比OLED上电快,需要延迟等待一下
-OLED_Init(); // 初始化OLED
-```
+  ```c
+  HAL_Delay(20); // 单片机启动比OLED上电快,需要延迟等待一下
+  OLED_Init(); // 初始化OLED
+  ```
 
 #### (2) 显示函数
 
 - **将缓存内容更新到屏幕显示**：
-
-> 注意：任何操作都需要调用此函数才能显示到屏幕上，否则只是改变显示缓冲区
-
-```c
-OLED_ShowFrame();
-```
+  ```c
+  OLED_ShowFrame();
+  ```
+  :::tip
+  任何操作都需要调用此函数才能显示到屏幕上，否则只是改变显示缓冲区
+  :::
+  
 
 
 - **新建空白缓冲区**：
-
-> 注意：只存在一个Frame，NewFrame后之前的内容将被清空
-
-```c
-OLED_NewFrame();
-```
-
-
+  ```c
+  OLED_NewFrame();
+  ```
+  :::tip
+  只存在一个Frame，NewFrame后之前的内容将被清空
+  :::
+  
 - **显示一个像素点**：
   - `uint8_t x` 横坐标
   - `uint8_t y` 纵坐标
@@ -318,8 +322,9 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 
   - 每种字体均有95个可打印字符
 
-    > 具体请参考 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 中的ASCII码表
-
+  :::tip
+  具体请参考 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 中的ASCII码表
+  :::
 - 中文字符：中文字符数量多，STM32内部Flash无法全部存储，因此需要根据使用的字符来取字模。
 
   - 在线取字模工具：https://led.baud-dance.com/
