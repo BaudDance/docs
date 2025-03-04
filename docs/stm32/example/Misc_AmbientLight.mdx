@@ -21,6 +21,10 @@ WS2812是一种集成了RGB LED和控制电路的智能型LED灯珠。它们以�
 
 - WS2812的RGB三色亮度经过匹配，只需要发送对应的RGB值，便可以混合出想要的颜色
 
+:::info
+查看 <a href="/docs/stm32/resourcePack/#配套模块手册" target="_blank">**WS2812手册.PDF 🔗**</a>
+:::
+
 #### 十六进制颜色表示
 
 WS2812 的颜色通过RGB三通道混合产生，每个通道的调节范围都是 0 - 255，也就是十六进制的 00 - FF
@@ -80,15 +84,17 @@ WS2812 的颜色通过RGB三通道混合产生，每个通道的调节范围都�
   - Configuration -> Parameter Settings -> Counter Settings，将 Prescaler 配置为 0，Counter Period配置为90-1，即PWM频率 800 kHz
 
   - Configuration -> GPIO Settings，将PB4的GPIO mode配置为 Alternate Function Open Drain，Maximum output speed 配置为 High
-
-    > 因为WS2812是5V电平的，因此需要用开漏输出模式，外接5V上拉电阻，使信号高电平变成5V
-    >
-    > 注意，PB4是 5V Tolerance PIN，可以容忍 5V 上拉。普通引脚不可以。
-
+  :::tip
+  由于WS2812信号电平是5V的，故必须用「**开漏输出模式**」，外接5V上拉电阻，使信号高电平变成5V
+  :::
+  :::info
+  PB4是「5V耐受引脚」，可以安全耐受 5V 上拉。普通引脚则不可以超过 3.3V
+  :::
   - Configuration -> DMA Settings，点击Add新增一个通道
 
-    - DMA Request 选择 TIM3_CH1/TRIG
-    - Direction 选择 Memory To Peripheral
+    - DMA Request 选择 **TIM3_CH1/TRIG**
+
+    - Direction 选择 **Memory To Peripheral**
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/MISC_WS2812/DMA配置.png').default} alt="DMA配置" width="600px" />

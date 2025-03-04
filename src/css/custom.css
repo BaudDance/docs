@@ -32,6 +32,11 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+}
+
 
 .source_download_button {
   display: inline-block;
