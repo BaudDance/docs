@@ -66,6 +66,7 @@ const config = {
         },
       }),
     ],
+    
   ],
 
   themeConfig:
@@ -144,6 +145,13 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
     }),
+
+    scripts:[
+      {
+        src: "/baidu.js",
+        async: true
+      }
+    ],
 };
 
 export default config
