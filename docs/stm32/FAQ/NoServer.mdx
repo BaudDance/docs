@@ -1,0 +1,38 @@
+---
+sidebar_position: 1.223
+sidebar_label: "【下载】缺少 STLink Server"
+---
+
+# 缺少 STLINK Server 组件
+
+## 📌 什么是 STLink Server？
+
+STLink Server（下文简称“服务”） 是 CubeIDE 软件访问 STLink 的桥梁
+
+下载程序时，CubeIDE 会连接到服务，而非直接连接到 ST-LINK 物理接口（USB）
+
+因此，当 STLink Server（服务）未安装时，CubeIDE 会弹窗出现如下报错：
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/DownloadError/noDebugSession.png').default} alt="noTitle" width="500px" />
+</div>
+
+## 📌 如何安装 STLink Server？
+
+1️⃣ 下载 STLink Server 安装包
+<div style={{marginBottom: "20px", marginLeft:"25px"}}>
+<a href="https://pan.baud-dance.com/d/STM32CubeIDE/st-stm32cubeide_1.17.0_23558_20241125_2245_x86_64.exe" class="source_download_button" target="_blank">立即下载</a>
+</div>
+
+2️⃣ 解压缩到非中文路径下
+
+3️⃣ 双击 **`st-stlink-server.2.1.1-1.msi`** 进行安装即可
+
+:::tip
+msi 安装包仅适配 Windows 系统，如果你使用苹果电脑，请安装 `.pkg` 文件
+:::
+<div style={{ marginBottom: '20px' }}></div>
+
+:::tip
+如果提示需要权限，请选择 「**是**」
+:::
