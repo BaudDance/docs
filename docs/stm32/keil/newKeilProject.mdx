@@ -1,0 +1,94 @@
+---
+sidebar_position: 1.13
+sidebar_label: "【2】Keil 使用教程"
+---
+
+# 创建工程
+:::info
+本篇将从新建工程开始，带大家掌握 Keil 的基本操作
+:::
+#### 1️⃣ 在 CubeMX 软件中选择 `ACCESS TO MCU SELECTOR`
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/accessMcuSel.png').default} alt="1" width="700px" style={{boxShadow: "0px 0px 5PX 1px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 2️⃣ 选择单片机型号 `STM32F103C8T6`
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/self103.png').default} alt="1" width="700px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 3️⃣ 首先配置下载方式为 `Serial Wire`
+:::tip
+每个新工程都需要配置下载方式，否则会导致下载接口关闭，<a href="/docs/stm32/FAQ/CompilationFailed#为什么会出现这个问题" target="_blank">**了解原因🔗**</a>
+:::
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/confDebug.png').default} alt="1" width="700px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 4️⃣ 配置工程
+:::tip
+工程名、存放路径均「**不能包含中文**」
+:::
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/projManager.png').default} alt="1" width="700px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 5️⃣ 生成代码
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/genCode.png').default} alt="1" width="700px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+点击 `OPEN Project` 即可在 Keil 中打开工程
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/openFolder.png').default} alt="1" width="400px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 6️⃣ 找到 `main.c` 代码文件
+
+从 `Application/User/Core` 下找到我们需要编辑的代码文件
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/keilProg.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+## Keil 配置
+
+:::tip
+Keil 工程需要先进行一定配置，才能正常编译、下载
+:::
+
+#### 1️⃣ 打开魔法棒配置
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/magicConf.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 2️⃣ 配置编译器版本为 ARMCC V6
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/armccv6.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 3️⃣ 先编译，再下载
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/buildanddownload.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 4️⃣ 看到此提示，说明下载成功
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/keildownloadsuccess.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+:::tip
+**为什么下载成功了没反应？**
+因兼容问题 Keil 无法自动复位，需要手动按下复位键即可
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "0px"}}>
+<img src={require('./img/RST.png').default} alt="1" width="350px" style={{boxShadow: "0px 0px 0PX 0px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+:::
