@@ -1,6 +1,6 @@
 ---
-sidebar_position: 1.234
-sidebar_label: "【软件】安装失败报错"
+sidebar_position: 1.222
+sidebar_label: "【安装软件】打不开安装包/报错"
 ---
 
 # 安装失败报错
@@ -11,7 +11,7 @@ sidebar_label: "【软件】安装失败报错"
 <img src={require('./img/IdeInstallationWizard/安装失败报错.png').default} alt="安装报错" width="400px" />
 </div>
 
-## 问题1： 安装包在中文路径中
+## 📌问题1： 安装包在中文路径中
 
 检查安装包所在的文件夹路径中是否存在中文
 
@@ -23,35 +23,43 @@ sidebar_label: "【软件】安装失败报错"
 | `D:\STM32`         | `D:\STM32资料`     |
 | ...                | ...                    |
 
-## 问题2： 环境变量TEMP中有中文
-:::tip
-这通常是因为系统用户名含有中文。鉴于嵌入式开发工具对中文支持不佳，建议用纯英文用户名，可避免一些莫名其妙的 bug
-:::
+## 📌问题2： 环境变量TEMP中有中文
 
 #### 1️⃣ 点击开始菜单，输入“环境变量”搜索，进入系统属性设置
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
-<img src={require('./img/搜索环境变量.png').default} alt="搜索环境变量" width="400px" />
+<img src={require('./img/搜索环境变量.png').default} alt="搜索环境变量" width="500px" />
 </div>
 
 #### 2️⃣ 点击系统属性下方的“环境变量”，进入环境变量配置页面
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
-<img src={require('./img/IdeInstallationWizard/打开环境变量.png').default} alt="打开环境变量" width="700px" />
+<img src={require('./img/IdeInstallationWizard/打开环境变量.png').default} alt="打开环境变量" width="500px" />
 </div>
 
-#### 3️⃣ 双击修改**用户变量**和**系统变量**中的**TEMP**和**TMP**变量, 将其值修改到一个**无中文**的文件夹中
-:::warning
-必须是真实存在的文件夹
-:::
-例如自己在 D 盘新建一个名为 `TEMP` 的文件夹, 然后把路径修改到这个文件夹
+#### 3️⃣ 双击 **`TEMP`** 弹出修改框
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
-<img src={require('./img/IdeInstallationWizard/修改环境变量.png').default} alt="修改环境变量" width="700px" />
+<img src={require('./img/IdeInstallationWizard/env1.png').default} alt="修改环境变量" width="500px" />
+</div>
+
+#### 4️⃣ 在修改框里输入  **`%SystemRoot%\TEMP`**  
+:::tip
+**为避全角符号问题，请直接复制粘贴进去**。注意复制完整，尤其不要漏掉百分号%
+:::
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/IdeInstallationWizard/env2.png').default} alt="修改环境变量" width="500px" />
+</div>
+
+#### 5️⃣ 用同样的操作方法，修改完这 4 行
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "40px"}}>
+<img src={require('./img/IdeInstallationWizard/env3.png').default} alt="修改环境变量" width="500px" />
 </div>
 
 
-#### 4️⃣ 修改完成后，重新打开IDE安装包，重新安装即可
+#### 6️⃣ 修改完成后，点「确定」。然后重新打开IDE安装包，重新安装即可
 :::warning
-新建工程、选择工作空间等步骤，也必须确保路径不含中文
+**新建工程、选择工作空间等步骤，也必须确保路径不含中文**。 否则还会出现错误
 :::

@@ -1,6 +1,6 @@
 ---
-sidebar_position: 1.223
-sidebar_label: "【下载】缺少 STLink Server"
+sidebar_position: 1.233
+sidebar_label: "【下载失败】缺少驱动程序"
 ---
 
 # 缺少 STLINK Server 组件
@@ -17,22 +17,39 @@ STLink Server（下文简称“服务”） 是 CubeIDE 软件访问 STLink 的�
 <img src={require('./img/DownloadError/noDebugSession.png').default} alt="noTitle" width="500px" />
 </div>
 
-## 📌 如何安装 STLink Server？
+## 📌 安装 STLink Server
 
 1️⃣ 下载 STLink Server 安装包
 <div style={{marginBottom: "20px", marginLeft:"25px"}}>
-<a href="https://pan.baud-dance.com/d/ST%E5%B7%A5%E5%85%B7/STLINK_Server.zip" class="source_download_button" target="_blank">立即下载</a>
+<a href="https://pan.baud-dance.com/d/ST%E5%B7%A5%E5%85%B7/STLINK_Server.zip" class="source_download_button" target="_blank">立即下载（Server）</a>
 </div>
 
 2️⃣ 解压缩到非中文路径下
 
 3️⃣ 双击 **`st-stlink-server.2.1.1-1.msi`** 进行安装即可
 
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/installServer.png').default} alt="noTitle" width="700px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
 :::tip
 msi 安装包仅适配 Windows 系统，如果你使用苹果电脑，请安装 `.pkg` 文件
 :::
 <div style={{ marginBottom: '20px' }}></div>
 
-:::tip
-如果提示需要权限，请选择 「**是**」
-:::
+## 📌 安装驱动
+
+1️⃣ 下载驱动安装包
+<div style={{marginBottom: "20px", marginLeft:"25px"}}>
+<a href="https://pan.baud-dance.com/d/ST%E5%B7%A5%E5%85%B7/STLINK_Diver.zip" class="source_download_button" target="_blank">立即下载（驱动包）</a>
+</div>
+
+2️⃣ 解压缩到非中文路径下
+
+3️⃣ 双击 **`dpinst_amd64.exe`** 进行安装即可
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/installDriver.png').default} alt="noTitle" width="700px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+<div style={{ marginBottom: '20px' }}></div>
