@@ -1,0 +1,304 @@
+---
+sidebar_position: 2.631
+---
+# 【UART 串口】循环缓冲区+命令解析
+
+**下载例程代码**： <a href="https://pan.baud-dance.com/d/%E6%B3%A2%E7%89%B9%E5%BE%8B%E5%8A%A8STM32%E4%BE%8B%E7%A8%8B/UART_Command.zip" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
+
+
+## 如何使用例程
+
+1️⃣ 编译并下载程序到学习板
+
+2️⃣ 使用配套TYPE-C数据线，将学习板连接到计算机
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
+
+3️⃣ 打开 [波特律动 串口助手](https://serial.keysking.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
+
+4️⃣ 发送相应的命令测试功能
+
+红色小灯亮起：
+```
+AA 05 01 01 B1
+```
+
+红色小灯熄灭 绿色小灯亮起：
+```
+AA 07 01 00 02 01 B5
+```
+
+测试长命令解析：
+```
+AA 1A 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 D8
+```
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_RGB/serial.png').default} alt="串口" width="700px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+1️⃣ **分配引脚**：如图，将 `PA6`、`PA7`、`PB0` 配置为 `GPIO_Output`，并分别设置 User label 为 `BLUE`、`GREEN`、`RED`
+:::tip
+**左键**点击对应的引脚，选择 GPIO_Output；
+**右键**点击对应的引脚，选择 User label，分别输入 BLUE、GREEN、RED
+:::
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/LED/gpio config.png').default} alt="gpio config" width="600px" />
+</div>
+
+2️⃣ **打开串口2外设**：`Pinout&Configuration` -> `Connectivity` -> `USART2`，将 `Mode` 选择为 `Asynchronous`
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_RGB/configUART.png').default} alt="uart config" width="600px" />
+</div>
+
+3️⃣ **使能串口中断**：在 USART2 -> Configuration -> NVIC Settings 标签卡中，勾选 USART2 global interrupt 的 Enable
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_RGB/enableIT.png').default} alt="IT config" width="600px" />
+</div>
+
+
+### 2、代码
+
+1️⃣ 在Core/Src文件夹下新建command.c文件
+
+    ```c
+    #include "command.h"
+
+    // 指令的最小长度
+    #define COMMAND_MIN_LENGTH 4
+
+    // 循环缓冲区大小
+    #define BUFFER_SIZE 128
+    // 循环缓冲区
+    uint8_t buffer[BUFFER_SIZE];
+    // 循环缓冲区读索引
+    uint8_t readIndex = 0;
+    // 循环缓冲区写索引
+    uint8_t writeIndex = 0;
+
+    /**
+    * @brief 增加读索引
+    * @param length 要增加的长度
+    */
+    void Command_AddReadIndex(uint8_t length) {
+        readIndex += length;
+        readIndex %= BUFFER_SIZE;
+    }
+
+    /**
+    * @brief 读取第i位数据 超过缓存区长度自动循环
+    * @param i 要读取的数据索引
+    */
+
+    uint8_t Command_Read(uint8_t i) {
+        uint8_t index = i % BUFFER_SIZE;
+        return buffer[index];
+    }
+
+    /**
+    * @brief 计算未处理的数据长度
+    * @return 未处理的数据长度
+    * @retval 0 缓冲区为空
+    * @retval 1~BUFFER_SIZE-1 未处理的数据长度
+    * @retval BUFFER_SIZE 缓冲区已满
+    */
+    //uint8_t Command_GetLength() {
+    //  // 读索引等于写索引时，缓冲区为空
+    //  if (readIndex == writeIndex) {
+    //    return 0;
+    //  }
+    //  // 如果缓冲区已满,返回BUFFER_SIZE
+    //  if (writeIndex + 1 == readIndex || (writeIndex == BUFFER_SIZE - 1 && readIndex == 0)) {
+    //    return BUFFER_SIZE;
+    //  }
+    //  // 如果缓冲区未满,返回未处理的数据长度
+    //  if (readIndex <= writeIndex) {
+    //    return writeIndex - readIndex;
+    //  } else {
+    //    return BUFFER_SIZE - readIndex + writeIndex;
+    //  }
+    //}
+
+    uint8_t Command_GetLength() {
+        return (writeIndex + BUFFER_SIZE - readIndex) % BUFFER_SIZE;
+    }
+
+
+    /**
+    * @brief 计算缓冲区剩余空间
+    * @return 剩余空间
+    * @retval 0 缓冲区已满
+    * @retval 1~BUFFER_SIZE-1 剩余空间
+    * @retval BUFFER_SIZE 缓冲区为空
+    */
+    uint8_t Command_GetRemain() {
+        return BUFFER_SIZE - Command_GetLength();
+    }
+
+    /**
+    * @brief 向缓冲区写入数据
+    * @param data 要写入的数据指针
+    * @param length 要写入的数据长度
+    * @return 写入的数据长度
+    */
+    uint8_t Command_Write(uint8_t *data, uint8_t length) {
+        // 如果缓冲区不足 则不写入数据 返回0
+        if (Command_GetRemain() < length) {
+            return 0;
+        }
+        // 使用memcpy函数将数据写入缓冲区
+        if (writeIndex + length < BUFFER_SIZE) {
+            memcpy(buffer + writeIndex, data, length);
+            writeIndex += length;
+        } else {
+            uint8_t firstLength = BUFFER_SIZE - writeIndex;
+            memcpy(buffer + writeIndex, data, firstLength);
+            memcpy(buffer, data + firstLength, length - firstLength);
+            writeIndex = length - firstLength;
+        }
+        return length;
+    }
+
+    /**
+    * @brief 尝试获取一条指令
+    * @param command 指令存放指针
+    * @return 获取的指令长度
+    * @retval 0 没有获取到指令
+    */
+    uint8_t Command_GetCommand(uint8_t *command) {
+        // 寻找完整指令
+        while (1) {
+            // 如果缓冲区长度小于COMMAND_MIN_LENGTH 则不可能有完整的指令
+            if (Command_GetLength() < COMMAND_MIN_LENGTH) {
+            return 0;
+            }
+            // 如果不是包头 则跳过 重新开始寻找
+            if (Command_Read(readIndex) != 0xAA) {
+            Command_AddReadIndex(1);
+            continue;
+            }
+            // 如果缓冲区长度小于指令长度 则不可能有完整的指令
+            uint8_t length = Command_Read(readIndex + 1);
+            if (Command_GetLength() < length) {
+            return 0;
+            }
+            // 如果校验和不正确 则跳过 重新开始寻找
+            uint8_t sum = 0;
+            for (uint8_t i = 0; i < length - 1; i++) {
+            sum += Command_Read(readIndex + i);
+            }
+            if (sum != Command_Read(readIndex + length - 1)) {
+            Command_AddReadIndex(1);
+            continue;
+            }
+            // 如果找到完整指令 则将指令写入command 返回指令长度
+            for (uint8_t i = 0; i < length; i++) {
+            command[i] = Command_Read(readIndex + i);
+            }
+            Command_AddReadIndex(length);
+            return length;
+        }
+    }
+    ```
+2️⃣ 在Core/Inc文件夹下新建command.h文件
+```c
+#ifndef INC_COMMAND_H_
+#define INC_COMMAND_H_
+
+#include "main.h"
+#include <string.h>
+
+uint8_t Command_Write(uint8_t *data, uint8_t length);
+
+uint8_t Command_GetCommand(uint8_t *command);
+
+#endif /* INC_COMMAND_H_ */
+
+```
+
+3️⃣ 在main.c中 引入command.c 定义串口接收数组 实现串口接收空闲中断回调函数
+:::info
+注意将代码写到对应的注释对中
+:::
+
+```c
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "command.h"
+/* USER CODE END Includes */
+```
+
+```c
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+uint8_t readBuffer[10];
+/* USER CODE END PD */
+```
+
+```c
+/* USER CODE BEGIN 0 */
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+	if (huart == &huart2){
+		Command_Write(readBuffer, Size);
+		HAL_UARTEx_ReceiveToIdle_IT(&huart2, readBuffer, sizeof(readBuffer));
+	}
+}
+/* USER CODE END 0 */
+```
+
+3️⃣ 开启串口接收 while循环中获取命令 根据命令控制小灯
+:::info
+`rx_data[0]` 第一个字符为小灯（0x01：红色，0x02：绿色，0x03：蓝色）
+
+`rx_data[1]` 第二个字符为状态（0：灭，1：亮）
+:::
+```c
+/* USER CODE BEGIN 2 */
+HAL_UARTEx_ReceiveToIdle_IT(&huart2, readBuffer, sizeof(readBuffer));
+uint8_t command[50];
+int commandLength = 0;
+/* USER CODE END 2 */
+
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+    commandLength = Command_GetCommand(command);
+    if (commandLength != 0){
+        HAL_UART_Transmit(&huart2, command, commandLength, HAL_MAX_DELAY);
+        for (int i = 2; i < commandLength - 1; i += 2){
+            GPIO_PinState state = GPIO_PIN_SET;
+            if (command[i + 1] == 0x00){
+                state = GPIO_PIN_RESET;
+            }
+            if (command[i] == 0x01){
+                HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, state);
+            }else if (command[i] == 0x02){
+                HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, state);
+            }else if (command[i] == 0x03){
+                HAL_GPIO_WritePin(BLUE_GPIO_Port, BLUE_Pin, state);
+            }
+        }
+    }
+
+/* USER CODE END WHILE */
+
+/* USER CODE BEGIN 3 */
+}
+```
+
+    
