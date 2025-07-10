@@ -1,0 +1,283 @@
+---
+sidebar_position: 2.41
+---
+# 【PWM】无源蜂鸣器播放音乐
+
+**下载例程代码**： <a href="https://pan.baud-dance.com/d/%E6%B3%A2%E7%89%B9%E5%BE%8B%E5%8A%A8STM32%E4%BE%8B%E7%A8%8B/Music.zip" class="source_download_button" target="_blank">下载代码</a> 
+
+:::warning
+请一定按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
+:::
+
+## 前置知识
+
+请参考视频教程 <a href="https://www.bilibili.com/video/BV1vKVWzCE6f" target="_blank">**【STM32】无源蜂鸣器**</a>与文档<a href="/docs/stm32/example/HowToImportExample" target="_blank">**【PWM】无源蜂鸣器**</a> 
+
+## 如何使用例程
+
+下载程序，即可听到效果
+
+#### 程序效果
+
+- 烧录例程后，按下 KEY1 会开始使用无源蜂鸣器播放《莫愁乡》的曲子，再次按下KEY1会暂停播放
+- 可以尝试修改例程代码，播放其他曲子
+
+
+## 例程讲解
+
+下面介绍了该例程的主要代码
+
+### 1、工程配置
+
+- **开启外部晶振**：在Pinout&Configuration -> System Core -> RCC 页面，将 High Speed Clock (HSE) 配置为 Crystal/Ceramic Resonator
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/配置时钟源.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+- **配置时钟频率**：在Clock Configuration 页面，将PLL Source 选择为 HSE，将System Clock Mux 选择为 PLLCLK，然后在HCLK (MHz) 输入72并回车，将HCLK频率配置为 72 MHz
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/时钟配置.png').default} alt="时钟配置" width="600px" />
+</div>
+
+- **分配引脚**：在Pinout&Configuration页面，配置如下引脚
+
+  - 将PB9配置为TIM4_CH4，
+
+  - 将PB12设置为GPIO_Input，并分别设置User Label为KEY1
+
+- **配置TIM4**：在Pinout&Configuration -> Timers -> TIM4
+
+  - 勾选 Internal Clock，开启 TIM4 的内部时钟源
+
+  - Configuration -> Mode，将 Channel4 配置为 PWM Generation CH4
+
+  - Configuration -> Parameter Settings -> Counter Settings，将 Prescaler 配置为 72-1
+
+### 2、代码
+
+- **1. 定义不同每个音调的频率**
+
+  这里定义了低音、中音和高音的各7中音符的频率，使用宏定义来表示每个音符的频率。
+  主要，这里的低中高音频率是基于标准音高的，小伙伴们如果需要其他音高的音符，可以自行查询相应音高的频率后修改这些宏定义。
+
+  ```c
+    /* USER CODE BEGIN Includes */
+    #include "main.h"
+    #include "stm32f1xx_hal.h"
+  ```c
+    /* USER CODE BEGIN PD */
+    #define P0 	0	// 休止符频率
+
+    #define L1 262  // 低音频率
+    #define L2 294
+    #define L3 330
+    #define L4 349
+    #define L5 392
+    #define L6 440
+    #define L7 494
+
+    #define M1 523  // 中音频率
+    #define M2 587
+    #define M3 659
+    #define M4 698
+    #define M5 784
+    #define M6 880
+    #define M7 988
+
+    #define H1 1047 // 高音频率
+    #define H2 1175
+    #define H3 1319
+    #define H4 1397
+    #define H5 1568
+    #define H6 1760
+    #define H7 1976
+  ```
+- **2. 定义结构体，存储歌曲中每个音符的频率与持续时间**
+
+  ```c
+    typedef struct
+    {
+        uint16_t frequency; // 音符频率
+        float period; // 音符持续时间，单位为拍
+    } Bate;
+  ```
+
+- **3. 定义歌曲的音符**
+
+  定义一个Bate数组，存储一首歌的每个音符的持续时间。(最近我比较喜欢《莫愁乡》，所以这里以《莫愁乡》为例)
+  
+  > 本文后面会介绍如何将其他歌曲转换为这种格式的音符数组
+  
+  ```c
+    const Bate MoChouXiang[] = {
+      // 我被困在了
+      {M6, 1}, {M5, 1}, {M3, 1}, {M5, 0.5f}, {M5, 0.5f},
+      // 这片混沌 柳暗
+      {M6, 0.5f}, {M5, 1}, {M5, 0.5f}, {M3, 0.5f}, {M3, 0.5f}, {M3, 0.5f}, {M3, 0.5f},
+      // 花明 一村一村一村
+      {M2, 0.5f}, {M3, 0.5f}, {M5, 0.5f}, {M3, 0.5f}, {M2, 0.5f}, {M3, 0.5f}, {M5, 0.5f}, {M3, 0.5f},
+      // 一村又一村
+      {M2, 0.5f}, {M3, 0.5f}, {M3, 0.5f}, {L7, 0.5f}, {M3, 1}, {M1, 1},
+      // 不能理顺我
+      {M2, 1}, {M3, 1}, {M2, 1}, {M3, 0.5f}, {M3, 0.5f},
+      
+      // ......
+      
+      // 娃儿抬头望
+      {M3, 0.5f}, {M2, 0.5f}, {M2, 0.5f}, {M3, 0.5f}, {M3, 0.5f}, {M2, 1.5f},
+      // 姥姥在天上
+      {M1, 0.5f}, {M3, 0.5f}, {M2, 0.5f}, {M3, 0.5f}, {M2, 1}, {M1, 1},
+    };  
+  ```
+
+- **4. 计算定时器计数频率**
+
+  因为我们需要知道定时器的频率来计算PWM的频率，因而封装了一个函数来计算定时器的计数频率。
+  
+  > 当然不优雅的方法是在程序里写死，因为我们知道用的定时器是TIM4，且Prescaler配置为72-1，那么定时器的计数频率就是72MHz / 72 = 1MHz
+
+  不理解程序里为何×2的小伙伴请复习<a href="https://www.bilibili.com/video/BV1ph4y1e7Ey" target="_blank">**【STM32】超清晰STM32时钟树动画讲解**</a> 
+  ```c
+    /**
+    * 计算定时器计数频率
+    */
+    uint32_t TIM_GetCounterFreq(TIM_HandleTypeDef *htim) {
+        uint32_t timer_clock;
+        // 高级定时器是APB2
+        if (htim->Instance == TIM1) {
+            timer_clock = HAL_RCC_GetPCLK2Freq();
+            // 如果APB分频不为1，定时器时钟会翻倍
+            if (HAL_RCC_GetPCLK2Freq() != (HAL_RCC_GetHCLKFreq() / 1)) {
+                timer_clock *= 2;
+            }
+        } else {
+          // 其他定时器是APB1
+            timer_clock = HAL_RCC_GetPCLK1Freq();
+            // 如果APB分频不为1，定时器时钟会翻倍
+            if (HAL_RCC_GetPCLK1Freq() != (HAL_RCC_GetHCLKFreq() / 1)) {
+                timer_clock *= 2;
+            }
+        }
+
+        uint32_t prescaler = htim->Instance->PSC;
+        return timer_clock / (prescaler + 1);
+    }
+  ```
+
+- **5.在while循环中检测按键并遍历数组播放其中的音符**
+
+  ```c
+    /* USER CODE BEGIN 2 */
+    // 开始PWM输出
+    HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+    // TIM4的计数频率
+    uint32_t timFrequency = TIM_GetCounterFreq(&htim4);
+    // 播放状态
+    uint8_t playState = 0;
+    // 播放进度
+    uint32_t playIndex = 0;
+    // 节拍速度(每分钟多少拍)
+    uint8_t bpm = 132;
+    // 每拍的持续时间
+    float noteDuration = 1000 * 60 / bpm;
+    /* USER CODE END 2 */
+
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1)
+    {
+      // 按键检测，切换播放与暂停
+      if (HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == GPIO_PIN_RESET){
+        HAL_Delay(10);
+        if (HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == GPIO_PIN_RESET){
+          playState = !playState;
+          while(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == GPIO_PIN_RESET);
+        }
+      }
+      // 播放
+      if (playState){
+        const Bate bate = MoChouXiang[playIndex];
+        if (bate.frequency == P0) {
+          // 休止符
+          __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+        } else {
+          // 将频率转换为计数值, 设置到自动重装载寄存器
+          uint32_t arr = timFrequency / bate.frequency;
+          __HAL_TIM_SET_AUTORELOAD(&htim4,arr);
+          // 设置占空比为20%
+          __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, arr / 5); // 20%占空比
+          // 从0开始计数 重置PWM波形
+          __HAL_TIM_SetCounter(&htim4, 0);
+        }
+        // 延时该音符的持续时间 (5ms的空白以区分连续两个相同的音符)
+        HAL_Delay((uint32_t) (bate.period * noteDuration) - 5);
+        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+        HAL_Delay(5);
+
+        // 下一个音符
+        playIndex++;
+        // 播放结束
+        if (playIndex >= sizeof(MoChouXiang)){
+          playState = 0;
+          playIndex = 0;
+        }
+      }else{
+        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+      }
+  ```
+
+## 如何把其他歌曲转换为音符数组
+
+首先需要从网上找到这首歌曲的简谱，例如莫愁乡的简谱如下：
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Buzzer_Music/简谱.png').default} alt="配置时钟源" width="600px" />
+</div>
+
+#### 1. 基本信息
+在简谱中的 4/4 下面的4表示以四分音符为一个拍，上面的4表示每小节4拍。
+
+然后bmp是指曲子的速度，单位是每分钟多少拍，这里的132就表示每分钟132拍。
+
+我们的程序中就有`bmp`变量，可以通过修改这个变量来调整曲子的速度。
+
+#### 2. 高低中音
+一半的数字我们都认为是中音，1 2 3使用M1 M2 M3宏定义的频率即可，如若数字下有·，则表示低音，我们使用L1 L2 L3宏定义的频率，
+若数字上有·，则表示高音，我们使用H1 H2 H3宏定义的频率。
+
+#### 3. 音符的持续时间
+
+在简谱中，一个普通的，下面没有带横线的数字，就是一个四分音符，持续1拍的时间。
+
+例如谱子刚上来的 6 5 3 就是3个四分音符，分别是6、5、3，每个音符持续1拍。所以转换到程序中就是：
+
+```c
+    {M6, 1}, {M5, 1}, {M3, 1},
+```
+而如果数字下面有一根横线，就表示这个音符是一个八分音符，持续的时间便是四分音符的一半，也就是0.5拍。
+
+例如第一句的后面的 5 5 就是两个八分音符，持续0.5拍，所以转换到程序中就是：
+
+```c
+    {M5, 0.5f}, {M5, 0.5f},
+```
+
+而假若数字下面带有两个横线，就表示这个音符是一个十六分音符，持续的时间便是四分音符的四分之一，也就是0.25拍。
+同理，若数字下有三个横线，则表示三十二分音符，持续的时间便是四分音符的八分之一，也就是0.125拍。
+
+例如简谱中“呼吸声”三个字对应的 1 3 5，其中1 3下有三个横线 5下有两个横线，转换到程序中就是：
+
+```c
+    {M1, 0.125f}, {M3, 0.125f}, {M5, 0.25f},
+```
+
+假若数字后有•，则表示这个音符延长半拍，也就是四分音符的1.5倍时间。例如“不能理顺我自己的疑问”中的“疑”对应的音符5•，转换到程序中就是：
+```c
+    {M5, 1.5f},
+```
+而若数字后有横杠-，则表示音频延长一拍，也就是四分音符的2倍时间。而且延音符号可以叠加，例如数字后面若有--•，则表示延长2.5拍。
+
+#### 4. 耐心
+按照以上规则，就可以将简谱转换为程序中的音符数组了~
+扒谱是一个比较繁琐的工作，小伙伴要有耐心和细心哦~
