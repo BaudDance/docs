@@ -25,3 +25,5 @@ yarn-error.log*
 yarn.lock
 build.zip
 build.tar.gz
+
+.history
