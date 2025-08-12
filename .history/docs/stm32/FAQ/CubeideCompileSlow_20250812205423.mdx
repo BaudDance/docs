@@ -1,0 +1,17 @@
+---
+sidebar_position: 1.237
+sidebar_label: "【软件】cube ide 编译速度慢"
+---
+
+# cube ide编译速度慢的原因和解决方法
+
+群里有些小伙伴提问说:  
+<img src={require('./img/CubeideCompileSlow/compile_slowly.jpg').default} alt="编译速度慢" width="700px" />
+发现使用cubeide编译的时候速度非常慢，几十行代码可能会需要将近一两分钟才能编译完成这速度显然是不正常的。 
+
+这个的主要原因可能是win11预装的微软管家在后台做了很多实时监控，对编译器的 I/O 操作影响比较大。  
+卸载之后就会恢复正常。  
+
+<img src={require('./img/CubeideCompileSlow/microsoft_manger.jpg').default} alt="微软管家" width="700px" />
+<img src={require('./img/CubeideCompileSlow/delete_microsoft_manger.jpg').default} alt="删除微软管家" width="700px" />
+
