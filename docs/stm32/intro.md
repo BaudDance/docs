@@ -40,7 +40,7 @@ Hello, 欢迎各位小伙伴们来到波特律动为大家准备的STM32学习�
 
 当你遇到无法解决的问题, 而搜索引擎与AI并未给到你满意地回答时, 提问往往是应该想到的第二个绝佳途径.
 
-小伙伴们可以在合适的地方提出自己的问题, 希望得到大佬们的一些回答来解决你的疑惑. 合适的地方有许多, 例如相关的论坛, 相关github库的issue, 或者也可以在[keysking和小伙伴们的吹水群](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=SJGEHZ00ZMncbxh0QEMWnQZqdzBLAOpX&authKey=Qc3ELoaLz5JswVsg2VasgYMwCx%2BObsA9ybEfcyibfp9puXJyq%2FJXcEQI8HrGR1Hr&noverify=0&group_code=65470374). 
+小伙伴们可以在合适的地方提出自己的问题, 希望得到大佬们的一些回答来解决你的疑惑. 合适的地方有许多, 例如相关的论坛, 相关github库的issue, 或者也可以在[keysking和小伙伴们的吹水群](https://qm.qq.com/cgi-bin/qm/qr?k=YDHKtCRcQDGXhb9uApL3nCzPAYcz89t3&jump_from=webapi&authKey=LbK75Dr7Sgxrnz/5UJM2HvWakAQKsS2ENGLpVMb88Hmz5zq3neN5f6juxA+hRFN7). 
 
 不过, 不管在哪里提问都需要注意, 大佬们并不对你负有任何帮助的责任, 他们的帮助只是出于好心. 所以提问的时候一定要注意方式方法, 令人反感的提问往往得不到回答. 在这里推荐所有想要进入这个"创造者世界"的小伙伴阅读此入门必读大作: [提问的智慧](/How-To-Ask-Questions-The-Smart-Way).
 
