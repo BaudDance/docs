@@ -82,3 +82,20 @@ ul {
   background-color: #39b10d;
   text-decoration: none;
 }
+
+.rainbow-text {
+  /* 只用红、蓝、紫之间的渐变，色调适中 */
+  background: linear-gradient(270deg, #d72660, #5643fd, #7c1fff, #5643fd, #d72660);
+  background-size: 600% 600%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* 兼容性处理 */
+  color: transparent;
+  animation: rainbowMove 4s linear infinite;
+}
+
+
+@keyframes rainbowMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
