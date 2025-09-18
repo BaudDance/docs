@@ -3,8 +3,208 @@ sidebar_position: 2
 sidebar_label: "【2】开发STM32"
 ---
 
-# 开发 STM32
+# Clion开发STM32
 
 :::tip
 需要使用STM32CubeMX生成工程代码，可阅读<a href="/docs/stm32/CubeMX/install" target="_blank">**安装STM32CubeMX** 🔗</a>
 :::
+
+## 安装编译环境
+
+CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境还需要我们自己安装：ArmGCC用于代码编译，OpenOCD用于烧录和调试。
+
+### 1️⃣ OpenOCD与ArmGCC
+
+**一、下载解压交叉编译环境压缩包**
+
+<a href="https://pan.baud-dance.com/d/r2/cube/DevEnv.zip" class="source_download_button" target="_blank">立即下载</a>
+<div style={{marginBottom: "20px"}}>
+</div>
+
+点击上方按钮下载我们为您准备的交叉编译环境压缩包
+
+
+建议您建立一个专门用于防止编译环境的文件夹, 比如 `D:\DevEnv`，然后将下载的压缩包解压到该文件夹下
+
+:::warning
+注意路径中不能包含中文字符
+:::
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/环境1.png').default} alt="环境1" width="600px" />
+</div>
+**二、给GCC设置环境变量**
+
+在Windows搜索栏中输入“环境”，打开环境变量设置
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/环境2.png').default} alt="环境2" width="600px" />
+</div>
+点“环境变量”
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/环境3.png').default} alt="环境3" width="400px" />
+</div>
+选中“Path”，点“编辑”
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/环境4.png').default} alt="环境4" width="400px" />
+</div>
+将刚刚解压出来的ArmGCC的bin目录添加进Path变量，比如我的是 `C:\DevEnv\GNU-tools-for-STM32\bin`
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/环境5.png').default} alt="环境5" width="600px" />
+</div>
+确定、确定、确定
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/环境6.png').default} alt="环境6" width="600px" />
+</div>
+
+### 2️⃣ 使用CubeMX创建工程
+
+点击“ACCESS TO MCU SELECTOR”
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/创建1.png').default} alt="创建1" width="600px" />
+</div>
+
+搜索、选择你要使用的芯片，比如我这里选择STM32F103C8T6，然后点击“Start Project”
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/创建2.png').default} alt="创建2" width="600px" />
+</div>
+按照你的需求对芯片进行配置
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/创建3.png').default} alt="创建3" width="600px" />
+</div>
+切换到“Project Manager”选项卡，填写项目名称，选择项目路径（路径中不要有中文字符）
+
+选择Toolchain/IDE为“CMake”，然后点击“Generate Code”生成代码
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/创建4.png').default} alt="创建4" width="600px" />
+</div>
+生成代码后，在Clion中打开刚刚生成代码的文件夹
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入1.png').default} alt="导入1" width="600px" />
+</div>
+可能会弹出如下提示，都勾选上，点信任就好
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入2.png').default} alt="导入2" width="600px" />
+</div>
+第一次打开项目会弹框选择工具链，使用默认工具链就好，点下一步
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入3.png').default} alt="导入3" width="600px" />
+</div>
+取消默认Debug配置，切换到Debug-Debug预设配置文件
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入4.png').default} alt="导入4" width="600px" />
+</div>
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入5.png').default} alt="导入5" width="600px" />
+</div>
+
+若出现如下报错，说明GCC环境变量没有配置成功，可能有两个原因：
+
+- 没有按照上面的要求配置GCC环境变量 或者 配置了环境变量但是没有重启CLion （只有重启CLion后才能读取到新设置的环境变量）
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/报错.png').default} alt="报错" width="600px" />
+</div>
+解决GCC环境变量配置问题后，重新打开CLion, 右键CMakeLists.t，选择重新加载CMake项目
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入6.png').default} alt="导入6" width="600px" />
+</div>
+
+若显示如下内容，说明CMake项目加载成功
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入7.png').default} alt="导入7" width="600px" />
+</div>
+
+这下就可以愉快地编写代码了
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/编写代码.png').default} alt="编写代码" width="600px" />
+</div>
+
+点击右上角的小锤子按钮可以对代码进行编译
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/编译烧录调试.png').default} alt="编译烧录调试" width="600px" />
+</div>
+
+若出现类似如下报错，说明没有按上面的说明，将配置文件选择为“Debug-Debug预设”
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/编译报错.png').default} alt="编译报错" width="600px" />
+</div>
+
+若出现如下图的信息，说明代码编译成功！
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/编译成功.png').default} alt="编译成功" width="600px" />
+</div>
+
+### 3️⃣ 配置OpenOCD
+
+第一次使用OpenOCD进行烧录时，要先告诉CLion OpenOCD的路径
+
+如下图打开相应配置，将openocd.exe的路径设置进去
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/打开设置.png').default} alt="打开设置" width="600px" />
+</div>
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/设置OpenOCD路径.png').default} alt="设置OpenOCD路径" width="600px" />
+</div>
+
+随后我们还需要为项目设置OpenOCD的配置
+
+如下图所示，编辑配置
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/打开编辑配置.png').default} alt="打开编辑配置" width="600px" />
+</div>
+
+点击左上角的“+”号，选择“OpenOCD下载并运行”添加OpenOCD配置
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/添加OpenOCD配置.png').default} alt="添加OpenOCD配置" width="600px" />
+</div>
+
+选择可执行二进制文件
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/选择可执行二进制文件.png').default} alt="选择可执行二进制文件" width="600px" />
+</div>
+
+然后还要根据你使用的调试器以及芯片型号，选择对应的配置文件，如果你与我一样使用的是ST-Link调试器，芯片是STM32F103C8T6，那么可以选择我在压缩包中写好的`stm32f1_stlink.cfg`文件
+
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/OpenOCD选择配置文件.png').default} alt="OpenOCD选择配置文件" width="600px" />
+</div>
+
+stm32f1_stlink.cfg的文件内容为：
+```
+source [find interface/stlink.cfg]
+source [find target/stm32f1x.cfg]
+reset_config none
+```
+若你使用其他的调试器或者芯片型号，可以参考到OpenOCD的interface与target文件中，找到相应的型号进行修改
+
+
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/OpenOCD寻找cfg文件.png').default} alt="OpenOCD寻找cfg文件" width="600px" />
+</div>
+
+若出现如下图的信息，说明代码下载成功！
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/OpenOCD下载成功.png').default} alt="OpenOCD下载成功" width="600px" />
+</div>
+
+若出现如下图的报错，说明没有安装STLink驱动，或者驱动安装不正确，按照<a href="/docs/stm32/FAQ/NoServer" target="_blank">**安装STLink驱动** 🔗</a>进行安装即可
+
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/未安装STLink驱动.png').default} alt="未安装STLink驱动" width="600px" />
+</div>
