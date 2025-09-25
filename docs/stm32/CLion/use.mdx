@@ -2,6 +2,7 @@
 sidebar_position: 2
 sidebar_label: "【2】开发STM32"
 ---
+import Link from '@docusaurus/Link';
 
 # Clion开发STM32
 
@@ -15,7 +16,7 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 
 ### 1️⃣ OpenOCD与ArmGCC
 
-**一、下载解压交叉编译环境压缩包**
+#### 一、下载解压交叉编译环境压缩包
 
 <a href="https://pan.baud-dance.com/d/r2/cube/DevEnv.zip" class="source_download_button" target="_blank">立即下载</a>
 <div style={{marginBottom: "20px"}}>
@@ -33,7 +34,7 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/环境1.png').default} alt="环境1" width="600px" />
 </div>
-**二、给GCC设置环境变量**
+#### 二、给GCC设置环境变量
 
 在Windows搜索栏中输入“环境”，打开环境变量设置
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
@@ -55,6 +56,10 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/环境6.png').default} alt="环境6" width="600px" />
 </div>
+
+:::tip
+CLion需在设置完成后重启，才能读取到新设置的环境变量
+:::
 
 ### 2️⃣ 使用CubeMX创建工程
 
@@ -99,17 +104,7 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 <img src={require('./img/导入5.png').default} alt="导入5" width="600px" />
 </div>
 
-若出现如下报错，说明GCC环境变量没有配置成功，可能有两个原因：
-
-- 没有按照上面的要求配置GCC环境变量 或者 配置了环境变量但是没有重启CLion （只有重启CLion后才能读取到新设置的环境变量）
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/报错.png').default} alt="报错" width="600px" />
-</div>
-解决GCC环境变量配置问题后，重新打开CLion, 右键CMakeLists.t，选择重新加载CMake项目
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/导入6.png').default} alt="导入6" width="600px" />
-</div>
+若此时出现报错，参考：<a href="/docs/stm32/CLion/error#新工程cmake解析失败" target="_blank">**新工程CMake解析失败** 🔗</a>
 
 若显示如下内容，说明CMake项目加载成功
 
@@ -129,11 +124,8 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 <img src={require('./img/编译烧录调试.png').default} alt="编译烧录调试" width="600px" />
 </div>
 
-若出现类似如下报错，说明没有按上面的说明，将配置文件选择为“Debug-Debug预设”
+若此时出现编译错误，参考：<Link to="/docs/stm32/CLion/error#2新工程编译报错" target="_blank">**2.新工程编译报错** 🔗</Link>
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/编译报错.png').default} alt="编译报错" width="600px" />
-</div>
 
 若出现如下图的信息，说明代码编译成功！
 
@@ -179,7 +171,7 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/OpenOCD选择配置文件.png').default} alt="OpenOCD选择配置文件" width="600px" />
+<img src={require('./img/OpenOCD选择Config.png').default} alt="OpenOCD选择Config" width="600px" />
 </div>
 
 stm32f1_stlink.cfg的文件内容为：
@@ -188,7 +180,7 @@ source [find interface/stlink.cfg]
 source [find target/stm32f1x.cfg]
 reset_config none
 ```
-若你使用其他的调试器或者芯片型号，可以参考到OpenOCD的interface与target文件中，找到相应的型号进行修改
+若你使用其他的调试器或者芯片型号，可以到OpenOCD的interface与target文件夹中，找到相应的型号进行修改
 
 
 

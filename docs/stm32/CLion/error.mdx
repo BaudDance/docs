@@ -1,0 +1,38 @@
+---
+sidebar_position: 10
+sidebar_label: "【3】常见问题"
+---
+
+# Clion开发STM32时的常见问题
+
+### 1.新工程CMake解析失败
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/报错.png').default} alt="报错" width="600px" />
+</div>
+若出现如上图报错，说明GCC环境变量没有配置成功，可能有两个原因：
+
+- 没有按照要求[**配置GCC环境变量**](/docs/stm32/CLion/use#二给gcc设置环境变量)
+- 或者配置了环境变量但是没有**重启CLion** （只有重启CLion后才能读取到新设置的环境变量）
+
+解决GCC环境变量配置问题后，重新打开CLion, 右键CMakeLists.t，选择重新加载CMake项目
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入6.png').default} alt="导入6" width="600px" />
+</div>
+
+### 2.新工程编译报错 
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/编译报错.png').default} alt="编译报错" width="600px" />
+</div>
+
+若出现类似如上图报错，说明没有**没有将配置文件选择为“Debug-Debug预设”**，按下图重新打开CMake配置文件，关掉Debug预设，打开**Debug-Debug**预设即可
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/打开编辑CMake配置文件.png').default} alt="编译报错" width="600px" />
+</div>
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入4.png').default} alt="导入4" width="600px" />
+</div>
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/导入5.png').default} alt="导入5" width="600px" />
+</div>
