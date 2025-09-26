@@ -34,7 +34,17 @@ CLion自带了编译环境(CMake、GDB等)，但对于STM32的交叉编译环境
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/环境1.png').default} alt="环境1" width="600px" />
 </div>
+
 #### 二、给GCC设置环境变量
+
+##### 方式一：自动设置（推荐）
+
+解压后，双击 `install.bat` 文件，双击运行即可自动设置环境变量
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/自动安装.png').default} alt="自动安装" width="600px" />
+</div>
+
+##### 方式二：手动设置
 
 在Windows搜索栏中输入“环境”，打开环境变量设置
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
@@ -167,7 +177,7 @@ CLion需在设置完成后重启，才能读取到新设置的环境变量
 <img src={require('./img/选择可执行二进制文件.png').default} alt="选择可执行二进制文件" width="600px" />
 </div>
 
-然后还要根据你使用的调试器以及芯片型号，选择对应的配置文件，如果你与我一样使用的是ST-Link调试器，芯片是STM32F103C8T6，那么可以选择我在压缩包中写好的`stm32f1_stlink.cfg`文件
+然后还要根据你使用的调试器以及芯片型号，选择对应的配置文件，如果你与我一样使用的是ST-Link调试器，芯片是STM32F103C8T6，那么可以选择我在DevEnv中写好的`stm32f1_stlink.cfg`文件
 
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
