@@ -368,20 +368,4 @@ OLED_ShowFrame(); // 将缓冲区内容显示到屏幕上
 
 ### cube重新生成代码后，中文出现乱码
 
-- **cubeIDE对中文支持的问题，添加环境变量可以解决（仅Windows下）**
-
-  - 点击开始菜单，输入“环境变量”搜索，进入系统属性设置
-
-  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-  <img src={require('./img/I2C_OLED/搜索环境变量.png').default} alt="搜索环境变量" width="500px" />
-  </div>
-
-  - 点击系统属性下方的“环境变量”，进入环境变量配置页面。如图，点击新建，添加一个环境变量并保存即可。
-
-    变量名：JAVA_TOOL_OPTIONS
-
-    变量值：-Dfile.encoding=UTF-8
-
-  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-  <img src={require('./img/I2C_OLED/添加环境变量.png').default} alt="添加环境变量" width="500px" />
-  </div>
+<a href="/docs/stm32/FAQ/ChineseGarbledProblem" target="_blank">查看解决方法🔗</a>
