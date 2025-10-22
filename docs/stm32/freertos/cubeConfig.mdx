@@ -1,0 +1,411 @@
+---
+sidebar_position: 1
+sidebar_label: "Cube配置项说明"
+---
+
+# CubeMX中FreeRTOS的配置项说明
+
+## API
+
+### FreeRTOS API
+
+选择 FreeRTOS 的接口标准，可选择 **CMSIS v1** 或 **CMSIS v2**。
+通常推荐使用 **CMSIS v2**，因为其结构更规范、可移植性更好。
+
+---
+
+## Versions 版本
+
+### FreeRTOS version
+
+例如：**10.3.1**
+当前使用的 FreeRTOS 内核版本号。不同版本在特性与兼容性上可能略有差异。
+
+### CMSIS-RTOS version
+
+例如：**2.00**
+CMSIS-RTOS 层的版本号，决定了与 FreeRTOS 的接口封装方式。
+
+---
+
+## MPU/FPU
+
+### ENABLE MPU
+
+是否启用 **MPU（Memory Protection Unit，内存保护单元）**。
+启用后，可对任务访问的内存区域进行限制，提高系统安全性和稳定性。
+通常仅在需要任务隔离的安全型系统中启用。
+
+### ENABLE FPU
+
+是否启用 **FPU（浮点运算单元）** 支持。
+启用后，FreeRTOS 会在任务切换时保存/恢复浮点寄存器。
+如果你的任务中使用了浮点运算（如 float、double），应启用此选项；否则可禁用以减少上下文切换开销。
+
+---
+
+## Kernel settings 内核设置
+
+### USE_PREEMPTION
+
+是否启用抢占式调度。
+
+通常选择开启，启用后，高优先级任务会立即中断低优先级任务的执行，从而获得更高的实时性。
+
+---
+
+### CPU_CLOCK_HZ
+
+CPU 的时钟频率。用于计算时间片、延时及节拍定时器中断周期。
+CubeMX中强制设为SystemCoreClock宏定义的值，通常无需修改。
+
+---
+
+### TICK_RATE_HZ
+
+系统节拍频率（例如：1000）。
+表示每秒钟产生多少次系统时钟中断，即 **1 tick = 1/TICK_RATE_HZ 秒**。
+常见配置：1000Hz（即1ms一个系统节拍）。
+
+---
+
+### MAX_PRIORITIES
+
+系统支持的最大任务优先级数量。
+例如：56 表示可用优先级范围为 0~55。
+设置得越大，任务优先级划分越细，但内核消耗的内存略增。
+
+---
+
+### MINIMAL_STACK_SIZE
+
+任务最小堆栈大小（以字为单位）。
+例如：128 Words。
+用于指定空闲任务或最小任务所需的堆栈空间。
+
+---
+
+### MAX_TASK_NAME_LEN
+
+任务名称的最大长度（字符数）。
+例如：16 表示每个任务的名称最长为 16 个字符。
+
+---
+
+### USE_16_BIT_TICKS
+
+是否使用 16 位节拍计数器。
+禁用时使用 32 位计数器，可支持更长的系统运行时间。
+一般建议禁用，除非在资源极其有限的系统中。
+
+---
+
+### IDLE_SHOULD_YIELD
+
+空闲任务是否允许让出 CPU。
+启用后，如果有相同优先级的就绪任务，空闲任务会主动让出 CPU。
+
+---
+
+### USE_MUTEXES
+
+是否启用 **互斥锁（Mutex）** 功能。
+启用后可在任务间实现资源独占访问，防止竞争条件。
+
+---
+
+### USE_RECURSIVE_MUTEXES
+
+是否启用 **递归互斥锁**。
+允许同一个任务多次获取同一互斥量，而不会造成死锁。
+
+---
+
+### USE_COUNTING_SEMAPHORES
+
+是否启用 **计数型信号量**。
+用于控制多个资源的访问，或在多个事件发生后再触发任务。
+
+---
+
+### QUEUE_REGISTRY_SIZE
+
+队列注册表大小。
+用于调试时在可视化工具（如 FreeRTOS+Trace）中查看任务间通信队列。
+设置值代表可注册的队列数量，例如：8 表示最多可登记 8 个队列。
+
+---
+
+### USE_APPLICATION_TASK_TAG
+
+是否启用任务标签功能。
+启用后可为任务附加用户定义的标记或回调函数，用于调试或统计。
+
+---
+
+### ENABLE_BACKWARD_COMPATIBILITY
+
+是否启用旧版本兼容模式。
+启用后可以继续使用旧版本 FreeRTOS 的宏或函数名。
+
+---
+
+### USE_PORT_OPTIMISED_TASK_SELECTION
+
+是否使用 **端口优化的任务选择算法**。
+启用后可利用硬件指令快速找到最高优先级任务，但仅部分架构支持。
+
+---
+
+### USE_TICKLESS_IDLE
+
+是否启用 **Tickless Idle 模式**。
+启用后在系统空闲时暂停系统节拍中断，降低功耗。
+适用于低功耗应用，但可能影响时间精度。
+
+---
+
+### USE_TASK_NOTIFICATIONS
+
+是否启用任务通知机制。
+任务通知是一种轻量级的任务间通信方式，比信号量更高效。
+
+---
+
+### RECORD_STACK_HIGH_ADDRESS
+
+是否记录任务堆栈的高地址值。
+启用后可用于堆栈使用监控或调试工具中查看堆栈空间使用情况。
+
+
+## Memory management settings 内存管理设置
+
+### Memory Allocation
+
+内存分配方式：**Dynamic / Static（动态 / 静态）**。
+
+动态分配允许在运行时灵活管理内存，而静态分配在编译时预分配所有资源，提高确定性和安全性。通常在资源受限或实时性要求高的系统中选择静态分配，以避免运行时分配失败。
+
+---
+
+### TOTAL_HEAP_SIZE
+
+总堆大小：**3072 Bytes**。
+
+定义FreeRTOS可用于动态分配任务栈、队列等资源的堆内存总量。增大该值可支持更多任务或更大数据结构，但会占用更多RAM；减小则可能导致分配失败，需根据应用需求平衡。
+
+---
+
+### Memory Management scheme
+
+内存管理方案：**heap_4**。
+
+选择FreeRTOS的堆管理算法。heap_4支持合并相邻空闲块，适用于频繁分配/释放的场景，提高内存利用率。其他方案如heap_1（简单、无释放）或heap_5（支持多区域）可根据碎片化和性能需求切换。
+
+---
+
+## Hook function related definitions 钩子函数相关定义
+
+### USE_IDLE_HOOK
+
+是否启用空闲钩子函数：**Disabled**。
+
+启用后，在空闲任务运行时调用用户定义的钩子函数，可用于低功耗模式或额外处理。禁用避免额外开销；启用适合需要在空闲时执行特定操作的应用。
+
+---
+
+### USE_TICK_HOOK
+
+是否启用时钟节拍钩子函数：**Disabled**。
+
+启用后，每次系统时钟中断时调用用户钩子函数，可用于周期性操作。禁用避免额外中断开销；启用适合定时监控，但会略微增加中断处理时间。
+
+---
+
+### USE_MALLOC_FAILED_HOOK
+
+是否启用内存分配失败钩子函数：**Disabled**。
+
+启用后，当pvPortMalloc()失败时调用用户钩子函数，便于错误处理或日志记录。禁用忽略失败；启用提升调试能力，但需实现vApplicationMallocFailedHook()。
+
+---
+
+### USE_DAEMON_TASK_STARTUP_HOOK
+
+是否启用守护任务启动钩子函数：**Disabled**。
+
+启用后，在软件定时器守护任务启动前调用用户钩子函数，用于自定义初始化。禁用简化启动；启用适用于需额外配置的复杂系统。
+
+---
+
+### CHECK_FOR_STACK_OVERFLOW
+
+是否启用栈溢出检查：**Disabled**。
+
+启用后，FreeRTOS在任务切换时检查栈溢出（方法1或2），可及早检测内存问题。禁用减少开销；启用提高可靠性，但会增加少量CPU负载。
+
+---
+
+## Run time and task stats gathering related definitions 运行时和任务统计相关定义
+
+### GENERATE_RUN_TIME_STATS
+
+是否生成运行时统计：**Disabled**。
+
+启用后，收集任务运行时间数据，用于性能分析。禁用节省资源；启用需实现定时器（如vConfigureTimerForRunTimeStats()），有助于优化任务调度。
+
+---
+
+### USE_TRACE_FACILITY
+
+是否启用跟踪设施：**Enabled**。
+
+启用后，支持FreeRTOS的跟踪宏，用于记录事件和调试。禁用减少代码大小；启用便于使用工具如Tracealyzer分析系统行为，提高开发效率。
+
+---
+
+### USE_STATS_FORMATTING_FUNCTIONS
+
+是否启用统计格式化函数：**Disabled**。
+
+启用后，提供函数如vTaskList()来格式化任务统计输出。禁用避免额外代码；启用便于通过串口或日志查看任务状态，适合调试阶段。
+
+---
+
+## Co-routine related definitions 协程相关定义
+
+⚠️ 协程不如任务灵活，官方已不建议使用，通常在旧版或资源极紧系统使用
+
+### USE_CO_ROUTINES
+
+是否启用协程：**Disabled**。
+
+启用后，支持轻量级协程（非抢占式），适用于简单并发任务。禁用节省资源。
+
+---
+
+### MAX_CO_ROUTINE_PRIORITIES
+
+最大协程优先级数：**2**。
+
+定义协程可用的优先级级别总数。增大允许更细粒度优先级管理；减小简化调度器，但至少需1。修改影响协程调度复杂度和性能。
+
+---
+
+## Software timer definitions 软件定时器定义
+
+### USE_TIMERS
+
+是否启用软件定时器：**Enabled**。
+
+启用后，支持基于FreeRTOS的软件定时器任务，用于延时回调。禁用节省一个任务和队列；启用简化应用定时逻辑，提高代码可读性。
+
+---
+
+### TIMER_TASK_PRIORITY
+
+定时器任务优先级：**2**。
+
+设置软件定时器守护任务的优先级。较高优先级确保定时器准时处理；较低可能导致延迟。修改需考虑与其他任务的相对优先级，以维持系统实时性。
+
+---
+
+### TIMER_QUEUE_LENGTH
+
+定时器队列长度：**10**。
+
+定义定时器命令队列的大小。增大支持更多并发定时器操作；减小节省内存。修改影响系统处理多个定时器的能力，避免队列满导致失败。
+
+---
+
+### TIMER_TASK_STACK_DEPTH
+
+定时器任务栈深度：**256 Words**。
+
+设置软件定时器任务的栈大小（单位：字，通常4字节）。增大防止栈溢出；减小节省RAM。需根据定时器回调复杂度估算，避免运行时错误。
+
+---
+
+## Interrupt nesting behaviour configuration 中断嵌套行为配置
+
+### LIBRARY_LOWEST_INTERRUPT_PRIORITY
+
+库最低中断优先级：**15**。
+
+定义STM32中断优先级的最低值（对于Cortex-M，通常0-15，0最高）。设置影响所有中断的范围；修改需匹配硬件，确保FreeRTOS syscall优先级正确。
+
+---
+
+### LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
+
+库最大系统调用中断优先级：**5**。
+
+定义可从中断中调用FreeRTOS API的最高优先级阈值。高于此值的中断不可调用API；修改确保安全的中断嵌套，防止优先级反转问题。
+
+---
+
+## Added with 10.2.1 support 10.2.1版本新增支持
+
+### MESSAGE_BUFFER_LENGTH_TYPE
+
+消息缓冲区长度类型：**size_t**。
+
+定义消息缓冲区长度的数据类型。通常为size_t以匹配平台；修改可为特定类型如uint32_t，但需确保兼容性，避免溢出或移植问题。
+
+---
+
+### USE_POSIX_ERRNO
+
+是否启用POSIX错误号：**Disabled**。
+
+启用后，支持POSIX风格的errno变量，用于错误报告。禁用简化代码；启用提升与POSIX兼容性，适合混合开发环境。
+
+---
+
+## CMSIS-RTOS V2 flags CMSIS-RTOS V2标志
+
+### USE_OS2_THREAD_SUSPEND_RESUME
+
+是否启用OS2线程挂起/恢复：**Enabled**。
+
+启用后，支持CMSIS-RTOS V2的线程挂起和恢复API。禁用移除相关功能；启用增强线程控制，适用于需要动态暂停任务的系统。
+
+---
+
+### USE_OS2_THREAD_ENUMERATE
+
+是否启用OS2线程枚举：**Enabled**。
+
+启用后，支持枚举所有线程的API。禁用节省代码；启用便于运行时查询线程列表，提高调试和监控能力。
+
+---
+
+### USE_OS2_EVENTFLAGS_FROM_ISR
+
+是否启用从ISR中使用OS2事件标志：**Enabled**。
+
+启用后，允许从中断服务程序设置/等待事件标志。禁用限制ISR使用；启用提升中断与任务间通信灵活性，确保实时响应。
+
+---
+
+### USE_OS2_THREAD_FLAGS
+
+是否启用OS2线程标志：**Enabled**。
+
+启用后，支持每个线程的标志位，用于信号传递。禁用移除功能；启用简化线程间同步，减少额外同步对象的使用。
+
+---
+
+### USE_OS2_TIMER
+
+是否启用OS2定时器：**Enabled**。
+
+启用后，支持CMSIS-RTOS V2的定时器API。禁用节省资源；启用提供标准化的定时接口，便于移植和集成。
+
+---
+
+### USE_OS2_MUTEX
+
+是否启用OS2互斥锁：**Enabled**。
+
+启用后，支持CMSIS-RTOS V2的互斥锁API。禁用移除互斥锁支持；启用确保资源互斥访问，防止数据竞争，提高系统可靠性。
