@@ -10,4 +10,98 @@ sidebar_position: 1.61
 CubeIDE代码请按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
 :::
 
-文档：正在施工🚧~ 😎
+使用软件I2C读取AHT20温湿度计并通过oled显示
+
+## 如何使用例程
+
+1️⃣ 编译并下载程序到学习板
+
+2️⃣ 使用配套TYPE-C数据线，将学习板连接到计算机
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
+</div>
+
+3️⃣ 打开 [波特律动 串口助手](https://serial.keysking.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
+
+4️⃣ 此时即可收到温湿度信息，如图所示
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_SOFT/soft_aht20.png').default} alt="soft_aht20" width="600px" />
+</div>
+
+## 例程讲解
+
+下面介绍了如何自己实现该例程的功能
+
+### 1、工程配置
+
+1️⃣ **分配引脚**：如图，将 `PB6`、`PB7` 配置为 `GPIO_Output`，并分别设置 User label 为 `SCL`、`SDA`。  
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_SOFT/配置引脚.png').default} alt="配置引脚" width="600px" />
+</div> 
+
+
+2️⃣ **配置GPIO**：在Pinout&Configuration -> GPIO，将 `PB7` 的 GPIO mode 配置为 Output Open Drain，
+将GPIO Pull-up/Pull-down 配置为 Pull-up。
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_SOFT/SDA引脚配置.png').default} alt="SDA引脚配置" width="600px" />
+</div> 
+
+3️⃣ **打开串口2外设**：`Pinout&Configuration` -> `Connectivity` -> `USART2`，将 `Mode` 选择为 `Asynchronous`
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/UART_RGB/configUART.png').default} alt="uart config" width="600px" />
+</div>
+
+4️⃣ **配置工程**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
+
+
+5️⃣ **启用小数打印**：在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
+  :::warning
+  默认情况下，**sprintf** 函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
+  :::
+
+
+### 2、代码
+
+1️⃣ **拷贝库文件**：将 `i2c_soft.c` 和 `aht20_i2csoft.c` 文件拷贝到Core -> Src目录下，将 `i2c_soft.h` 和 `aht20_i2csoft.h` 
+文件拷贝到Core -> Inc目录下。
+
+2️⃣ **在main.c中添加include** ：`aht20_i2csoft.h`
+
+需要使用 sprintf 打印输出，在 main.c 引用头文件：
+```c
+#include <stdio.h>
+#include <string.h>
+```
+
+3️⃣ **初始化AHT20**：
+
+```c
+// 初始化AHT20
+AHT20_I2CSOFT_Init();
+```
+
+4️⃣ **定义所需变量**：
+
+```c
+float temperature, humidity; // 接收温度和湿度变量
+```
+
+5️⃣ **读取并发送数据**：
+
+```c
+AHT20_I2CSOFT_Read(&temperature, &humidity);    // 获取温湿度数值
+sprintf(message, "soft温度: %.1f ℃，湿度: %.1f %%\r\n", temperature, humidity); // 构造字符串
+HAL_UART_Transmit(&huart2, (uint8_t *)message, strlen(message),100);        // 串口发送
+HAL_Delay(1000);
+```
+
+:::tip
+建议读取间隔大于500毫秒
+::: 
+
+  
