@@ -43,7 +43,14 @@ CubeIDE代码请按照 <a href="/docs/stm32/example/HowToImportExample" target="
 <img src={require('./img/连接usb线.webp').default} alt="连接usb线" width="400px" />
 </div>
 
-- 打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
+- 在oled屏幕上，就可以看到温湿度信息
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/I2C_AHT20/OLED显示.png').default} alt="OLED显示" width="400px" />
+</div> 
+
+
+- 也可以打开 [波特律动 串口助手 (baud-dance.com)](https://serial.baud-dance.com/) 在线串口调试助手，点击“选择串口”，选择USB Single Serial
 - 此时即可收到温湿度信息，如图所示
 
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
@@ -62,17 +69,22 @@ CubeIDE代码请按照 <a href="/docs/stm32/example/HowToImportExample" target="
 
 - **配置工程**：在Project Manager -> Code Generator页面中，勾选Generate peripheral initialization as ... per peripheral
 
-- **启用float打印**：在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
-  :::tip
-  默认情况下，sprintf函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
+
+- **启用小数打印**：在cubeIDE菜单栏中，Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Settings，勾选Use float with printf ... -nano
+  :::warning
+  默认情况下，**sprintf** 函数不能打印小数。因此我们需要配置一下编译器，使其能够打印小数
   :::
 ### 2、代码
 
 #### (1) 初始化过程
 
-- **拷贝库文件**：将 **`aht20.c`** 文件拷贝到 `Core` -> `Src` 目录下，将 **`aht20.h`** 文件拷贝到 `Core` -> `Inc` 目录下。
+- **拷贝库文件**：将 **`aht20.c`** **`oled.c`** **`font.c`** 文件拷贝到 `Core` -> `Src` 目录下，将 **`aht20.h`**  **`oled.h`** **`font.h`** 文件拷贝到 `Core` -> `Inc` 目录下。
 
-- **在main.c中添加include**：`aht20.h`
+- **在main.c中添加include**：`aht20.h` `oled.h`
+
+:::tip
+需要将 **温湿度℃** 取字模存入 **font.c**，小伙伴们也可以复制本例程的 **font.c** 直接用
+:::
 
 - **引用头文件**：需要使用 sprintf 打印输出，在 main.c 引用头文件：
 
@@ -86,15 +98,40 @@ CubeIDE代码请按照 <a href="/docs/stm32/example/HowToImportExample" target="
   ```c
   // 初始化AHT20
   AHT20_Init();
+  // 初始化OLED
+  HAL_Delay(20); // 单片机启动比OLED上电快,需要延迟等待一下
+  OLED_Init(); // 初始化OLED
+  ```
+
+- **定义所需变量**：
+
+  ```c
+  float temperature, humidity; // 接收温度和湿度变量
+  char message_uart[50];       // 串口发送的字符串
+  char message_temp[30];	     // oled显示温度字符串
+  char message_hum[30];		 // oled显示湿度字符串
   ```
 
 #### (2) 读取数据
 
   ```c
-  AHT20_Read(float *Temperature, float *Humidity)
+  // 读取温湿度
+  AHT20_Read(&temperature, &humidity);
+  // 打印温湿度
+  sprintf(message_uart, "温度: %.1f ℃, 湿度: %.1f %%\r\n", temperature, humidity);
+  sprintf(message_temp, "温度: %.1f ℃", temperature);
+  sprintf(message_hum, "湿度: %.1f %%", humidity);
+  // 串口发送
+  HAL_UART_Transmit(&huart2, (uint8_t *)message_uart, strlen(message_uart), HAL_MAX_DELAY);
+  // oled显示
+  OLED_NewFrame();
+  OLED_PrintString(0, 16, message_temp, &font16x16, OLED_COLOR_NORMAL);
+  OLED_PrintString(0, 32, message_hum, &font16x16, OLED_COLOR_NORMAL);
+  OLED_ShowFrame();
+  // 延时 1 秒
+  HAL_Delay(1000);
   ```
 
-预先定义两个float类型的变量，将指针传入该函数，用于接收读取结果
 :::tip
 建议读取间隔大于500毫秒
 :::

@@ -14,7 +14,7 @@ GPIO的第一个例子：控制GPIO输出高电平，点亮学习板正面的LED
 
 ## 如何使用例程
 
-编译并下载程序到学习板，即可看到程序效果：红色LED点亮
+编译并下载程序到学习板，即可看到程序效果：红绿蓝三色小灯循环点亮
 
 ## 例程讲解
 
@@ -44,15 +44,27 @@ GPIO的第一个例子：控制GPIO输出高电平，点亮学习板正面的LED
 
 - 在main.c文件中编写HAL_GPIO_WritePin函数来改变GPIO的输出电平
 
-- 这三行代码分别控制红、蓝、绿三个灯对应GPIO的输出电平
+- 以下代码控制红、绿、蓝三个灯对应的GPIO依次输出电平
 
 ```c
 HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, GPIO_PIN_SET); //红色，点亮
 HAL_GPIO_WritePin(BLUE_GPIO_Port, BLUE_Pin, GPIO_PIN_RESET); //蓝色，熄灭
 HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_RESET); //绿色，熄灭
+HAL_Delay(1000);
+HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, GPIO_PIN_RESET); //红色，熄灭
+HAL_GPIO_WritePin(BLUE_GPIO_Port, BLUE_Pin, GPIO_PIN_RESET); //蓝色，熄灭
+HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_SET); //绿色，点亮
+HAL_Delay(1000);
+HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, GPIO_PIN_RESET); //红色，熄灭
+HAL_GPIO_WritePin(BLUE_GPIO_Port, BLUE_Pin, GPIO_PIN_SET); //蓝色，点亮
+HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_RESET); //绿色，熄灭
+HAL_Delay(1000);
+
 ```
 
-函数最后一个参数：`GPIO_PIN_SET`设置为高电平（点亮），`GPIO_PIN_RESET`设置为低电平（熄灭）
+- `XX_GPIO_Port`和`XX_Pin`是我们设置用户标签后，CubeMX自动帮我们生成的宏定义固定格式，注意不要打错大小写哦~
+
+- 函数最后一个参数：`GPIO_PIN_SET`设置为高电平（点亮），`GPIO_PIN_RESET`设置为低电平（熄灭）
 
 - 三个LED可以同时点亮，尝试不同的组合能显现出不同的颜色~
 
