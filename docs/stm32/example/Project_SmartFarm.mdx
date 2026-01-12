@@ -1,0 +1,1343 @@
+---
+sidebar_position: 100
+---
+# 【实战】智慧农场项目
+
+> 本文档面向已经学过 STM32 外设基础、了解 FreeRTOS 基本概念,但从未做过完整 RTOS 实战工程的学习者。
+
+---
+
+**下载例程代码**： <a href="https://fubestore.baud.dance/SmartFarm.zip" class="source_download_button" target="_blank">下载代码(CLion / VSCode)</a>
+
+## 一、项目整体介绍
+
+### 1.1 这个项目是做什么的
+
+智慧农场项目是一个**完整的嵌入式监测与控制系统**,运行在 STM32F103 单片机上,使用 FreeRTOS 实时操作系统进行任务调度。
+
+系统能够:
+- **实时监测**: 温度、湿度、土壤湿度、光照强度、降雨量等环境参数
+- **自动控制**: 根据土壤湿度自动启停水泵
+- **报警提示**: 环境参数超出安全范围时触发蜂鸣器和蓝牙报警
+- **人机交互**: 通过 OLED 显示屏、按键和旋钮进行参数设置和状态查看
+
+### 1.2 为什么选择"智慧农场"作为实战项目
+
+在真实的嵌入式项目中,**单一功能的 demo**和**完整的产品级系统**之间存在巨大鸿沟。智慧农场这个场景恰好能填平这个鸿沟,因为它具备真实产品的典型特征:
+
+✅ **多传感器融合**: 涉及 I2C(AHT20)、ADC(土壤湿度、光照、降雨量)等多种外设
+
+✅ **实时性要求不同**: 传感器采集需要周期执行,用户输入需要快速响应,报警需要及时处理
+
+✅ **任务间协作**: 传感器数据要传递给显示任务,报警消息要传递给蓝牙任务
+
+✅ **资源竞争**: OLED 和 AHT20 共用 I2C1 总线,需要互斥访问
+
+✅ **用户交互**: 有完整的菜单系统、参数编辑逻辑
+
+这正是真实嵌入式项目的典型特征。
+
+### 1.3 学完这个项目你能掌握什么
+
+**不只是函数调用,而是工程思维:**
+
+- 如何将一个复杂系统拆分成多个任务
+- 如何设计任务的优先级和执行周期
+- 任务之间如何安全地交换数据
+- 如何避免资源竞争导致的死锁和数据错乱
+- 如何处理周期性任务和事件驱动任务
+
+---
+
+## 二、系统整体架构设计
+
+### 2.1 系统由哪些模块组成
+
+从**硬件模块**看,系统包含:
+
+| 模块 | 功能 | 通信接口 |
+|------|------|----------|
+| AHT20 | 温湿度传感器 | I2C1 |
+| OLED | 显示屏 | I2C1 |
+| 土壤湿度传感器 | 检测土壤湿度 | ADC1 |
+| 光照传感器 | 检测光照强度 | ADC2 |
+| 降雨量传感器 | 检测降雨量 | ADC |
+| 水泵 | 自动灌溉 | GPIO |
+| 蜂鸣器 | 报警提示 | GPIO + 定时器 |
+| 按键 | 用户输入 | GPIO |
+| 旋钮 | 参数调节 | GPIO |
+| 蓝牙模块 | 无线通信 | UART3 + DMA |
+
+#### 硬件连接说明
+
+本项目所有外设模块均通过杜邦线连接到[STM32学习板](https://item.taobao.com/item.htm?id=697575142917)的相应接口。
+
+**![硬件接线图](img/SmartFarm/硬件连线.png)**
+
+> **图 2.1: 智慧农场项目硬件连接示意图**
+>
+> 上图展示了所有模块与[STM32学习板](https://item.taobao.com/item.htm?id=697575142917)的连接方式。如果你手头有实物,可以按照上图进行接线。
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+    <div className='flex flex-col gap-5 justify-center items-center p-5 m-5 font-bold shadow-xl text-2xl rounded-2xl'>
+        <div>已有学习套件？</div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", }}>
+            <img src={require('./img/SmartFarm/智慧农场商品图.png').default} alt="导入6" width="400px" />
+        </div>
+        <div className='flex justify-center items-center gap-2'>
+        <div>
+        <svg t="1767867837296" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1619" width="40" height="40"><path d="M512 73.28A438.72 438.72 0 1 0 950.72 512 438.72 438.72 0 0 0 512 73.28zM301.44 266.4a52.64 52.64 0 1 1-52.64 52.64 52.64 52.64 0 0 1 52.64-52.64z m-23.68 464l-89.12-64s124.96-102.56 117.92-136.64-93.12-76.64-93.12-76.64l40-56.48s102.56 67.04 109.6 120.16-85.28 213.44-85.28 213.44z m529.44-100.16s-8.32 67.2-65.92 90.72-146.24 5.92-146.24 5.92l4.8-36.64s52.96 11.84 85.92 1.28a67.2 67.2 0 0 0 42.56-36.64V392a75.04 75.04 0 0 0-35.36-45.92c-30.72-18.72-46.08-16-79.04-11.68a393.44 393.44 0 0 0-83.68 28.16l-28.16 55.36h190.88v37.76H576v47.2h121.6v32.96l-119.04 4.64v89.6l56.64-24.8-4.64-38.88 45.92-9.44 34.08 89.6L654.08 672l-7.2-32s-106.88 45.12-149.76 48-84.96-6.72-105.44-35.68-16-87.2-16-87.2l76.16 1.92a82.08 82.08 0 0 0 9.12 54.08c15.04 20.96 48.96 16 48.96 16v-99.04l-117.76-3.52v-32H512l-1.28-47.2-36.96-7.36s-30.56 48-50.72 46.56S400 466.24 400 466.24l64.8-80-35.2-3.68-53.12 62.56-40-35.36a294.56 294.56 0 0 0 51.84-64 281.28 281.28 0 0 0 30.56-75.36l64.8 25.92-18.88 36.48s4.8 4.8 21.28 2.4 124.96-56.48 199.04-43.52 121.44 71.84 121.44 117.76z" fill="#FC8848" p-id="1620"></path></svg>
+       </div>
+        <a href="https://item.taobao.com/item.htm?id=1010484518759" target="_blank" rel="noopener noreferrer">获取智慧农场DLC扩展包</a>
+        </div>
+
+    </div>
+     <div className='flex flex-col gap-5  justify-center items-center p-5 m-5  font-bold shadow-xl text-2xl rounded-2xl'>
+        <div>需先学习STM32？</div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center",}}>
+            <img src={require('./img/SmartFarm/学习套件商品图.png').default} alt="导入6" width="400px" />
+        </div>
+        <div className='flex justify-center items-center gap-2'>
+        <div>
+                <svg t="1767867837296" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1619" width="40" height="40"><path d="M512 73.28A438.72 438.72 0 1 0 950.72 512 438.72 438.72 0 0 0 512 73.28zM301.44 266.4a52.64 52.64 0 1 1-52.64 52.64 52.64 52.64 0 0 1 52.64-52.64z m-23.68 464l-89.12-64s124.96-102.56 117.92-136.64-93.12-76.64-93.12-76.64l40-56.48s102.56 67.04 109.6 120.16-85.28 213.44-85.28 213.44z m529.44-100.16s-8.32 67.2-65.92 90.72-146.24 5.92-146.24 5.92l4.8-36.64s52.96 11.84 85.92 1.28a67.2 67.2 0 0 0 42.56-36.64V392a75.04 75.04 0 0 0-35.36-45.92c-30.72-18.72-46.08-16-79.04-11.68a393.44 393.44 0 0 0-83.68 28.16l-28.16 55.36h190.88v37.76H576v47.2h121.6v32.96l-119.04 4.64v89.6l56.64-24.8-4.64-38.88 45.92-9.44 34.08 89.6L654.08 672l-7.2-32s-106.88 45.12-149.76 48-84.96-6.72-105.44-35.68-16-87.2-16-87.2l76.16 1.92a82.08 82.08 0 0 0 9.12 54.08c15.04 20.96 48.96 16 48.96 16v-99.04l-117.76-3.52v-32H512l-1.28-47.2-36.96-7.36s-30.56 48-50.72 46.56S400 466.24 400 466.24l64.8-80-35.2-3.68-53.12 62.56-40-35.36a294.56 294.56 0 0 0 51.84-64 281.28 281.28 0 0 0 30.56-75.36l64.8 25.92-18.88 36.48s4.8 4.8 21.28 2.4 124.96-56.48 199.04-43.52 121.44 71.84 121.44 117.76z" fill="#FC8848" p-id="1620"></path></svg>
+         </div>
+        <a href="https://item.taobao.com/item.htm?id=697575142917" target="_blank" rel="noopener noreferrer">获取STM32学习套件</a>
+        </div>
+
+    </div>
+</div>
+
+
+{/* <div className='p-5 m-5 bg-pink-100 font-bold shadow-md text-xl'>
+已有学习套件 → [获取智慧农场DLC扩展包](https://item.taobao.com/item.htm?id=1010484518759)
+
+需学习STM32 → [获取STM32学习套件](https://item.taobao.com/item.htm?id=697575142917)
+</div> */}
+
+**关键连接说明:**
+
+1. **I2C1 总线连接**(共享总线,需要特别关注):
+   - **OLED 显示屏**: SCL → PB6, SDA → PB7
+   - **AHT20 温湿度传感器**: SCL → PB6, SDA → PB7
+   - ⚠️ **注意**: 两个设备共用 I2C1 总线,这就是为什么代码中需要使用互斥锁 `i2c1Mutex` 来保护总线访问
+
+2. **ADC 传感器连接**:
+   - **光照传感器**: AO → PB1(ADC1_IN9)
+   - **土壤湿度传感器**: AO → PA0(ADC2_IN0)
+   - **降雨量传感器**: ADC 输入引脚请参考具体硬件配置
+
+3. **GPIO 输入设备**:
+   - **KEY1 按键**: PB12(页面切换)
+   - **KEY3 按键**: PB15(编辑模式切换)
+   - **旋钮(编码器)**: CH1 → PA8, CH2 → PA9(使用 TIM1 编码器模式)
+
+4. **输出设备**:
+   - **水泵继电器**: PA12(低电平触发)
+   - **蜂鸣器**: PB9(TIM4_CH4, PWM 控制)
+
+5. **UART3 蓝牙模块**:
+   - **TX**: PB10
+   - **RX**: PB11
+   - 使用 DMA 方式传输,提高效率
+
+**电源连接:**
+- 所有模块 VCC 接 3.3V 或 5V(根据模块规格)
+- 所有模块 GND 接 STM32 GND
+- ⚠️ **注意**: 务必保证共地,否则通信会失败
+
+从**软件任务**看,系统划分为 4 个任务 + 1 个定时器:
+
+```
+┌─────────────────────────────────────────────────┐
+│           FreeRTOS 调度器                        │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌──────────────┐  ┌──────────────┐            │
+│  │ SensorTask   │  │ InputTask    │            │
+│  │ 优先级:普通  │  │ 优先级:高    │            │
+│  │ 周期:1000ms  │  │ 周期:10ms    │            │
+│  └──────────────┘  └──────────────┘            │
+│                                                 │
+│  ┌──────────────┐  ┌──────────────┐            │
+│  │ ScreenTask   │  │ BLETask      │            │
+│  │ 优先级:低    │  │ 优先级:低    │            │
+│  │ 周期:10ms    │  │ 事件驱动     │            │
+│  └──────────────┘  └──────────────┘            │
+│                                                 │
+│  ┌──────────────────────────┐                  │
+│  │ BeepTimer (软件定时器)    │                  │
+│  │ 周期:500ms               │                  │
+│  └──────────────────────────┘                  │
+└─────────────────────────────────────────────────┘
+```
+
+### 2.2 这是一个"任务驱动"的系统
+
+**为什么不用 while(1) 全部写在 main 里?**
+
+在裸机编程中,你可能习惯这样写:
+
+```c
+int main() {
+    // 初始化所有外设
+    AHT20_Init();
+    OLED_Init();
+    // ...
+
+    while(1) {
+        // 读取传感器
+        AHT20_Read(&temp, &humi);
+        soilMoisture = SoilMoisture_Get();
+        // ...
+
+        // 检查报警
+        if (temp > MAX_TEMP) {
+            Beep_on();
+        }
+        // ...
+
+        // 刷新显示
+        OLED_ShowTemp(temp);
+        OLED_ShowHumi(humi);
+        // ...
+
+        // 检测按键
+        if (KEY1_Pressed()) {
+            // 切换页面
+        }
+        // ...
+
+        delay_ms(10);
+    }
+}
+```
+
+**这种写法在实际项目中会遇到什么问题?**
+
+❌ **问题 1: 代码耦合严重**
+  - 传感器读取、显示刷新、按键检测全混在一起
+  - 修改显示逻辑可能会影响传感器采集
+
+❌ **问题 2: 实时性无法保证**
+  - OLED 刷新需要时间(通过 I2C 发送整屏数据)
+  - 在刷新 OLED 期间,按键检测被阻塞,用户会感觉"按键不灵敏"
+  - 传感器采集也被延迟,数据时效性变差
+
+❌ **问题 3: 难以扩展**
+  - 要添加蓝牙功能,需要在主循环里加一堆代码
+  - 主循环变得越来越长,越来越难维护
+
+❌ **问题 4: 资源竞争无保护**
+  - AHT20 和 OLED 共用 I2C1,交替访问时可能出现数据错乱
+  - 需要手动管理互斥访问,容易出错
+
+**FreeRTOS 如何解决这些问题?**
+
+FreeRTOS 通过**任务调度**让每个功能模块独立运行:
+
+```c
+// 传感器任务:每秒执行一次
+void SensorTask() {
+    while(1) {
+        // 采集数据
+        AHT20_Read(&temp, &humi);
+        // 检查报警
+        osDelay(1000);
+    }
+}
+
+// 显示任务:每10ms执行一次
+void ScreenTask() {
+    while(1) {
+        // 刷新显示
+        OLED_Refresh();
+        osDelay(10);
+    }
+}
+
+// 输入任务:每10ms执行一次
+void InputTask() {
+    while(1) {
+        // 检测按键
+        if (KEY1_Pressed()) {
+            // 切换页面
+        }
+        osDelay(10);
+    }
+}
+```
+
+每个任务都是**独立的执行流**,FreeRTOS 调度器会根据优先级自动切换任务执行:
+
+- InputTask 优先级最高,按键检测不会被其他任务阻塞
+- ScreenTask 优先级较低,不会影响传感器采集和报警检测
+- SensorTask 每秒执行一次,保证数据及时更新
+
+这就是**任务驱动**的核心思想:**关注点分离 + 调度器管理**。
+
+---
+
+## 三、FreeRTOS 任务划分思路
+
+### 3.1 为什么要拆成多个任务
+
+**任务划分的本质是什么?**
+
+任务划分不是简单地把代码拆成多个函数,而是要回答:**哪些操作可以独立执行,哪些操作有先后顺序?**
+
+在本项目中,我们通过**分析实时性需求**和**功能独立性**来划分任务:
+
+| 功能模块 | 实时性需求 | 执行频率 | 是否需要独立任务 | 理由 |
+|---------|----------|---------|----------------|------|
+| 传感器采集 | 低(1秒更新一次) | 1Hz | ✅ 是 | 周期性执行,耗时较长(I2C通信) |
+| 显示刷新 | 低(人眼100Hz足够) | 100Hz | ✅ 是 | 周期性执行,耗时较长(发送整屏数据) |
+| 按键检测 | 高(用户要求灵敏) | 100Hz | ✅ 是 | 需要快速响应,不能被显示刷新阻塞 |
+| 蓝牙通信 | 低(可以缓冲) | 按需 | ✅ 是 | 事件驱动,有报警时才执行 |
+| 蜂鸣器控制 | 高(报警及时性) | 2Hz | ❌ 否(用定时器) | 周期性翻转GPIO,用软件定时器更合适 |
+
+### 3.2 每个任务负责什么
+
+#### **SensorTask(传感器任务)**
+
+**职责:**
+1. 初始化所有传感器
+2. 定期读取传感器数据
+3. 更新全局状态变量 `farmState`
+4. 检查环境参数是否超出安全范围
+5. 超出范围时发送报警消息到队列
+
+**为什么这样设计?**
+
+- **周期性执行**: 环境参数变化缓慢,1秒采集一次足够
+- **优先级 Normal**: 不需要快速响应,但不能过低(否则被显示任务抢占太久)
+- **使用互斥锁**: AHT20 和 OLED 共用 I2C1,读取前必须获取 `i2c1Mutex`
+
+**新手容易犯的错误:**
+❌ 在任务里用 `HAL_Delay()` 延时,会阻塞整个任务
+❌ 忘记释放互斥锁,导致死锁(OLED 永远无法访问 I2C1)
+❌ 报警检测逻辑写死在任务里,导致代码难以扩展
+
+**正确做法:**
+```c
+void StartSensorTask(void *argument) {
+    // 初始化
+    osMutexAcquire(i2c1MutexHandle, osWaitForever);
+    AHT20_Init();
+    osMutexRelease(i2c1MutexHandle);
+
+    for(;;) {
+        // 读取数据(使用互斥锁保护I2C)
+        osMutexAcquire(i2c1MutexHandle, osWaitForever);
+        AHT20_Read(&farmState.temperature, &farmState.humidity);
+        osMutexRelease(i2c1MutexHandle);
+
+        // 检查报警,发送消息
+        if (farmState.temperature > farmSafeRange.maxTemperature) {
+            SendWarningFloat("temperature_high", farmState.temperature);
+        }
+
+        // 延时1秒
+        osDelay(1000);  // ✅ 使用osDelay,任务会进入阻塞态,让出CPU
+    }
+}
+```
+
+#### **ScreenTask(显示任务)**
+
+**职责:**
+1. 初始化 OLED 显示屏
+2. 根据当前页面渲染界面(首页/阈值设置页)
+3. 定期刷新显示内容
+
+**为什么这样设计?**
+
+- **周期性执行**: 10ms 刷新一次,保证显示流畅(100Hz)
+- **优先级 BelowNormal5**: 最低优先级,不会影响实时性要求高的任务
+- **使用互斥锁**: OLED 和 AHT20 共用 I2C1,刷新前必须获取 `i2c1Mutex`
+
+**新手容易犯的错误:**
+❌ 每次刷新都重新初始化 OLED(非常慢)
+❌ 刷新频率太低(比如100ms),导致界面卡顿
+❌ 忘记使用互斥锁,导致 I2C 数据错乱
+
+**正确做法:**
+```c
+void StartScreenTask(void *argument) {
+    OLED_Init();  // 只初始化一次
+
+    for(;;) {
+        // 双缓冲:先在内存中绘制,再一次性发送
+        OLED_NewFrame();
+
+        // 根据当前页面渲染
+        switch (pageIndex) {
+        case PAGE_HOME:
+            renderHomePage();
+            break;
+        case PAGE_RANGE:
+            renderRangePage();
+            break;
+        }
+
+        // 使用互斥锁保护I2C
+        osMutexAcquire(i2c1MutexHandle, osWaitForever);
+        OLED_ShowFrame();
+        osMutexRelease(i2c1MutexHandle);
+
+        osDelay(10);
+    }
+}
+```
+
+#### **InputTask(输入任务)**
+
+**职责:**
+1. 检测按键输入(KEY1、KEY3)
+2. 检测旋钮旋转方向
+3. 根据输入控制页面切换和阈值编辑
+
+**为什么这样设计?**
+
+- **周期性执行**: 10ms 检测一次,保证响应及时
+- **优先级 High**: 高优先级,确保用户输入快速响应
+- **事件驱动**: 按键按下时才执行操作,平时只检测不操作
+
+**新手容易犯的错误:**
+❌ 按键检测用延时消抖,阻塞任务执行
+❌ 旋钮检测逻辑复杂,导致任务执行时间过长
+❌ 忘记处理"长按"、"连发"等边界情况
+
+**正确做法:**
+```c
+void StartInputTask(void *argument) {
+    Knob_Init();  // 只初始化一次
+
+    for(;;) {
+        // 检测按键(消抖逻辑在 BSP 层处理)
+        if (isKey1Clicked()) {
+            ScreenPage_NextPage();
+        }
+
+        // 在阈值设置页时处理阈值编辑
+        if (pageIndex == PAGE_RANGE) {
+            if (isKey3Clicked()) {
+                RangeEditState_Toggle();
+            }
+
+            KnobDirection dir = Knob_IsRotating();
+            if (dir == KNOB_DIR_LEFT) {
+                // 左旋逻辑
+            } else if (dir == KNOB_DIR_RIGHT) {
+                // 右旋逻辑
+            }
+        }
+
+        osDelay(10);
+    }
+}
+```
+
+#### **BLETask(蓝牙任务)**
+
+**职责:**
+1. 从 BLE 队列接收报警消息
+2. 通过 UART3(DMA 方式)发送消息到蓝牙模块
+3. 发送完成后释放消息内存
+
+**为什么这样设计?**
+
+- **事件驱动**: 使用 `osMessageQueueGet(..., osWaitForever)` 阻塞等待,队列为空时任务挂起,不占用 CPU
+- **优先级 Low**: 低优先级,不影响实时性要求高的任务
+- **内存管理**: 消息由 SensorTask 分配,由 BLETask 释放,避免内存泄漏
+
+**新手容易犯的错误:**
+❌ 用轮询方式检查队列,浪费 CPU
+❌ 发送完消息后忘记释放内存,导致内存泄漏
+❌ 用阻塞方式发送 UART,导致任务长时间占用 CPU
+
+**正确做法:**
+```c
+void StartBLETask(void *argument) {
+    for(;;) {
+        char *msg;
+
+        // 阻塞等待队列消息(队列为空时任务挂起,不占用CPU)
+        osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
+
+        if (msg != NULL) {
+            // 使用DMA发送(异步,不阻塞CPU)
+            HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
+
+            // 等待发送完成
+            while (HAL_UART_GetState(&huart3) != HAL_UART_STATE_READY) {
+                osDelay(1);
+            }
+
+            // 释放内存
+            vPortFree(msg);
+        }
+    }
+}
+```
+
+### 3.3 任务优先级是如何考虑的
+
+**优先级设计的核心原则: 实时性要求越高,优先级越高**
+
+本项目优先级排序:
+
+```
+InputTask (High) > SensorTask (Normal) > ScreenTask (BelowNormal5) ≈ BLETask (Low)
+```
+
+**为什么要这样设计?**
+
+| 任务 | 优先级 | 理由 |
+|------|--------|------|
+| InputTask | High | 用户按键要求立即响应,否则体验差 |
+| SensorTask | Normal | 1秒采集一次,不需要快速响应,但不能过低 |
+| ScreenTask | BelowNormal5 | 10ms刷新一次,低优先级不影响实时性 |
+| BLETask | Low | 报警消息可以缓冲,低优先级不影响系统功能 |
+
+**如果优先级设计不当会怎样?**
+
+❌ **ScreenTask 优先级过高**: 显示刷新频繁,会导致传感器采集被延迟,报警不及时
+❌ **InputTask 优先级过低**: 用户按键检测被显示任务阻塞,感觉"按键不灵敏"
+✅ **当前设计合理**: 按键响应最快,传感器采集不被阻塞,显示刷新优先级最低但不影响功能
+
+### 3.4 哪些任务是周期性的,哪些是事件驱动的
+
+#### **周期性任务**
+
+**特点:** 固定时间间隔执行一次,不管有没有事件发生
+
+| 任务 | 执行周期 | 典型代码 |
+|------|---------|----------|
+| SensorTask | 1000ms | `osDelay(1000);` |
+| ScreenTask | 10ms | `osDelay(10);` |
+| InputTask | 10ms | `osDelay(10);` |
+
+**为什么这样设计?**
+
+- **SensorTask**: 环境参数变化缓慢,1秒采集一次足够,太频繁浪费资源
+- **ScreenTask**: 10ms 刷新一次,保证显示流畅(100Hz),人眼无法感知更高刷新率
+- **InputTask**: 10ms 检测一次,保证按键响应及时,不会漏按
+
+#### **事件驱动任务**
+
+**特点:** 只有事件发生时才执行,平时阻塞等待
+
+| 任务 | 触发条件 | 典型代码 |
+|------|---------|----------|
+| BLETask | 队列有消息 | `osMessageQueueGet(..., osWaitForever);` |
+
+**为什么这样设计?**
+
+- **BLETask**: 报警消息是偶发事件,用轮询浪费 CPU,用阻塞等待最合理
+- **阻塞等待的优势**: 队列为空时任务挂起,不占用 CPU,收到消息时立即唤醒
+
+---
+
+## 四、任务之间的通信与协作
+
+### 4.1 为什么任务不能"直接互相调用"
+
+**在裸机编程中,你可能习惯这样调用函数:**
+
+```c
+int main() {
+    while(1) {
+        temp = readTemperature();
+        if (temp > MAX_TEMP) {
+            sendBluetoothAlert(temp);
+        }
+        delay_ms(1000);
+    }
+}
+```
+
+**在 FreeRTOS 中,为什么不能直接调用其他任务的函数?**
+
+❌ **问题 1: 任务是独立的执行流**
+  - 每个任务都有自己的栈空间和程序计数器
+  - 直接调用只是"函数调用",不是"任务切换"
+
+❌ **问题 2: 无法保证实时性**
+  - 如果 `sendBluetoothAlert()` 耗时较长(比如发送 UART),会阻塞当前任务
+  - SensorTask 被阻塞,传感器采集延迟,报警不及时
+
+❌ **问题 3: 无法解耦**
+  - SensorTask 直接调用 BLETask 的函数,耦合严重
+  - 如果 BLETask 的实现改变,SensorTask 也要修改
+
+**正确的做法是什么?**
+
+✅ **使用队列进行任务间通信:**
+
+```c
+// SensorTask:检测到报警时,发送消息到队列
+char *msg = pvPortMalloc(100);
+snprintf(msg, 100, "{\"type\":\"warning\", \"reason\":\"temperature_high\", \"value\":%d.%d}", minInt, minDec);
+osMessageQueuePut(BLEQueueHandle, &msg, NULL, 0);
+
+// BLETask:从队列接收消息,异步处理
+char *msg;
+osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
+HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
+vPortFree(msg);
+```
+
+### 4.2 本项目中哪些地方需要任务通信
+
+#### **场景 1: SensorTask → BLETask(报警消息传递)**
+
+**问题:** SensorTask 检测到温度超标,需要通知 BLETask 发送蓝牙报警
+
+**解决方案:** 使用消息队列 `BLEQueue`
+
+```
+SensorTask                          BLETask
+   │                                  │
+   │ 检测到温度超标                     │
+   ├──────────分配内存创建消息──────────>│
+   │                                  │
+   │ <────────────放入队列────────────┤
+   │                                  │
+   │                          (队列非空,唤醒BLETask)
+   │                                  │
+   │                          从队列取出消息
+   │                                  │
+   │                          通过UART发送
+   │                                  │
+   │                          发送完成,释放内存
+```
+
+**为什么使用队列而不是全局变量?**
+
+❌ **全局变量的问题:**
+  - SensorTask 写入全局变量后,BLETask 如何知道"有新消息"?需要轮询或标志位
+  - 如果 BLETask 正在处理上一条消息,SensorTask 写入会覆盖数据
+
+✅ **队列的优势:**
+  - 自动阻塞/唤醒:队列为空时 BLETask 挂起,有消息时自动唤醒
+  - 缓冲机制:队列可以存储多条消息,不会丢失
+  - 解耦:SensorTask 只管发送,不管 BLETask 何时处理
+
+#### **场景 2: SensorTask → ScreenTask(数据共享)**
+
+**问题:** SensorTask 读取传感器数据,ScreenTask 需要显示这些数据
+
+**解决方案:** 使用全局变量 `farmState` + 内存屏障
+
+```c
+// SensorTask:更新全局变量
+farmState.temperature = 25.5;
+farmState.humidity = 60.2;
+
+// ScreenTask:读取全局变量
+OLED_PrintTemperature(farmState.temperature);
+OLED_PrintHumidity(farmState.humidity);
+```
+
+**为什么不用队列?**
+
+- 数据更新频繁(1秒1次),队列开销太大
+- 数据不需要缓冲,只关心最新值
+- 读写都是简单变量,不存在数据竞争风险
+
+**需要注意的问题:**
+
+✅ **浮点数在 ARM Cortex-M3 上不是原子操作**
+  - `farmState.temperature = 25.5` 实际上是多条汇编指令
+  - 如果 ScreenTask 在赋值过程中读取,可能读到"一半新值、一半旧值"
+
+✅ **解决方案:使用互斥锁或内存屏障**
+  - 本项目中,SensorTask 只写,ScreenTask 只读,不会同时访问同一变量
+  - 且 ARM Cortex-M3 的对齐读写保证原子性,所以没有加锁
+  - 如果有"多写多读"场景,必须加锁
+
+#### **场景 3: InputTask → ScreenTask(页面切换)**
+
+**问题:** 用户按下 KEY1,需要切换 OLED 显示页面
+
+**解决方案:** 使用全局变量 `pageIndex`
+
+```c
+// InputTask:检测到按键,修改全局变量
+if (isKey1Clicked()) {
+    ScreenPage_NextPage();  // 修改pageIndex
+}
+
+// ScreenTask:根据全局变量渲染
+switch (pageIndex) {
+    case PAGE_HOME:
+        renderHomePage();
+        break;
+    case PAGE_RANGE:
+        renderRangePage();
+        break;
+}
+```
+
+**为什么不用队列?**
+
+- 页面切换是"命令",不需要携带数据
+- 全局变量简单高效,队列开销太大
+
+**需要注意的问题:**
+
+✅ **全局变量的读写顺序**
+  - InputTask 修改 `pageIndex` 后,ScreenTask 可能正在执行 `switch (pageIndex)` 之前
+  - 由于 10ms 刷新周期,即使延迟一帧,用户也感知不到
+
+### 4.3 互斥锁的使用动机
+
+#### **问题场景: I2C 总线竞争**
+
+**AHT20 和 OLED 共用 I2C1 总线:**
+
+```
+STM32F103
+   │
+   ├─ I2C1 ──┬── AHT20 (温湿度传感器)
+   │         └── OLED (显示屏)
+```
+
+**如果不使用互斥锁会发生什么?**
+
+```
+时间线:
+t0: SensorTask 开始读取 AHT20
+t1: SensorTask 正在通过 I2C 发送"读取温度"命令
+t2: 任务调度器切换到 ScreenTask
+t3: ScreenTask 开始刷新 OLED,通过 I2C 发送数据
+t4: I2C 总线混乱!AHT20 收到错误命令,OLED 显示乱码
+```
+
+**解决方案:使用互斥锁 `i2c1Mutex`**
+
+```c
+// SensorTask:读取 AHT20 前获取互斥锁
+osMutexAcquire(i2c1MutexHandle, osWaitForever);
+AHT20_Read(&farmState.temperature, &farmState.humidity);
+osMutexRelease(i2c1MutexHandle);
+
+// ScreenTask:刷新 OLED 前获取互斥锁
+osMutexAcquire(i2c1MutexHandle, osWaitForever);
+OLED_ShowFrame();
+osMutexRelease(i2c1MutexHandle);
+```
+
+**互斥锁的工作原理:**
+
+```
+时间线:
+t0: SensorTask 获取 i2c1Mutex 成功,开始读取 AHT20
+t1: SensorTask 正在通过 I2C 发送命令
+t2: 任务调度器切换到 ScreenTask
+t3: ScreenTask 尝试获取 i2c1Mutex,失败(已被 SensorTask 持有)
+t4: ScreenTask 进入阻塞态,等待互斥锁
+t5: SensorTask 释放 i2c1Mutex
+t6: ScreenTask 被唤醒,获取 i2c1Mutex 成功,开始刷新 OLED
+```
+
+**新手容易犯的错误:**
+
+❌ **忘记释放互斥锁**
+  - 导致死锁:其他任务永远无法获取互斥锁
+  - 系统挂起,看似"卡死"
+
+❌ **获取互斥锁后调用可能阻塞的函数**
+  - 比如 `osDelay()`,其他任务长时间等待
+  - 互斥锁应该"快进快出",只保护临界区
+
+✅ **正确做法:**
+```c
+// 错误示例
+osMutexAcquire(i2c1MutexHandle, osWaitForever);
+AHT20_Read(&temp, &humi);
+osDelay(100);  // ❌ 错误:延时期间占用互斥锁,其他任务无法访问I2C
+osMutexRelease(i2c1MutexHandle);
+
+// 正确示例
+osMutexAcquire(i2c1MutexHandle, osWaitForever);
+AHT20_Read(&temp, &humi);
+osMutexRelease(i2c1MutexHandle);
+osDelay(100);  // ✅ 正确:释放互斥锁后再延时
+```
+
+---
+
+## 五、典型工作流程的完整拆解
+
+### 5.1 场景:温湿度采集 → 数据处理 → 显示更新 → 报警执行
+
+让我们完整追踪一次"温度超限报警"的数据流动:
+
+#### **步骤 1: SensorTask 采集温湿度数据(每秒执行)**
+
+```c
+// Core/App/Tasks/SensorTask.c:179
+osMutexAcquire(i2c1MutexHandle, osWaitForever);  // 获取I2C互斥锁
+AHT20_Read(&farmState.temperature, &farmState.humidity);  // 读取温湿度
+osMutexRelease(i2c1MutexHandle);  // 释放I2C互斥锁
+```
+
+**发生了什么?**
+1. SensorTask 尝试获取 `i2c1Mutex`
+2. 如果 ScreenTask 正在刷新 OLED,SensorTask 会阻塞等待
+3. 获取互斥锁成功后,通过 I2C1 读取 AHT20 的温湿度数据
+4. 将数据写入全局变量 `farmState.temperature` 和 `farmState.humidity`
+5. 释放互斥锁
+
+#### **步骤 2: SensorTask 检查温度是否超限**
+
+```c
+// Core/App/Tasks/SensorTask.c:202-203
+warning += CheckRangeFloat(farmState.temperature,
+                           farmSafeRange.minTemperature,
+                           farmSafeRange.maxTemperature,
+                           "temperature_low", "temperature_high");
+```
+
+**发生了什么?**
+1. 读取 `farmState.temperature` 的当前值(比如 35.5℃)
+2. 读取 `farmSafeRange.maxTemperature` 的阈值(比如 30.0℃)
+3. 比较发现 35.5 > 30.0,温度超限!
+4. 调用 `SendWarningFloat("temperature_high", 35.5)`
+
+#### **步骤 3: SensorTask 发送报警消息到队列**
+
+```c
+// Core/App/Tasks/SensorTask.c:41-56
+static void SendWarningFloat(const char *reason, float value) {
+    char *msg = pvPortMalloc(100);  // 在FreeRTOS堆中分配内存
+    snprintf(msg, 100, "{\"type\":\"warning\", \"reason\":\"%s\", \"value\":%d.%d}",
+             reason, minInt, minDec);
+    osMessageQueuePut(BLEQueueHandle, &msg, NULL, 0);  // 将消息指针放入队列
+}
+```
+
+**发生了什么?**
+1. 在 FreeRTOS 堆中分配 100 字节内存
+2. 格式化 JSON 字符串: `{"type":"warning", "reason":"temperature_high", "value":35.5}`
+3. 将消息指针(不是消息内容!)放入 `BLEQueue`
+4. 队列由空变为非空,BLETask 被唤醒
+
+#### **步骤 4: SensorTask 启动蜂鸣器**
+
+```c
+// Core/App/Tasks/SensorTask.c:219-223
+if (warning > 0) {
+    Beep_on();  // 启动蜂鸣器(软件定时器)
+} else {
+    Beep_off();  // 关闭蜂鸣器
+}
+```
+
+**发生了什么?**
+1. 检测到 `warning > 0`,有报警
+2. 调用 `Beep_on()` 启动软件定时器 `BeepTimer`
+3. 定时器每 500ms 触发一次回调,翻转蜂鸣器 GPIO,实现"滴-滴-滴"报警音
+
+#### **步骤 5: SensorTask 延时 1 秒,继续下一次循环**
+
+```c
+// Core/App/Tasks/SensorTask.c:226
+osDelay(1000);
+```
+
+**发生了什么?**
+1. SensorTask 进入阻塞态,让出 CPU
+2. 调度器切换到其他就绪任务(比如 ScreenTask 或 BLETask)
+3. 1 秒后,SensorTask 被唤醒,继续下一次采集
+
+#### **步骤 6: BLETask 被队列唤醒,发送蓝牙报警**
+
+```c
+// Core/App/Tasks/BleTask.c:54
+osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);  // 阻塞等待,直到有消息
+```
+
+**发生了什么?**
+1. BLETask 之前在 `osMessageQueueGet()` 处阻塞,等待队列消息
+2. SensorTask 放入消息后,队列非空,BLETask 被唤醒
+3. 从队列取出消息指针 `msg`
+
+#### **步骤 7: BLETask 通过 UART3 发送报警消息**
+
+```c
+// Core/App/Tasks/BleTask.c:58
+HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));  // 使用DMA发送
+```
+
+**发生了什么?**
+1. 通过 UART3 以 DMA 方式发送 JSON 字符串到蓝牙模块
+2. DMA 是异步的,不会阻塞 CPU
+3. 蓝牙模块将消息无线传输到手机或网关
+
+#### **步骤 8: BLETask 等待发送完成,释放内存**
+
+```c
+// Core/App/Tasks/BleTask.c:61-69
+while (HAL_UART_GetState(&huart3) != HAL_UART_STATE_READY) {
+    osDelay(1);  // 等待DMA发送完成
+}
+vPortFree(msg);  // 释放消息内存
+```
+
+**发生了什么?**
+1. 轮询 UART 状态,等待 DMA 发送完成
+2. 发送完成后,释放之前分配的内存(避免内存泄漏)
+3. 继续等待下一条消息
+
+#### **步骤 9: ScreenTask 显示最新的温度数据(每 10ms 执行)**
+
+```c
+// Core/App/Tasks/ScreenTask.c:68-74
+OLED_PrintString(9, 14, "温度", &font12x12, OLED_COLOR_NORMAL);
+floatToIntDec(farmState.temperature, &minInt, &minDec);
+sprintf(msg, "%d.%d℃", minInt, minDec);
+OLED_PrintString(x, 26, msg, &font12x12, OLED_COLOR_NORMAL);
+```
+
+**发生了什么?**
+1. ScreenTask 读取全局变量 `farmState.temperature`(35.5℃)
+2. 将浮点数转换为字符串 "35.5℃"
+3. 在 OLED 的帧缓冲区中绘制温度文字
+4. 使用互斥锁保护 I2C,将帧缓冲区发送到 OLED 显示
+
+**数据流动总结:**
+
+```
+AHT20 (硬件)
+    ↓
+SensorTask (I2C读取)
+    ↓
+farmState.temperature (全局变量)
+    ↓
+CheckRangeFloat() (检查超限)
+    ↓
+SendWarningFloat() (创建消息)
+    ↓
+BLEQueue (消息队列)
+    ↓
+BLETask (UART发送)
+    ↓
+蓝牙模块 → 手机用户
+
+同时:
+farmState.temperature (全局变量)
+    ↓
+ScreenTask (OLED显示)
+    ↓
+OLED屏幕显示 "35.5℃"
+```
+
+### 5.2 FreeRTOS 在其中起到了什么作用
+
+**如果没有 FreeRTOS,这些功能怎么实现?**
+
+❌ **裸机实现:**
+```c
+int main() {
+    while(1) {
+        // 读取传感器
+        AHT20_Read(&temp, &humi);
+
+        // 检查报警
+        if (temp > MAX_TEMP) {
+            Beep_on();
+            // 发送蓝牙(阻塞式,会延迟整个系统)
+            HAL_UART_Transmit(&huart3, msg, len, 1000);
+            Beep_off();
+        }
+
+        // 刷新显示(慢速I2C操作)
+        OLED_Refresh();
+
+        // 检测按键(可能在刷新OLED期间漏按)
+        if (KEY_Pressed()) {
+            // 切换页面
+        }
+
+        delay_ms(10);
+    }
+}
+```
+
+**问题:**
+- UART 发送阻塞 1 秒,期间按键检测失效,用户感觉"卡顿"
+- OLED 刷新期间,传感器采集延迟,数据时效性差
+- 所有功能耦合在一起,难以维护和扩展
+
+**有了 FreeRTOS 后:**
+
+✅ **任务独立执行:**
+  - SensorTask 每秒采集一次,不会被其他任务阻塞
+  - BLETask 异步发送报警,不影响 SensorTask 和 ScreenTask
+  - InputTask 快速响应按键,不会被 OLED 刷新阻塞
+
+✅ **调度器自动管理:**
+  - 优先级高的任务(InputTask)优先执行
+  - 阻塞的任务自动让出 CPU,其他任务运行
+  - 事件驱动的任务(BLETask)只在有事件时执行,节省 CPU
+
+✅ **资源同步保护:**
+  - 互斥锁保护 I2C 总线,避免竞争
+  - 队列实现任务间解耦通信
+  - 全局变量实现高效数据共享
+
+**这就是 FreeRTOS 的核心价值: 让复杂系统变得简单、可维护、可扩展。**
+
+---
+
+## 六、写给初学者的工程经验总结
+
+### 6.1 初学者最容易犯的 5 个错误
+
+#### **错误 1: 任务划分不合理**
+
+❌ **错误示例:** 把所有功能都写在一个任务里
+
+```c
+void StartTask(void *argument) {
+    while(1) {
+        // 读取传感器
+        AHT20_Read(&temp, &humi);
+
+        // 刷新显示
+        OLED_Refresh();
+
+        // 检测按键
+        if (KEY_Pressed()) {
+            // 切换页面
+        }
+
+        // 发送蓝牙
+        if (needAlert) {
+            HAL_UART_Transmit(&huart3, msg, len, 1000);
+        }
+
+        osDelay(10);
+    }
+}
+```
+
+**问题:** 又回到裸机编程模式了,FreeRTOS 的优势完全没用上
+
+✅ **正确做法:** 按功能模块划分任务
+
+```c
+// 传感器任务
+void SensorTask() {
+    while(1) {
+        AHT20_Read(&temp, &humi);
+        osDelay(1000);
+    }
+}
+
+// 显示任务
+void ScreenTask() {
+    while(1) {
+        OLED_Refresh();
+        osDelay(10);
+    }
+}
+
+// 输入任务
+void InputTask() {
+    while(1) {
+        if (KEY_Pressed()) {
+            // 切换页面
+        }
+        osDelay(10);
+    }
+}
+```
+
+#### **错误 2: 优先级设计不当**
+
+❌ **错误示例:** 所有任务优先级相同
+
+```c
+const osThreadAttr_t SensorTask_attributes = {
+    .priority = osPriorityNormal,  // 普通优先级
+};
+
+const osThreadAttr_t InputTask_attributes = {
+    .priority = osPriorityNormal,  // 也是普通优先级
+};
+```
+
+**问题:** 按键响应不及时,用户感觉"按键不灵敏"
+
+✅ **正确做法:** 根据实时性要求设计优先级
+
+```c
+const osThreadAttr_t InputTask_attributes = {
+    .priority = osPriorityHigh,  // 高优先级,按键响应快
+};
+
+const osThreadAttr_t SensorTask_attributes = {
+    .priority = osPriorityNormal,  // 普通优先级
+};
+```
+
+#### **错误 3: 忘记使用互斥锁保护共享资源**
+
+❌ **错误示例:** 直接访问共享的 I2C 总线
+
+```c
+// SensorTask
+void SensorTask() {
+    while(1) {
+        AHT20_Read(&temp, &humi);  // 没有互斥锁保护
+        osDelay(1000);
+    }
+}
+
+// ScreenTask
+void ScreenTask() {
+    while(1) {
+        OLED_Refresh();  // 没有互斥锁保护
+        osDelay(10);
+    }
+}
+```
+
+**问题:** I2C 数据错乱,OLED 显示花屏
+
+✅ **正确做法:** 使用互斥锁保护共享资源
+
+```c
+// SensorTask
+void SensorTask() {
+    while(1) {
+        osMutexAcquire(i2c1MutexHandle, osWaitForever);
+        AHT20_Read(&temp, &humi);
+        osMutexRelease(i2c1MutexHandle);
+        osDelay(1000);
+    }
+}
+
+// ScreenTask
+void ScreenTask() {
+    while(1) {
+        osMutexAcquire(i2c1MutexHandle, osWaitForever);
+        OLED_Refresh();
+        osMutexRelease(i2c1MutexHandle);
+        osDelay(10);
+    }
+}
+```
+
+#### **错误 4: 阻塞函数导致任务长时间占用 CPU**
+
+❌ **错误示例:** 在任务里用 `HAL_Delay()` 或阻塞式 UART
+
+```c
+void BLETask() {
+    while(1) {
+        char *msg;
+        osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
+
+        // 阻塞式发送,占用CPU 1秒
+        HAL_UART_Transmit(&huart3, (uint8_t *)msg, strlen(msg), 1000);
+
+        vPortFree(msg);
+    }
+}
+```
+
+**问题:** BLETask 占用 CPU 期间,其他任务无法执行,系统卡顿
+
+✅ **正确做法:** 使用 DMA 或异步操作
+
+```c
+void BLETask() {
+    while(1) {
+        char *msg;
+        osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
+
+        // DMA发送,异步不阻塞CPU
+        HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
+
+        // 等待发送完成(期间可以执行其他任务)
+        while (HAL_UART_GetState(&huart3) != HAL_UART_STATE_READY) {
+            osDelay(1);
+        }
+
+        vPortFree(msg);
+    }
+}
+```
+
+#### **错误 5: 内存泄漏**
+
+❌ **错误示例:** 分配内存后忘记释放
+
+```c
+void SensorTask() {
+    while(1) {
+        char *msg = pvPortMalloc(100);  // 分配内存
+        snprintf(msg, 100, "alert: temp=%f", temperature);
+        osMessageQueuePut(BLEQueueHandle, &msg, NULL, 0);
+        // ❌ 忘记释放内存!
+        osDelay(1000);
+    }
+}
+
+void BLETask() {
+    while(1) {
+        char *msg;
+        osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
+        HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
+        // ❌ 忘记释放内存!
+    }
+}
+```
+
+**问题:** 运行一段时间后,FreeRTOS 堆内存耗尽,系统崩溃
+
+✅ **正确做法:** 谁分配谁释放,或者明确释放责任
+
+```c
+// SensorTask:分配内存
+char *msg = pvPortMalloc(100);
+snprintf(msg, 100, "alert: temp=%f", temperature);
+osMessageQueuePut(BLEQueueHandle, &msg, NULL, 0);
+// 注释说明:BLETask负责释放
+
+// BLETask:释放内存
+char *msg;
+osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
+HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
+while (HAL_UART_GetState(&huart3) != HAL_UART_STATE_READY) {
+    osDelay(1);
+}
+vPortFree(msg);  // 释放内存
+```
+
+### 6.2 本项目如何刻意避免这些错误
+
+| 错误类型 | 本项目的解决方案 | 代码位置 |
+|---------|----------------|---------|
+| 任务划分不合理 | 按功能模块划分为 4 个独立任务 + 1 个定时器 | [freertos.c:250-274](Core/Src/freertos.c#L250-L274) |
+| 优先级设计不当 | 根据实时性要求设计:Input(High) > Sensor(Normal) > Screen(BelowNormal) ≈ BLE(Low) | [freertos.c:63-103](Core/Src/freertos.c#L63-L103) |
+| 忘记使用互斥锁 | 创建 `i2c1Mutex` 保护 I2C1 总线,所有访问前必须获取 | [freertos.c:199](Core/Src/freertos.c#L199), [SensorTask.c:168-170](Core/App/Tasks/SensorTask.c#L168-L170) |
+| 阻塞函数占用 CPU | UART 使用 DMA 发送,异步不阻塞 | [BleTask.c:58](Core/App/Tasks/BleTask.c#L58) |
+| 内存泄漏 | 明确约定:SensorTask 分配,BLETask 释放 | [SensorTask.c:43](Core/App/Tasks/SensorTask.c#L43), [BleTask.c:69](Core/App/Tasks/BleTask.c#L69) |
+
+### 6.3 学完这个项目后,下一步可以挑战什么
+
+**初级挑战:**
+
+1. **添加新的传感器**
+   - 添加 CO2 传感器(UART 通信)
+   - 添加气压传感器(I2C 通信)
+   - 思考:新传感器如何集成到现有任务架构?
+
+2. **优化显示效果**
+   - 添加更多页面(历史数据曲线图)
+   - 添加开机动画和图标
+   - 思考:如何避免页面切换时闪烁?
+
+**中级挑战:**
+
+3. **添加数据存储功能**
+   - 使用 Flash 或 EEPROM 存储历史数据
+   - 定期保存传感器数据(每分钟)
+   - 思考:如何避免频繁写操作损坏 Flash?
+
+4. **添加网络通信**
+   - 集成 WiFi 模块(ESP8266)
+   - 实现 MQTT 协议上传数据到云平台
+   - 思考:网络通信优先级如何设计?网络断开如何处理?
+
+5. **优化电源管理**
+   - 添加低功耗模式(Stop Mode)
+   - 定时唤醒采集数据
+   - 思考:如何平衡功耗和实时性?
+
+**高级挑战:**
+
+6. **实现 OTA 升级**
+   - 通过蓝牙或 WiFi 升级固件
+   - 实现 Bootloader 和 APP 双分区
+   - 思考:如何保证升级过程中断电恢复?
+
+7. **实现多语言支持**
+   - 支持中英文切换
+   - 使用文件系统存储字库
+   - 思考:如何存储大量多语言文本?
+
+---
+
+## 七、总结:从"看懂"到"会设计"
+
+### 7.1 这个项目的核心设计思想
+
+**任务驱动的本质:** 将复杂系统拆分为多个独立执行的任务,通过调度器自动管理任务切换,实现"关注点分离"。
+
+**任务划分的核心原则:**
+1. **功能独立:** 每个任务只负责一个功能模块
+2. **实时性匹配:** 任务优先级与其实时性要求匹配
+3. **资源保护:** 共享资源必须用互斥锁保护
+4. **通信解耦:** 任务间通过队列或全局变量通信,不直接调用
+
+### 7.2 如何设计下一个 STM32 + FreeRTOS 项目
+
+**步骤 1: 分析系统需求**
+- 列出所有功能模块(传感器、执行器、通信、显示等)
+- 分析每个模块的实时性要求(快速响应 / 周期执行 / 事件驱动)
+
+**步骤 2: 划分任务**
+- 根据功能模块划分任务
+- 确定每个任务的执行频率(周期性 / 事件驱动)
+- 设计任务优先级(实时性要求越高,优先级越高)
+
+**步骤 3: 设计任务间通信**
+- 数据共享:用全局变量(简单高效)
+- 事件通知:用消息队列(解耦、缓冲)
+- 资源保护:用互斥锁(避免竞争)
+
+**步骤 4: 编写和调试**
+- 从简单任务开始(先让单个任务跑起来)
+- 逐步添加任务和通信机制
+- 使用调试工具(串口打印、逻辑分析仪)验证时序
+
+**步骤 5: 优化和扩展**
+- 分析任务执行时间(是否合理?)
+- 检查资源占用(堆栈、堆内存)
+- 优化优先级和执行周期
+
+---
+
+## 八、附录:关键文件索引
+
+| 文件 | 功能说明 | 关键代码 |
+|------|---------|---------|
+| [Core/Src/main.c](Core/Src/main.c) | 主程序入口,初始化外设和 FreeRTOS | `main()` 函数 |
+| [Core/Src/freertos.c](Core/Src/freertos.c) | FreeRTOS 初始化,创建任务、队列、互斥锁、定时器 | `MX_FREERTOS_Init()` |
+| [Core/App/Tasks/SensorTask.c](Core/App/Tasks/SensorTask.c) | 传感器采集任务 | `StartSensorTask()` |
+| [Core/App/Tasks/ScreenTask.c](Core/App/Tasks/ScreenTask.c) | 显示任务 | `StartScreenTask()` |
+| [Core/App/Tasks/InputTask.c](Core/App/Tasks/InputTask.c) | 输入任务 | `StartInputTask()` |
+| [Core/App/Tasks/BleTask.c](Core/App/Tasks/BleTask.c) | 蓝牙通信任务 | `StartBLETask()` |
+| [Core/App/global/farmState.h](Core/App/global/farmState.h) | 农场环境状态数据结构 | `FarmState`, `FarmSafeRange` |
+| [Core/App/global/screen.h](Core/App/global/screen.h) | 屏幕页面和阈值编辑状态管理 | `ScreenPage`, `RangeEditIndex` |
+
+---
+
+**希望这份文档能帮助你真正理解 STM32 + FreeRTOS 的工程实践!**
+
+如果你在阅读代码时有疑问,建议按以下顺序深入:
+1. 先看 [freertos.c](Core/Src/freertos.c) 了解任务创建和资源初始化
+2. 再看 [SensorTask.c](Core/App/Tasks/SensorTask.c) 理解周期性任务的设计
+3. 然后看 [ScreenTask.c](Core/App/Tasks/ScreenTask.c) 理解双缓冲和互斥锁的使用
+4. 最后看 [BleTask.c](Core/App/Tasks/BleTask.c) 理解事件驱动任务和队列通信
+
+**记住:看懂代码只是第一步,自己动手设计一个新项目才是真正掌握!**
+
+祝你学习顺利! 🚀
+
