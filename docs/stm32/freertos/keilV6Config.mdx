@@ -1,0 +1,32 @@
+---
+sidebar_position: 1.1
+sidebar_label: "【2】KeilV6编译器编译报错"
+---
+
+# Keil V6编译器 FreeRTOS组件报错解决方法
+目前CubeMX生成的FreeRTOS工程与keil的V6编译器不兼容，从而导致无法识别某些字段，进而导致编译时如下图出现大量错误，因此需要手动替换FreeRTOS组件中的相关文件以解决该问题。
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/报错.png').default} alt="报错" width="1000px" />
+</div>
+
+#### 1️⃣ 打开固件包所在的文件夹
+
+首先根据下图所示，找到固件包的文件路径并打开
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/固件包位置.png').default} alt="固件包位置" width="1000px" />
+</div>
+
+#### 2️⃣ 替换对应文件
+
+将 **\STM32Cube_FW_F1_V1.8.6\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM3** 中的所有文件用
+**\STM32Cube_FW_F1_V1.8.6\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3** 中的文件进行替换。
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/替换文件.png').default} alt="替换文件" width="1000px" />
+</div>
+
+:::tip
+通过替换固件包中的文件，可以一劳永逸地解决上述问题，即使CubeMX重新生成代码也不会再出现该问题🎉🎉
+:::
+
+

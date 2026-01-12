@@ -87,8 +87,32 @@ Keil 工程需要先进行一定配置，才能正常编译、下载
 
 :::tip
 **为什么下载成功了没反应？**
-因兼容问题 Keil 无法自动复位，需要手动按下复位键即可
+Keil 无法自动复位，需要手动按下复位键或者根据下文配置自动复位。
+
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "0px"}}>
 <img src={require('./img/RST.png').default} alt="1" width="350px" style={{boxShadow: "0px 0px 0PX 0px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 :::
+
+## Keil 自动复位设置
+
+#### 1️⃣ 点击魔法棒，打开 `Debug` 选项卡，选择 `ST-Link Debugger`，点击 `Settings` 
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/复位1.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 2️⃣ 点击 `Flash Download` 选项卡，勾选 `Reset and Run`
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/复位2.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 3️⃣ 点击 `Pack` 选项卡，取消勾选 `Enable`，点击确定即可 
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "40px"}}>
+<img src={require('./img/复位3.png').default} alt="1" width="600px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+#### 4️⃣ 重新下载程序，即可实现自动复位运行
+
