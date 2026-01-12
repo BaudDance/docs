@@ -6,53 +6,66 @@ sidebar_label: "【3】Keil V5编译器安装教程"
 # Keil V5编译器 安装教程
 
 
-首先，我们先完成keil软件的安装：[**点击此处安装🔗**](docs/stm32/keil/installKeil.mdx)
+首先，我们需要先完成keil软件的安装：[**点击此处安装🔗**](docs/stm32/keil/installKeil.mdx)
 
 #### 1️⃣ 下载V5编译器安装包并安装
 
-【TODO】此处加一个安装包下载链接（暂用sever）
 <div style={{marginBottom: "20px", marginLeft:"25px"}}>
-<a href="https://pan.baud-dance.com/d/ST%E5%B7%A5%E5%85%B7/STLINK_Server.zip" class="source_download_button" target="_blank">立即下载（Server）</a>
+<a href="https://pan.baud-dance.com/d/STM32CubeMX/ARMCompiler_506_Windows_x86_b960.zip" class="source_download_button" target="_blank">立即下载</a>
 </div>
 
-下载完成后，解压后双击 `setup.exe` 进行安装
+下载完成后，解压后双击 `setup.exe` 进行安装。
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/安装1.png').default} alt="安装1" width="600px" />
 </div>
 
-安装比较简单，按照提示一步步点击 `Next` 即可。
+点击两次 `Next` ，即可到达此界面，点击 `Browse` 选择安装路径。
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/安装2.png').default} alt="安装2" width="600px" />
+</div>
+
+此文件必须安装在Keil的ARM文件夹里，所以需要先获取keil的文件路径，可以右键点击快捷方式，选择 `打开文件所在的位置` 。
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/安装3.png').default} alt="安装3" width="200px" />
+</div>
+
+根据图中所示，选择并复制 `Keil_v5` 的路径。
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/安装4.png').default} alt="安装4" width="600px" />
+</div>
+
+将路径粘贴到安装路径中,并在后面添加 `ARM\ARM_Compiler_5.06u7\`，点击 `OK`，然后点击 `Next` 继续安装。
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/安装5.png').default} alt="安装5" width="600px" />
+</div>
+
+最后一步步点击 `Next`和 `Install`，即可完成安装。
 
 #### 2️⃣ 添加编译器版本
 
 打开keil软件，根据下图所示，打开添加编译器版本的界面。
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/路径1.png').default} alt="路径1" width="600px" />
 </div>
 
-此处我们可以看到，ArmCC版本只有一个V6编辑器，此时我们点击下方添加其他编译器版本按钮。
+此处可以看到，ArmCC版本只有一个V6编辑器，点击下方添加其他编译器版本按钮。
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/路径2.png').default} alt="路径2" width="600px" />
 </div>
 
-此处我们要找到我们刚刚安装的V5编译器路径，默认路径为： **C:\Program Files (x86)\ARM_Compiler_5.06u7**,根据下图选择文件夹并点击确定。
+找到刚刚安装的V5编译器路径，选择 `ARM_Compiler_5.06u7` 文件夹并点击确定。
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/路径3.png').default} alt="路径3" width="600px" />
 </div>
 
-此时我们就可以看到V5编译器已经添加成功，点击关闭即可。
+此时就可以看到V5编译器已经添加成功，点击关闭即可。
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/路径4.png').default} alt="路径4" width="600px" />
-</div>
-
-#### 3️⃣ 切换V5编辑器
-
-点击魔法棒图标，在ARM Compiler 选项中选择我们刚刚添加的V5编译器，点击确定即可。
-
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
-<img src={require('./img/切换v5.png').default} alt="切换v5" width="600px" />
 </div>
