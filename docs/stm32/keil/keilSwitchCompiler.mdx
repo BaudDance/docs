@@ -8,17 +8,29 @@ sidebar_label: "【4】Keil 切换编译器"
 
 很多工程是使用不同编译器创建的，所以需要根据工程所使用的编译器进行切换，否则会导致编译失败，无法下载程序。
 
-#### 切换V5编辑器
+#### 切换V5编译器
 
-点击魔法棒图标，在 `ARM Compiler` 选项中选择要切换的编译器版本，点击确定即可。
+点击魔法棒图标，在 `ARM Compiler` 选项中选择V5编译器版本，点击确定即可。
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
 <img src={require('./img/switch.png').default} alt="switch" width="600px" />
 </div>
 
 :::tip
-切换编辑器时，如若缺失ArmCC V5编译器，请[**点击此处查看安装流程🔗**](docs/stm32/keil/keilv5Install.mdx)检查是否正确安装ArmCC V5编译器，及是否正确添加V5编译器路径；
-如若缺少ArmCC V6编译器，请[**点击此处查看安装流程🔗**](docs/stm32/keil/installKeil.mdx)安装ArmCC V6编译器。
+切换编译器时，如若缺失ArmCC V5编译器，请[**点击此处查看安装流程🔗**](docs/stm32/keil/keilv5Install.mdx)检查是否正确安装ArmCC V5编译器，及是否正确添加V5编译器路径。
+:::
+
+
+#### 切换V6编译器
+
+点击魔法棒图标，在 `ARM Compiler` 选项中选择V6编译器版本，点击确定即可。
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/switch_v6.png').default} alt="switch_v6" width="600px" />
+</div>
+
+:::tip
+切换编译器时，如若缺少ArmCC V6编译器，说明安装的keil版本过低，[**点击此处安装新版Keil🔗**](docs/stm32/keil/installKeil.mdx)。
 :::
 
 :::warning
