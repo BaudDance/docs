@@ -8,6 +8,8 @@ sidebar_position: 100
 ---
 
 **下载例程代码**： <a href="https://fubestore.baud.dance/SmartFarm.zip" class="source_download_button" target="_blank">下载代码(CLion / VSCode)</a>
+ <a href="https://pan.baud-dance.com/d/r2/SmartFarm_cubeIDE.7z" class="source_download_button" target="_blank">下载代码(CubeIDE)</a>
+ <a href="https://pan.baud-dance.com/d/r2/SmartFarm_keil.7z" class="source_download_button" target="_blank">下载代码(keil)</a>
 
 ## 一、项目整体介绍
 
@@ -1223,12 +1225,11 @@ vPortFree(msg);  // 释放内存
 
 | 错误类型 | 本项目的解决方案 | 代码位置 |
 |---------|----------------|---------|
-| 任务划分不合理 | 按功能模块划分为 4 个独立任务 + 1 个定时器 | [freertos.c:250-274](Core/Src/freertos.c#L250-L274) |
-| 优先级设计不当 | 根据实时性要求设计:Input(High) > Sensor(Normal) > Screen(BelowNormal) ≈ BLE(Low) | [freertos.c:63-103](Core/Src/freertos.c#L63-L103) |
-| 忘记使用互斥锁 | 创建 `i2c1Mutex` 保护 I2C1 总线,所有访问前必须获取 | [freertos.c:199](Core/Src/freertos.c#L199), [SensorTask.c:168-170](Core/App/Tasks/SensorTask.c#L168-L170) |
-| 阻塞函数占用 CPU | UART 使用 DMA 发送,异步不阻塞 | [BleTask.c:58](Core/App/Tasks/BleTask.c#L58) |
-| 内存泄漏 | 明确约定:SensorTask 分配,BLETask 释放 | [SensorTask.c:43](Core/App/Tasks/SensorTask.c#L43), [BleTask.c:69](Core/App/Tasks/BleTask.c#L69) |
-
+| 任务划分不合理 | 按功能模块划分为 4 个独立任务 + 1 个定时器 | freertos.c:250-274 |
+| 优先级设计不当 | 根据实时性要求设计:Input(High) > Sensor(Normal) > Screen(BelowNormal) ≈ BLE(Low) | freertos.c:63-103 |
+| 忘记使用互斥锁 | 创建 `i2c1Mutex` 保护 I2C1 总线,所有访问前必须获取 | freertos.c:199, SensorTask.c:168-170 |
+| 阻塞函数占用 CPU | UART 使用 DMA 发送,异步不阻塞 | BleTask.c:58 |
+| 内存泄漏 | 明确约定:SensorTask 分配,BLETask 释放 | SensorTask.c:43, BleTask.c:69 |
 ### 6.3 学完这个项目后,下一步可以挑战什么
 
 **初级挑战:**
@@ -1318,24 +1319,25 @@ vPortFree(msg);  // 释放内存
 
 | 文件 | 功能说明 | 关键代码 |
 |------|---------|---------|
-| [Core/Src/main.c](Core/Src/main.c) | 主程序入口,初始化外设和 FreeRTOS | `main()` 函数 |
-| [Core/Src/freertos.c](Core/Src/freertos.c) | FreeRTOS 初始化,创建任务、队列、互斥锁、定时器 | `MX_FREERTOS_Init()` |
-| [Core/App/Tasks/SensorTask.c](Core/App/Tasks/SensorTask.c) | 传感器采集任务 | `StartSensorTask()` |
-| [Core/App/Tasks/ScreenTask.c](Core/App/Tasks/ScreenTask.c) | 显示任务 | `StartScreenTask()` |
-| [Core/App/Tasks/InputTask.c](Core/App/Tasks/InputTask.c) | 输入任务 | `StartInputTask()` |
-| [Core/App/Tasks/BleTask.c](Core/App/Tasks/BleTask.c) | 蓝牙通信任务 | `StartBLETask()` |
-| [Core/App/global/farmState.h](Core/App/global/farmState.h) | 农场环境状态数据结构 | `FarmState`, `FarmSafeRange` |
-| [Core/App/global/screen.h](Core/App/global/screen.h) | 屏幕页面和阈值编辑状态管理 | `ScreenPage`, `RangeEditIndex` |
+| Core/Src/main.c | 主程序入口,初始化外设和 FreeRTOS | `main()` 函数 |
+| Core/Src/freertos.c | FreeRTOS 初始化,创建任务、队列、互斥锁、定时器 | `MX_FREERTOS_Init()` |
+| Core/App/Tasks/SensorTask.c | 传感器采集任务 | `StartSensorTask()` |
+| Core/App/Tasks/ScreenTask.c | 显示任务 | `StartScreenTask()` |
+| Core/App/Tasks/InputTask.c | 输入任务 | `StartInputTask()` |
+| Core/App/Tasks/BleTask.c | 蓝牙通信任务 | `StartBLETask()` |
+| Core/App/global/farmState.h | 农场环境状态数据结构 | `FarmState`, `FarmSafeRange` |
+| Core/App/global/screen.h | 屏幕页面和阈值编辑状态管理 | `ScreenPage`, `RangeEditIndex` |
 
 ---
 
 **希望这份文档能帮助你真正理解 STM32 + FreeRTOS 的工程实践!**
 
 如果你在阅读代码时有疑问,建议按以下顺序深入:
-1. 先看 [freertos.c](Core/Src/freertos.c) 了解任务创建和资源初始化
-2. 再看 [SensorTask.c](Core/App/Tasks/SensorTask.c) 理解周期性任务的设计
-3. 然后看 [ScreenTask.c](Core/App/Tasks/ScreenTask.c) 理解双缓冲和互斥锁的使用
-4. 最后看 [BleTask.c](Core/App/Tasks/BleTask.c) 理解事件驱动任务和队列通信
+
+- 先看 freertos.c 了解任务创建和资源初始化
+- 再看 SensorTask.c 理解周期性任务的设计
+- 然后看 ScreenTask.c 理解双缓冲和互斥锁的使用
+- 最后看 BleTask.c 理解事件驱动任务和队列通信
 
 **记住:看懂代码只是第一步,自己动手设计一个新项目才是真正掌握!**
 
