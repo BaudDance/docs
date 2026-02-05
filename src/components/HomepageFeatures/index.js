@@ -4,29 +4,47 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: '立志做最易懂的教程',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: "立志做最易懂的教程",
+    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
     description: (
       <>
-        精心设计的视频教程，简洁易懂的语句，配合清晰动画，助您快速掌握知识。
+        精心设计的视频教程
+        <br />
+        简洁易懂的语句
+        <br />
+        配合清晰动画
+        <br />
+        助您快速掌握知识。
       </>
     ),
   },
   {
-    title: '立志做最全面的文档',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: "立志做最全面的文档",
+    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
     description: (
       <>
-        条理详尽的文档内容，全面系统的知识点，配合丰富例程，助您全面理解知识。
+        条理详尽的文档内容
+        <br />
+        全面系统的知识点
+        <br />
+        配合丰富例程
+        <br />
+        助您全面理解知识。
       </>
     ),
   },
   {
-    title: '立志做最好用的工具',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: "立志做最好用的工具",
+    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
     description: (
       <>
-        专业现代的辅助工具，丰富可靠的功能，友好易用的界面，助您轻松完成工作。
+        专业现代的辅助工具
+        <br />
+        丰富可靠的功能
+        <br />
+        友好易用的界面
+        <br />
+        助您轻松完成工作。
       </>
     ),
   },
@@ -34,10 +52,8 @@ const FeatureList = [
 
 function Feature({Svg, title, description}) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
+    <div className="flex flex-col items-center col col--4">
         <Svg className={styles.featureSvg} role="img" />
-      </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
         <p>{description}</p>
