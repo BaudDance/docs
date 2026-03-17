@@ -1,0 +1,68 @@
+---
+sidebar_position: 2.31
+---
+# 【PWM】舵机问题解决方案
+
+:::tip
+
+此文档是【**舵机控制例程**】中舵机不运行问题的解决方案，如果您还没有下载【**舵机控制例程**】，请先前往 <a href="/docs/stm32/example/PWM_Servo.mdx" target="_blank">**舵机控制🔗**</a> 下载并使用例程。
+
+:::
+
+## 问题描述
+
+我们发现2025年12月16日~2026年3月13日期间的部分舵机，内部可能带有上拉电阻。这会与学习板上的保护电路冲突，从而导致驱动信号被阻断无法传到舵机。 
+
+## 解决方案
+
+- 可以使用右侧 `DRV8833接口` 连接有内部上拉的舵机，如下图所示：
+
+> <span style={{ color: 'gray'}}>如有其他需要，请在会员群联系技术支持或客服获取帮助，给您造成困扰非常抱歉</span>
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Servo/舵机连接PA1.png').default} alt="PWM波形" width="400px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+- 更换接口后，舵机驱动引脚变为：`PB8` -> `PA1`，因此需要在CubeIDE中重新分配引脚、定时器：
+
+> <span style={{ color: 'gray'}}>系统时钟配置不变，仍为72MHz（可参考舵机例程）</span>
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px"}}>
+<img src={require('./img/PWM_Servo/引脚配置舵机PA1.png').default} alt="PWM波形" width="700px" style={{boxShadow: "0px 0px 5PX 2px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+- 将代码中的 `TIM4`  `TIM_CHANNEL_3` 替换为 `TIM2` `TIM_CHANNEL_2`，即可正常控制舵机
+
+```c
+// 启动PWM输出
+HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+// 旋转到中点，占空比7.5%，即2000 * 7.5% = 150
+__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 150);
+HAL_Delay(1000);
+```
+
+## 直接下载改好的代码
+
+为方便快速验证，您可以直接下载使用 `DRV8833接口` 连接舵机的例程代码
+
+<a href="https://pan.baud-dance.com/d/r2/CubeIDE_Project/PWM_Servo_PA1.zip" class="source_download_button" target="_blank">下载代码(CubeIDE)</a> 
+<a href="https://pan.baud-dance.com/d/r2/PWM_Servo_PA1_keil.7z" class="source_download_button" target="_blank">下载代码(Keil)</a>
+<div style={{"marginBottom": "24px"}}> </div>
+
+:::tip
+您可以解压缩后直接双击 **`下载这个例程.bat`**，即可直接下载代码到学习板中
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginTop: "0px", marginBottom: "10px"}}>
+<img src={require('./img/IMPORT_EXAMPLE/click_bat.png').default} alt="downloadCode" width="500px" style={{boxShadow: "0px 0px 6PX 3PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+:::
+
+## 详细原因说明
+
+- 学习板的保护电路是**肖特基二极管**（位号D8，原理图第三页），它用于限制电流方向仅允许 `STM32` -> `舵机`，以防止将舵机插头插反时，高压5V灌入引脚而烧毁单片机。
+
+- 然而它也限制了只能由STM32将舵机信号引脚拉高，一旦舵机内部存在上拉电阻，信号引脚就会被彻底钳位在高电平，STM32无法拉低信号引脚，从而无法控制舵机。
+
+- 连接到 `DRV8833接口` 后，信号引脚不再经过肖特基二极管的保护，因此不会被钳位，可以正常控制带内部上拉电阻的舵机。
+
+- 如您需要其他帮助和支持，请在会员群内联系技术支持或客服，给您造成困扰非常抱歉。
