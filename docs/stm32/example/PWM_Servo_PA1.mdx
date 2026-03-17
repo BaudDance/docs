@@ -42,6 +42,21 @@ __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 150);
 HAL_Delay(1000);
 ```
 
+## 直接下载改好的代码
+
+为方便快速验证，您可以直接下载使用 `DRV8833接口` 连接舵机的例程代码
+
+<a href="https://pan.baud-dance.com/d/r2/CubeIDE_Project/PWM_Servo_PA1.zip" class="source_download_button" target="_blank">下载代码(CubeIDE)</a> 
+<a href="https://pan.baud-dance.com/d/r2/PWM_Servo_PA1_keil.7z" class="source_download_button" target="_blank">下载代码(Keil)</a>
+<div style={{"marginBottom": "24px"}}> </div>
+
+:::tip
+您可以解压缩后直接双击 **`下载这个例程.bat`**，即可直接下载代码到学习板中
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginTop: "0px", marginBottom: "10px"}}>
+<img src={require('./img/IMPORT_EXAMPLE/click_bat.png').default} alt="downloadCode" width="500px" style={{boxShadow: "0px 0px 6PX 3PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+:::
+
 ## 详细原因说明
 
 - 学习板的保护电路是**肖特基二极管**（位号D8，原理图第三页），它用于限制电流方向仅允许 `STM32` -> `舵机`，以防止将舵机插头插反时，高压5V灌入引脚而烧毁单片机。
