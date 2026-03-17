@@ -6,10 +6,20 @@ sidebar_position: 2.3
 **下载例程代码**： <a href="https://pan.baud-dance.com/d/%E6%B3%A2%E7%89%B9%E5%BE%8B%E5%8A%A8STM32%E4%BE%8B%E7%A8%8B/PWM_Servo.zip" class="source_download_button" target="_blank">下载代码(CubeIDE)</a> 
 <a href="https://fubestore.baud.dance/PWM_Servo_keil.7z" class="source_download_button" target="_blank">下载代码(Keil)</a>
 
-:::warning
+:::tip
 **CubeIDE**：请按照 <a href="/docs/stm32/example/HowToImportExample" target="_blank">**例程使用方法🔗**</a> 导入例程，否则下载的可能不是例程而是其他工程。
 
 **Keil**：请使用 **ArmCC V6** 编译，否则可能会出现编译错误。[**点击此处查看切换编译器方法🔗**](docs/stm32/keil/keilSwitchCompiler.mdx)
+:::
+
+:::warning
+**【2026年3月13日】紧急情况说明**
+
+**📌如果您下载【**舵机例程**】后发现舵机不运行，可能是舵机内部带有上拉电阻所致。若出现此情况，<a href="/docs/stm32/example/PWM_Servo.mdx" target="_blank">**请点击查看解决方案🔗**</a>，也可在会员群内联系技术支持、客服获取帮助，给您造成困扰非常抱歉。**
+
+**📌问题范围及原因： 我们发现2025年12月16日~2026年3月13日期间的部分舵机，内部可能带有上拉电阻。
+这会与学习板上的保护电路冲突，从而导致驱动信号被阻断无法传到舵机。
+学习板的保护电路是肖特基二极管，用于限制电流方向仅为 STM32 -> 舵机，以防止将舵机插头插反时烧毁单片机，详细原理和解决方法请参考上方链接。**
 :::
 
 ## PWM 简介
