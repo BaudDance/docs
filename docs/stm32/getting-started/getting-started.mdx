@@ -23,21 +23,34 @@ import React, { useState } from 'react';
 **点击上面按钮打开资料👆** 更多功能请看左侧导航栏
 :::
 
+### STM32学习套件获取：
+  注意，目前波特律动**只有以下三个正版店铺**，拼多多、闲鱼等其他店铺均为盗版，我们正在走法律程序打击。
+    我们已收到多次小伙伴反馈买到盗版使用不正常的反馈，且盗版产品无法加入到
+  <span  className="relative inline-block rainbow-text font-bold cursor-pointer"  
+  onMouseEnter={() =>  document.getElementById('julebu-img').style.display = 'block'  }  
+  onMouseLeave={() =>  document.getElementById('julebu-img').style.display = 'none'  }> STM32俱乐部 <img id="julebu-img" src={require('./img/julebu.jpeg').default} alt="STM32俱乐部" style={{ display: 'none' }} className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 rounded-lg shadow-lg pointer-events-none z-50"/></span>
+  获得技术答疑。
+  
+  - 淘宝店铺：<a href="https://item.taobao.com/item.htm?id=697575142917" target="_blank" rel="noopener noreferrer">波特律动</a> （推荐）
+  - 抖音店铺：<a href="https://haohuo.jinritemai.com/ecommerce/trade/detail/index.html?id=3662447732439786021&origin_type=605&pd_hide_footer=1" target="_blank" rel="noopener noreferrer">波特律动</a> (手机访问)
+  - B 站店铺：<a href="https://b23.tv/44ZisnA" target="_blank" rel="noopener noreferrer">波特律动</a> (手机访问)
+
+
 ### 互动交流群：
 <div className='flex flex-col gap-2' >
   <div className='flex gap-5' >
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=04uwgN6C7syuCF5_B-4TGYYESytWVrP5&jump_from=webapi&authKey=v81m7iM4BSRewj0879nbm/v+R7Ii7OOMvrm2Qs/AipM7B5lwZcajFSkA3WTZ36iQ">kk与小伙伴们1</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=egIjMtpgzU85Utw1DDEc3XUo3EZoqlNd&jump_from=webapi&authKey=Q6x5PO6PnBcPX4Vybxloy+pzP+Wc5Rb7z7bLgweYv6KJvNJjBVBTJ8Ri/mYf61lC">kk与小伙伴们2</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=KxIgRuSR58F15mqxaat2KpwO4WbZama2&jump_from=webapi&authKey=470Muu1yfZDRkpPCG9hAulE2JdtV7ORHxQcMKaVCfUrGkN0IYMW32O7oFbPs4xpK">kk与小伙伴们3</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=U4zKqUf_-Jo4crcqeWuQVrKBVS7Mn18l&jump_from=webapi&authKey=VaapPoc+59VMz16jA8WliGrWDhMaz91WVCBdcN83ki5RzuWwZ4f07PruRvDQOOAR">kk与小伙伴们4</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=0TwGRN60324L21HG2yf493jYQ_OAU14r&jump_from=webapi&authKey=mkaUPlKBrwGHKTZuCJi1DfaBe9yxcffH3oQvtNUUyDcc7FaHZHaenOEzUn/MO3R0">kk与小伙伴们5</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=04uwgN6C7syuCF5_B-4TGYYESytWVrP5&jump_from=webapi&authKey=v81m7iM4BSRewj0879nbm/v+R7Ii7OOMvrm2Qs/AipM7B5lwZcajFSkA3WTZ36iQ">kk与小伙伴们1(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=egIjMtpgzU85Utw1DDEc3XUo3EZoqlNd&jump_from=webapi&authKey=Q6x5PO6PnBcPX4Vybxloy+pzP+Wc5Rb7z7bLgweYv6KJvNJjBVBTJ8Ri/mYf61lC">kk与小伙伴们2(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=KxIgRuSR58F15mqxaat2KpwO4WbZama2&jump_from=webapi&authKey=470Muu1yfZDRkpPCG9hAulE2JdtV7ORHxQcMKaVCfUrGkN0IYMW32O7oFbPs4xpK">kk与小伙伴们3(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=U4zKqUf_-Jo4crcqeWuQVrKBVS7Mn18l&jump_from=webapi&authKey=VaapPoc+59VMz16jA8WliGrWDhMaz91WVCBdcN83ki5RzuWwZ4f07PruRvDQOOAR">kk与小伙伴们4(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=0TwGRN60324L21HG2yf493jYQ_OAU14r&jump_from=webapi&authKey=mkaUPlKBrwGHKTZuCJi1DfaBe9yxcffH3oQvtNUUyDcc7FaHZHaenOEzUn/MO3R0">kk与小伙伴们5(爆满)</a>
   </div>
   <div className='flex gap-5' >
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=9XAsAwenWfUtFzkwfjfMn_b8OUTZgrRp&jump_from=webapi&authKey=xgPyynThpX0A7+CzJpxQfAKjbAKqI8WopN192hVvIOxwq/eu58mSVfIwbX2pWlDG">kk与小伙伴们6</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=D4FoAGNNYaDbU5ihcBpHBHTa-0YT0yhj&jump_from=webapi&authKey=OnN2K2j3ej6SDZphFLHlETttn0Euy0BQ+nDVadyFuRSB1Uqufu8LQghmOmfQfovN">kk与小伙伴们7</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=S9skKCVhvHhQDqGDIEe9ocodk8J8u5ON&jump_from=webapi&authKey=lKeTyhwJwjEui6p8ULv6LBv3VBFQVgIfYmjoHayQGI8IIsiGZIoFP5ANlitsQkPb">kk与小伙伴们8</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=WgQqGm6cg_Hp30bqsXgE7ZGZsBqZaTxH&jump_from=webapi&authKey=ep+9SkUiw/AOef9yPTIZ9j8K1u9/QtIsNVTdILznOmXcA4akEQBQADQCe9bHIrWh">kk与小伙伴们9</a>
-    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=TOzih9e7m74qmV7Ru4Z8gDRvUbuQpL6o&jump_from=webapi&authKey=D49tUQsREGUX+RrejfoknEYEowukoaW967FLm4/RMtgN8L+qFaLi13pVWPFTNbT9">kk与小伙伴们10</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=9XAsAwenWfUtFzkwfjfMn_b8OUTZgrRp&jump_from=webapi&authKey=xgPyynThpX0A7+CzJpxQfAKjbAKqI8WopN192hVvIOxwq/eu58mSVfIwbX2pWlDG">kk与小伙伴们6(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=D4FoAGNNYaDbU5ihcBpHBHTa-0YT0yhj&jump_from=webapi&authKey=OnN2K2j3ej6SDZphFLHlETttn0Euy0BQ+nDVadyFuRSB1Uqufu8LQghmOmfQfovN">kk与小伙伴们7(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=S9skKCVhvHhQDqGDIEe9ocodk8J8u5ON&jump_from=webapi&authKey=lKeTyhwJwjEui6p8ULv6LBv3VBFQVgIfYmjoHayQGI8IIsiGZIoFP5ANlitsQkPb">kk与小伙伴们8(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=WgQqGm6cg_Hp30bqsXgE7ZGZsBqZaTxH&jump_from=webapi&authKey=ep+9SkUiw/AOef9yPTIZ9j8K1u9/QtIsNVTdILznOmXcA4akEQBQADQCe9bHIrWh">kk与小伙伴们9(爆满)</a>
+    <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=TOzih9e7m74qmV7Ru4Z8gDRvUbuQpL6o&jump_from=webapi&authKey=D49tUQsREGUX+RrejfoknEYEowukoaW967FLm4/RMtgN8L+qFaLi13pVWPFTNbT9">kk与小伙伴们10(爆满)</a>
   </div>
   <div className='flex gap-5' >
     <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=kBqeTuGt4DPCJSIhTq7h7AD3mves1_BA&jump_from=webapi&authKey=SEoqNzTeDNHX7pN9zDOjOwfGs3wGTrfHf8sBfA68pqj3iDfwI22KVPkFNql+g0IY">kk与小伙伴们11</a>
@@ -53,8 +66,6 @@ import React, { useState } from 'react';
 </div>
 
 ### 技术交流群
-
-
 
 <div className=''>
 <a href="https://e.tb.cn/h.TsMWC9ZLtCLGVM6?tk=SbjTe8X2Drd" target="_blank" className='rainbow-text font-bold'>购买学习套件的小伙伴</a>，客服会邀请您加入技术交流群: “
