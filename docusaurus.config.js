@@ -138,7 +138,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} 波特律动 提供`,
+        copyright: `Copyright © ${new Date().getFullYear()} 波特律动 提供 | <a href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2023023212号-1</a>`,
       },
       prism: {
         theme: prismThemes.github,

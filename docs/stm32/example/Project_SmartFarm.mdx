@@ -27,7 +27,7 @@ sidebar_position: 100
 
 在真实的嵌入式项目中,**单一功能的 demo**和**完整的产品级系统**之间存在巨大鸿沟。智慧农场这个场景恰好能填平这个鸿沟,因为它具备真实产品的典型特征:
 
-✅ **多传感器融合**: 涉及 I2C(AHT20)、ADC(土壤湿度、光照、降雨量)等多种外设
+✅ **多传感器融合**: 涉及 I2C1(AHT20、OLED)、软件 I2C(光照)、ADC(土壤湿度、降雨量)等多种外设
 
 ✅ **实时性要求不同**: 传感器采集需要周期执行,用户输入需要快速响应,报警需要及时处理
 
@@ -61,9 +61,9 @@ sidebar_position: 100
 |------|------|----------|
 | AHT20 | 温湿度传感器 | I2C1 |
 | OLED | 显示屏 | I2C1 |
-| 土壤湿度传感器 | 检测土壤湿度 | ADC1 |
-| 光照传感器 | 检测光照强度 | ADC2 |
-| 降雨量传感器 | 检测降雨量 | ADC |
+| 土壤湿度传感器 | 检测土壤湿度 | ADC2 |
+| 光照传感器 | 检测光照强度 | 软件 I2C |
+| 降雨量传感器 | 检测降雨量 | ADC1 |
 | 水泵 | 自动灌溉 | GPIO |
 | 蜂鸣器 | 报警提示 | GPIO + 定时器 |
 | 按键 | 用户输入 | GPIO |
@@ -123,24 +123,27 @@ sidebar_position: 100
    - **AHT20 温湿度传感器**: SCL → PB6, SDA → PB7
    - ⚠️ **注意**: 两个设备共用 I2C1 总线,这就是为什么代码中需要使用互斥锁 `i2c1Mutex` 来保护总线访问
 
-2. **ADC 传感器连接**:
-   - **光照传感器**: AO → PB1(ADC1_IN9)
-   - **土壤湿度传感器**: AO → PA0(ADC2_IN0)
-   - **降雨量传感器**: ADC 输入引脚请参考具体硬件配置
+2. **光照传感器连接**(独立软件 I2C):
+   - **光照传感器**: SDA → PA10, SCL → PA11
+   - ⚠️ **注意**: 光照模块不走硬件 I2C1,而是使用 GPIO 模拟 I2C,因此它与 OLED/AHT20 不共享 `i2c1Mutex`
 
-3. **GPIO 输入设备**:
+3. **ADC 传感器连接**:
+   - **降雨量传感器**: AO → PB1(ADC1_IN9)
+   - **土壤湿度传感器**: AO → PA0(ADC2_IN0)
+
+4. **GPIO 输入设备**:
    - **KEY1 按键**: PB12(页面切换)
    - **KEY3 按键**: PB15(编辑模式切换)
    - **旋钮(编码器)**: CH1 → PA8, CH2 → PA9(使用 TIM1 编码器模式)
 
-4. **输出设备**:
-   - **水泵继电器**: PA12(低电平触发)
+5. **输出设备**:
+   - **水泵继电器**: PA12(`Pump_On()` 输出高电平,`Pump_Off()` 输出低电平)
    - **蜂鸣器**: PB9(TIM4_CH4, PWM 控制)
 
-5. **UART3 蓝牙模块**:
+6. **UART3 蓝牙模块**:
    - **TX**: PB10
    - **RX**: PB11
-   - 使用 DMA 方式传输,提高效率
+   - 使用 DMA 方式发送,发送期间任务通过 `osDelay(1)` 让出 CPU 等待完成
 
 **电源连接:**
 - 所有模块 VCC 接 3.3V 或 5V(根据模块规格)
@@ -450,6 +453,7 @@ void StartInputTask(void *argument) {
 
 - **事件驱动**: 使用 `osMessageQueueGet(..., osWaitForever)` 阻塞等待,队列为空时任务挂起,不占用 CPU
 - **优先级 Low**: 低优先级,不影响实时性要求高的任务
+- **DMA 发送**: 串口数据由 DMA 搬运,当前实现会在发送后轮询状态,并通过 `osDelay(1)` 让出 CPU
 - **内存管理**: 消息由 SensorTask 分配,由 BLETask 释放,避免内存泄漏
 
 **新手容易犯的错误:**
@@ -467,10 +471,10 @@ void StartBLETask(void *argument) {
         osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
 
         if (msg != NULL) {
-            // 使用DMA发送(异步,不阻塞CPU)
+            // 使用DMA发送,数据搬运交给DMA完成
             HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
 
-            // 等待发送完成
+            // 等待发送完成(等待期间让出CPU)
             while (HAL_UART_GetState(&huart3) != HAL_UART_STATE_READY) {
                 osDelay(1);
             }
@@ -875,7 +879,7 @@ HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));  // 使用DMA发送
 
 **发生了什么?**
 1. 通过 UART3 以 DMA 方式发送 JSON 字符串到蓝牙模块
-2. DMA 是异步的,不会阻塞 CPU
+2. 数据搬运由 DMA 完成,不会像阻塞式串口发送那样一直占着 CPU
 3. 蓝牙模块将消息无线传输到手机或网关
 
 #### **步骤 8: BLETask 等待发送完成,释放内存**
@@ -1154,7 +1158,7 @@ void BLETask() {
 
 **问题:** BLETask 占用 CPU 期间,其他任务无法执行,系统卡顿
 
-✅ **正确做法:** 使用 DMA 或异步操作
+✅ **正确做法:** 使用 DMA 发送,并在等待完成时让出 CPU
 
 ```c
 void BLETask() {
@@ -1162,7 +1166,7 @@ void BLETask() {
         char *msg;
         osMessageQueueGet(BLEQueueHandle, &msg, NULL, osWaitForever);
 
-        // DMA发送,异步不阻塞CPU
+        // DMA发送,数据搬运交给DMA完成
         HAL_UART_Transmit_DMA(&huart3, (uint8_t *)msg, strlen(msg));
 
         // 等待发送完成(期间可以执行其他任务)
@@ -1228,7 +1232,7 @@ vPortFree(msg);  // 释放内存
 | 任务划分不合理 | 按功能模块划分为 4 个独立任务 + 1 个定时器 | freertos.c:250-274 |
 | 优先级设计不当 | 根据实时性要求设计:Input(High) > Sensor(Normal) > Screen(BelowNormal) ≈ BLE(Low) | freertos.c:63-103 |
 | 忘记使用互斥锁 | 创建 `i2c1Mutex` 保护 I2C1 总线,所有访问前必须获取 | freertos.c:199, SensorTask.c:168-170 |
-| 阻塞函数占用 CPU | UART 使用 DMA 发送,异步不阻塞 | BleTask.c:58 |
+| 阻塞函数占用 CPU | UART 使用 DMA 发送,并在等待完成时通过 `osDelay(1)` 让出 CPU | BleTask.c:58 |
 | 内存泄漏 | 明确约定:SensorTask 分配,BLETask 释放 | SensorTask.c:43, BleTask.c:69 |
 ### 6.3 学完这个项目后,下一步可以挑战什么
 
