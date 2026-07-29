@@ -1,0 +1,76 @@
+---
+sidebar_position: 3.2
+---
+# 【技巧】微秒级延时
+
+## 原理介绍
+
+### DWT 和 CYCCNT
+
+`DWT`（Data Watchpoint and Trace）是 Cortex-M 内核自带的调试与追踪模块，
+其中的 `CYCCNT` 是一个按 **CPU 时钟周期** 递增的 32 位计数器。
+
+开启 `CYCCNT` 后，它会从 0 开始持续计数。我们在进入延时函数时先记录起始值，
+再根据系统主频计算目标周期数：
+
+- `1 us` 对应的周期数：`SystemCoreClock / 1000000`
+- `N us` 对应的周期数：`N * (SystemCoreClock / 1000000)`
+
+最后通过轮询 `CYCCNT` 的差值是否达到目标周期数来实现微秒级延时。
+这种方式不依赖定时器外设，精度高、实现简单，适合短延时场景。
+
+## 代码
+
+创建usDelay.c和usDelay.h文件，分别粘贴以下代码：
+
+usDelay.c
+```c
+#include "usDelay.h"
+
+void DWT_Init(void) {
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // 开启 TRC
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;          // 开启 CYCCNT 计数器
+}
+
+void delay_us(uint32_t us) {
+    uint32_t startTick = DWT->CYCCNT;
+    uint32_t delayTicks = us * (SystemCoreClock / 1000000);
+    while ((DWT->CYCCNT - startTick) < delayTicks);
+}
+```
+
+usDelay.h
+```c
+#ifndef __US_DELAY_H
+#define __US_DELAY_H
+
+#include "stm32f1xx_hal.h"
+
+void DWT_Init(void);
+void delay_us(uint32_t us);
+
+#endif /* __US_DELAY_H */
+```
+
+使用CMake工程的小伙伴别忘记将usDelay.c加入target_sources
+
+然后即可在main函数中使用了：
+
+```c
+  /* USER CODE BEGIN 2 */
+  DWT_Init(); // 初始化 DWT
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+    delay_us(10); // Delay for 10 microseconds
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+    delay_us(10); // Delay for 10 microseconds
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+```
