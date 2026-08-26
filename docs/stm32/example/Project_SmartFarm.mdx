@@ -11,6 +11,14 @@ sidebar_position: 100
  <a href="https://pan.baud-dance.com/d/r2/SmartFarm_cubeIDE.7z" class="source_download_button" target="_blank">下载代码(CubeIDE)</a>
  <a href="https://pan.baud-dance.com/d/r2/SmartFarm_keil.7z" class="source_download_button" target="_blank">下载代码(keil)</a>
 
+
+
+:::tip 🎬 视频介绍
+
+<a href="https://b23.tv/3yIIXtH" target="_blank" rel="noopener noreferrer"><strong>点击观看：【开源】STM32 智慧农场</strong></a>
+
+:::
+
 ## 一、项目整体介绍
 
 ### 1.1 这个项目是做什么的
@@ -55,20 +63,24 @@ sidebar_position: 100
 
 ### 2.1 系统由哪些模块组成
 
-从**硬件模块**看,系统包含:
+ <a href="https://pan.baud-dance.com/d/r2/SmartFarm_ModuleData.zip" class="source_download_button" target="_blank">点击下载智慧农场模块资料</a>
+
+<div style={{ height: '24px' }}></div>
 
 | 模块 | 功能 | 通信接口 |
 |------|------|----------|
 | AHT20 | 温湿度传感器 | I2C1 |
 | OLED | 显示屏 | I2C1 |
-| 土壤湿度传感器 | 检测土壤湿度 | ADC2 |
-| 光照传感器 | 检测光照强度 | 软件 I2C |
-| 降雨量传感器 | 检测降雨量 | ADC1 |
-| 水泵 | 自动灌溉 | GPIO |
+| 土壤湿度传感器 （YL-69） | 检测土壤湿度 | ADC2 |
+| 光照传感器 (GY-30) | 检测光照强度 | 软件 I2C |
+| 降雨量传感器 (YL-83) | 检测降雨量 | ADC1 |
+| 水泵 (MOS驱动：HW-517) | 自动灌溉 | GPIO |
 | 蜂鸣器 | 报警提示 | GPIO + 定时器 |
 | 按键 | 用户输入 | GPIO |
 | 旋钮 | 参数调节 | GPIO |
 | 蓝牙模块 | 无线通信 | UART3 + DMA |
+
+
 
 #### 硬件连接说明
 
