@@ -1,29 +1,36 @@
-# 如何查找我遇到的问题
+# 常见问题解决
 
-首先，看看在以下哪一步中遇到了问题？
+import Link from '@docusaurus/Link';
+import styles from '@site/src/css/faq.module.css';
 
-## 📌 我在安装 cubeIDE 时遇到问题
-
-- 我的安装包打不开：[**解决方法🔗**](docs/stm32/FAQ/InstallError.mdx)
-
-- 我不能登录 ST 账号
-
-    - 可以查看详细登录方法：[**详细登录方法🔗**](docs/stm32/FAQ/login.mdx)
-
-    - 我的电脑不能联网：[**绕过登录，手动安装芯片包🔗**](docs\stm32\FAQ\manualInstall.mdx)
-
-## 📌 我在下载程序时遇到问题
-
-先根据下面截图对比报错信息，找到具体原因
 :::tip
 提示：如果不显示底部 `Console` 栏，可以先 [**恢复显示布局🔗**](docs\stm32\FAQ\resetLayout.mdx)
 :::
-#### 1️⃣ 找不到目标芯片
 
-解决方法：[**找不到目标芯片🔗**](docs\stm32\FAQ\CompilationFailed.mdx)
+## 之前能下载，突然下载失败还报错
 
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
-<img src={require('./img/DownloadError/errorNoTarget_zip.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 6PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/intro/报错noDev2.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+错误原因 **Target no Device found**。这是软件关闭了芯片的调试接口导致的，非常常见。
+
+<div className={styles.solutionRow}>
+  <span>解决方法也很简单：</span>
+  <Link className={styles.solutionLink} to="/docs/stm32/FAQ/CompilationFailed"><span>查看解决步骤</span><span aria-hidden="true">→</span></Link>
+</div>
+
+## 第一次下载就报错了
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/intro/报错noDev2.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+错误原因 **Target no Device found**。这是软件关闭了芯片的调试接口导致的，非常常见。
+
+<div className={styles.solutionRow}>
+  <span>解决方法也很简单：</span>
+  <Link className={styles.solutionLink} to="/docs/stm32/FAQ/CompilationFailed"><span>查看解决步骤</span><span aria-hidden="true">→</span></Link>
 </div>
 
 #### 2️⃣ TCP 端口被其他软件占用
@@ -72,3 +79,15 @@ ST 官方会不定期推送 STLINK 的固件更新，[**升级方法🔗**](docs
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
 <img src={require('./img/DownloadError/run_project.png').default} alt="gpio config" width="460px" />
 </div>
+
+--- 
+
+## 在安装 cubeIDE 时遇到问题
+
+- 我的安装包打不开：[**解决方法🔗**](docs/stm32/FAQ/InstallError.mdx)
+
+- 我不能登录 ST 账号
+
+    - 可以查看详细登录方法：[**详细登录方法🔗**](docs/stm32/FAQ/login.mdx)
+
+    - 我的电脑不能联网：[**绕过登录，手动安装芯片包🔗**](docs\stm32\FAQ\manualInstall.mdx)

@@ -1,0 +1,41 @@
+.solutionRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 28px;
+}
+
+.solutionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 24%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ifm-color-primary) 7%, transparent);
+  color: var(--ifm-color-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.solutionLink > span:first-child {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.solutionLink:hover {
+  border-color: var(--ifm-color-primary);
+  background: color-mix(in srgb, var(--ifm-color-primary) 13%, transparent);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.solutionLink:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 3px;
+}
