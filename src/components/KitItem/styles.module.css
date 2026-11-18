@@ -12,75 +12,58 @@
 
 .item {
   display: grid;
-  grid-template-columns: 168px minmax(0, 1fr);
+  grid-template-columns: 192px minmax(0, 1fr);
   align-items: center;
-  gap: 24px;
-  padding: 16px 0;
+  gap: 28px;
+  padding: 20px 0;
 }
 
 .photo {
   display: block;
   width: 100%;
-  height: 126px;
+  height: auto;
+  aspect-ratio: 4 / 3;
   object-fit: contain;
   border-radius: 6px;
 }
 
 .details {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: baseline;
-  gap: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   min-width: 0;
 }
 
 .details .title {
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1.25rem;
+  font-weight: 600;
   line-height: 1.5;
-  text-wrap: balance;
   overflow-wrap: anywhere;
 }
 
 .number {
   color: var(--ifm-color-primary);
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
   line-height: 1.5;
-}
-
-.namePart {
-  display: inline-block;
-  max-width: 100%;
-  vertical-align: top;
-}
-
-.details .quantity {
-  grid-column: 2;
-  margin: 0;
-  color: var(--ifm-color-emphasis-700);
-  font-size: 0.9375rem;
-  white-space: nowrap;
 }
 
 @media (max-width: 576px) {
   .item {
-    grid-template-columns: clamp(136px, 44%, 180px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
     gap: 16px;
-    padding: 12px 0;
-  }
-
-  .photo {
-    height: auto;
-    aspect-ratio: 4 / 3;
+    padding: 16px 0;
   }
 
   .details {
-    column-gap: 8px;
+    gap: 4px;
   }
 
   .details .title {
-    font-size: 1rem;
+    font-size: 1.0625rem;
   }
 }
