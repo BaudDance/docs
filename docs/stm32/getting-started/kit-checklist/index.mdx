@@ -3,144 +3,135 @@ sidebar_position: 1.16
 sidebar_label: "📦 套件开箱"
 title: "📦 套件开箱"
 slug: /stm32/getting-started/kit-checklist
-description: "核对 STM32 学习套件中的模块、线材和配件，了解每件物品的用途与对应教程。"
+description: "STM32 学习套件开箱清单：按图片核对物品名称与数量。"
 ---
 
+import Link from '@docusaurus/Link';
 import { KitItem } from '@site/src/components/KitItem';
 import styles from '@site/src/components/KitItem/styles.module.css';
+import actionStyles from '@site/src/css/faq.module.css';
 
 # 📦 套件开箱
 
-拿到套件后，可以在这里清点物品，认识各个模块、线材和配件。
-
-除了学习板，还有 **4 种线材、6 种模块**，以及说明书、透明收纳盒各 1 份。
-
-## 装箱对照表
-
-{/* 图片编号与 maintenance.txt 的补图清单对应；已填写基础规格与用途，详细参数可继续补充。 */}
+请按下列图片核对套件内的物品与数量。
 
 <div className={styles.list}>
   <div id="kit-item-01">
     <KitItem
       number="01"
       name="STM32 学习板"
-      quantity="1 个"
-      specs="STM32 单片机学习板。"
-      usage="编写的代码下载进学习板，实现各种功能和控制。中心位置就是 STM32F103C8T6 主芯片。"
+      quantity="1个"
+      image={require('./img/stm32-board.png').default}
     />
   </div>
   <div id="kit-item-02">
     <KitItem
       number="02"
       name="STLINK 调试器及排线"
-      quantity="1 个"
-      specs="STLINK V2，含调试灰排线；排线已插在调试器上，并用皮筋固定。"
-      usage="连接电脑与学习板，用于下载程序和调试。"
+      quantity="1个"
+      image={require('./img/stlink-debugger.png').default}
     />
   </div>
   <div id="kit-item-03">
     <KitItem
       number="03"
       name="USB-C 数据线"
-      quantity="1 根"
-      specs="USB-A 转 USB-C，1 米，白色。"
-      usage="连接电脑与学习板，实现 USB 串口通信。提示：下载程序使用上面的 STLINK，而不是这跟数据线哦。"
+      quantity="1根"
+      image={require('./img/usb-c-cable.png').default}
     />
   </div>
   <div id="kit-item-04">
     <KitItem
       number="04"
       name="NTC 热敏线"
-      quantity="1 根"
-      specs="NTC 热敏线，长 0.5 米。"
-      usage="感知温度变化，用于温度采集实验。"
+      quantity="1根"
+      image={require('./img/ntc-cable.png').default}
     />
   </div>
   <div id="kit-item-05">
     <KitItem
       number="05"
       name="杜邦线"
-      quantity="1 组"
-      specs="含 3P 线 1 根、4P 线 1 根、1P 线 10 根。"
-      usage="蓝牙模块、电机驱动模块、超声波模块均使用 4P 线；循迹模块使用 3P 线。"
+      quantity="1组"
+      image={require('./img/dupont-wires.png').default}
     />
   </div>
   <div id="kit-item-06">
     <KitItem
       number="06"
       name="马达组件"
-      quantity="1 包"
-      specs="含 130 带线马达、604 桨叶、支架。"
-      usage="配合电机驱动模块，学习电机驱动控制。"
+      quantity="1包"
+      image={require('./img/motor-kit.png').default}
     />
   </div>
   <div id="kit-item-07">
     <KitItem
       number="07"
       name="舵机"
-      quantity="1 套"
-      specs="含舵机、摇臂、螺丝。"
-      usage="通过控制信号调整摇臂位置，用于角度控制实验。"
+      quantity="1套"
+      image={require('./img/servo.png').default}
     />
   </div>
   <div id="kit-item-08">
     <KitItem
       number="08"
       name="循迹模块"
-      quantity="1 个"
-      specs="TCRT5000 循迹传感器模块。"
-      usage="检测表面反射，用于黑白线识别与计数实验。"
+      quantity="1个"
+      image={require('./img/line-tracking-module.png').default}
     />
   </div>
   <div id="kit-item-09">
     <KitItem
       number="09"
       name="超声波测距模块"
-      quantity="1 个"
-      specs="HC-SR04P 超声波测距模块。"
-      usage="通过超声波回波测量与前方物体的距离。"
+      quantity="1个"
+      image={require('./img/ultrasonic-module.png').default}
     />
   </div>
   <div id="kit-item-10">
     <KitItem
       number="10"
       name="电机驱动模块"
-      quantity="1 个"
-      specs="DRV8833 电机驱动模块。"
-      usage="接收学习板的控制信号，驱动马达并控制转速和方向。"
+      quantity="1个"
+      image={require('./img/motor-driver.png').default}
     />
   </div>
   <div id="kit-item-11">
     <KitItem
       number="11"
       name="蓝牙模块"
-      quantity="1 个"
-      specs="蓝牙透传模块，型号为 DX-BT24 或 BD-BT26。"
-      usage="建立无线数据连接，用于蓝牙通信实验。"
+      quantity="1个"
+      image={require('./img/bluetooth-module.png').default}
     />
   </div>
   <div id="kit-item-12">
     <KitItem
       number="12"
       name="说明书"
-      quantity="1 份"
-      specs="套件配套说明书。"
-      usage="上手指南。"
+      quantity="1份"
+      image={require('./img/manual.png').default}
     />
   </div>
   <div id="kit-item-13">
     <KitItem
       number="13"
       name="透明收纳盒（带内衬托盘）"
-      quantity="1 个"
-      specs="透明收纳盒，含内衬托盘。"
-      usage="分类收纳学习板、模块和线材，方便取用与整理。"
+      quantity="1个"
+      image={require('./img/storage-box.png').default}
     />
   </div>
 </div>
 
-我们会努力保证装箱正确~ 若确有缺失请及时联系客服哦~
+**如有缺失，请联系客服。**
 
-## 核对完成后
-
-前往 [**从这里开始🔗**](../getting-started.mdx)，开始学习和使用套件。
+<div className={actionStyles.solutionRow}>
+  <span>**完成后，可以跟随视频教程开始学习啦：**</span>
+  <Link
+    className={actionStyles.solutionLink}
+    to="https://www.bilibili.com/video/BV12v4y1y7uV/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <span>观看视频教程</span><span aria-hidden="true">→</span>
+  </Link>
+</div>

@@ -12,78 +12,68 @@ import styles from '@site/src/css/faq.module.css';
 提示：如果不显示底部 `Console` 栏，可以先 [**恢复显示布局🔗**](docs\stm32\FAQ\resetLayout.mdx)
 :::
 
-## 之前能下载，突然下载失败还报错
+## 之前能下载，突然就下载失败，弹红叉报错
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
 <img src={require('./img/intro/报错noDev2.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
-错误原因 **Target no Device found**。这是软件关闭了芯片的调试接口导致的，非常常见。
+如果错误原因是 **Target no Device found**（如图箭头所指）。这是软件关闭了芯片的调试接口导致的，非常常见。
 
 <div className={styles.solutionRow}>
   <span>解决方法也很简单：</span>
   <Link className={styles.solutionLink} to="/docs/stm32/FAQ/CompilationFailed"><span>查看解决步骤</span><span aria-hidden="true">→</span></Link>
 </div>
 
-## 第一次下载就报错了
+## 第一次下载，弹窗问 Yes 还是 No
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
-<img src={require('./img/intro/报错noDev2.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+<img src={require('./img/intro/报错oldVersion2.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
-错误原因 **Target no Device found**。这是软件关闭了芯片的调试接口导致的，非常常见。
+这是正常的，因为调试器固件会不断更新，第一次用往往会提示需要更新。
 
 <div className={styles.solutionRow}>
-  <span>解决方法也很简单：</span>
-  <Link className={styles.solutionLink} to="/docs/stm32/FAQ/CompilationFailed"><span>查看解决步骤</span><span aria-hidden="true">→</span></Link>
+  <span>更新一下调试器固件即可：</span>
+  <Link className={styles.solutionLink} to="/docs/stm32/FAQ/STLinkUpdate"><span>查看操作步骤</span><span aria-hidden="true">→</span></Link>
 </div>
 
-#### 2️⃣ TCP 端口被其他软件占用
-
-查看 [**端口占用解决方法🔗**](docs\stm32\FAQ\PortOccupied.mdx)
-
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
-<img src={require('./img/DownloadError/errorOccupied_cut.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 6PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
-</div>
-
-#### 3️⃣ 需要先升级 STLINK 固件
-
-ST 官方会不定期推送 STLINK 的固件更新，[**升级方法🔗**](docs\stm32\FAQ\STLinkUpdate.mdx)
-
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "0px"}}>
-<img src={require('./img/STLinkUpdate/linkNewVersion.png').default} alt="升级提示" width="460px" />
-</div>
-
-#### 4️⃣ 未安装 GDB Server 程序
-
-解决方法：[**安装 GDB SERVER 🔗**](docs\stm32\FAQ\NoServer.mdx)
+## 报错 ST-Link Server 需要下载
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
-<img src={require('./img/DownloadError/noDebugSession.png').default} alt="noTitle" width="460px" />
+<img src={require('./img/intro/报错noServer.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
 
-#### 5️⃣ 编写的代码有错误
+电脑缺少 ST-LINK Server 程序，下载安装即可解决。
 
-代码有错无法生成下载文件，改正错误即可。可以参考 [**如何解决代码报错 🔗**](docs\stm32\FAQ\index.mdx) // TODO：添加此问题的文档
-
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
-<img src={require('./img/DownloadError/errorCode_mark.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 6PX 4PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+<div className={styles.solutionRow}>
+  <span>下载链接：</span>
+  <Link className={styles.solutionLink} to="/docs/stm32/FAQ/NoServer"><span>下载 Server 程序</span><span aria-hidden="true">→</span></Link>
 </div>
 
-#### 6️⃣ 没有可下载工程
-
-因为下载按钮是从历史记录找“上次下载的工程”
-
-新工程有可能找不到，需要右键工程，选择 `Run as` 下载（如图）
-
-如此操作一次，后面即可正常
+## 点绿色箭头弹提示框，然后什么反应都没有
 
 <div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
-<img src={require('./img/DownloadError/errorNoRecent.png').default} alt="noTitle" width="460px" style={{boxShadow: "0px 0px 0PX 0PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+<img src={require('./img/intro/报错unableToLaunch.png').default} alt="noTitle" width="520px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
-<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "50px"}}>
-<img src={require('./img/DownloadError/run_project.png').default} alt="gpio config" width="460px" />
+
+第一次需要右键工程，选择 run as 来下载，如下图所示：
+
+之后就可以正常通过绿色箭头来下载了。
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/intro/右键工程下载.png').default} alt="noTitle" width="600px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
 </div>
+
+## 点下载时，弹窗问 Proceed 还是 Cancel
+
+<div style={{ display: "flex", justifyContent: "left", alignItems: "center", marginBottom: "20px", marginBottom: "20px"}}>
+<img src={require('./img/intro/报错编译失败.png').default} alt="noTitle" width="600px" style={{boxShadow: "0px 0px 8PX 5PX rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)"}}/>
+</div>
+
+这个报错是因为编写的代码中存在语法错误，这样没办法编译成可执行文件。
+
+解决掉代码中的语法错误，即可正常下载。
 
 --- 
 
